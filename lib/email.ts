@@ -1,7 +1,18 @@
 // lib/email.ts
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy-load Resend to avoid build errors when API key is not set
+let resend: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 // Use your verified domain in production, or onboarding@resend.dev for testing
 const FROM_EMAIL = process.env.FROM_EMAIL || 'PRBuild <onboarding@resend.dev>';
@@ -16,7 +27,7 @@ export async function sendJournalistVerificationEmail(
 ) {
   const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/journalist/verify?token=${verificationToken}`;
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: 'Verify your PRBuild subscription',
@@ -93,7 +104,7 @@ export async function sendNewsletterEmail(
     </div>
   `).join('');
 
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: subject,
@@ -155,7 +166,7 @@ export async function sendClientNotification(
   ctaText?: string,
   ctaUrl?: string
 ) {
-  const { data, error } = await resend.emails.send({
+  const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: `PRBuild: ${subject}`,
