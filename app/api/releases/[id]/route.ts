@@ -1,0 +1,112 @@
+// app/api/releases/[id]/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+// GET - Get a single release
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: release, error } = await supabase
+      .from('release_requests')
+      .select('*')
+      .eq('id', params.id)
+      .single();
+
+    if (error || !release) {
+      return NextResponse.json({ error: 'Release not found' }, { status: 404 });
+    }
+
+    // Check access - admin can see all, clients can only see own
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'admin' && release.client_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    return NextResponse.json({ release });
+  } catch (error) {
+    console.error('Error fetching release:', error);
+    return NextResponse.json({ error: 'Failed to fetch release' }, { status: 500 });
+  }
+}
+
+// PATCH - Update a release
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { data: release } = await supabase
+      .from('release_requests')
+      .select('client_id')
+      .eq('id', params.id)
+      .single();
+
+    if (!release) {
+      return NextResponse.json({ error: 'Release not found' }, { status: 404 });
+    }
+
+    // Check access
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profile?.role !== 'admin' && release.client_id !== user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    
+    // Remove fields that shouldn't be updated directly
+    const { id, client_id, created_at, ...updates } = body;
+
+    const { data: updated, error } = await supabase
+      .from('release_requests')
+      .update({
+        ...updates,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', params.id)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Log activity
+    await supabase.from('activity_log').insert({
+      release_request_id: params.id,
+      user_id: user.id,
+      action: 'release_updated',
+      details: { fields: Object.keys(updates) },
+    });
+
+    return NextResponse.json({ release: updated });
+  } catch (error) {
+    console.error('Error updating release:', error);
+    return NextResponse.json({ error: 'Failed to update release' }, { status: 500 });
+  }
+}
