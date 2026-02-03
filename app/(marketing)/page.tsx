@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, FileText, Users, Send, Zap, Target, Shield, ArrowRight, Check, Star, Menu, X, ChevronDown, AlertTriangle, Quote } from 'lucide-react';
 import { PricingSection } from '@/components/landing/pricing-section';
+import { ExitIntentPopup } from '@/components/ExitIntent';
+import { StickyCTA } from '@/components/StickyCTA';
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -600,6 +602,10 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Conversion Components */}
+      <ExitIntentPopup />
+      <StickyCTA />
     </div>
   );
 }

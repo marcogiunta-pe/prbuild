@@ -25,6 +25,14 @@ const FAQ_ITEMS = [
     question: "How long does it take to get my press release?",
     answer: "Most releases are ready for your review within 24-48 hours. After you submit your news details, our team writes the draft, runs it through our journalist panel, and sends you everything with actionable feedback. Rush delivery is available on Pro plans."
   },
+  {
+    question: "Who are the 16 journalist personas?",
+    answer: "Our journalist personas are AI models trained on real journalist preferences across different beats: tech, business, lifestyle, local news, trade publications, and more. Each persona evaluates your release from their specific perspective, providing feedback on newsworthiness, clarity, and what would make them actually cover your story."
+  },
+  {
+    question: "What does the pickup rate mean?",
+    answer: "Pickup rate measures journalist engagement within 7 days of distribution. This includes opens, clicks, replies, and coverage. The industry average for wire services is around 2%. Our higher rate comes from sending releases only to journalists who specifically requested news in your category."
+  },
 ];
 
 export function PricingSection() {

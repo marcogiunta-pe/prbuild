@@ -76,7 +76,7 @@ export function FAQSchema() {
   const faqs = [
     {
       question: 'What do I get with my first free release?',
-      answer: 'Your first press release includes professional AI + human writing, review by 16 journalist personas, unlimited revisions, showcase publication, and newsletter distribution to opted-in journalists.'
+      answer: 'Your first press release includes professional AI + human writing, review by 16 journalist personas, unlimited revisions, showcase publication, and newsletter distribution to opted-in journalists. No credit card required.'
     },
     {
       question: 'How is this different from PRWeb or PR Newswire?',
@@ -89,6 +89,14 @@ export function FAQSchema() {
     {
       question: 'What if I\'m not happy with my press release?',
       answer: 'We offer unlimited revisions until you\'re satisfied. Our process includes feedback from 16 journalist personas, so you\'ll see exactly what needs improvement before approving.'
+    },
+    {
+      question: 'Who are the 16 journalist personas?',
+      answer: 'Our journalist personas are AI models trained on real journalist preferences across different beats: tech, business, lifestyle, local news, trade publications, and more. Each persona evaluates your release from their specific perspective.'
+    },
+    {
+      question: 'What does the pickup rate mean?',
+      answer: 'Pickup rate measures journalist engagement within 7 days of distribution, including opens, clicks, replies, and coverage. Our higher rate comes from sending releases only to journalists who specifically requested news in your category.'
     }
   ];
 
