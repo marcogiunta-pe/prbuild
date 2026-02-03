@@ -12,6 +12,8 @@ import { ExitIntentPopup } from '@/components/ExitIntent';
 import { StickyCTA } from '@/components/StickyCTA';
 import { AnimatedStatsBanner } from '@/components/AnimatedStats';
 import { ROICalculator } from '@/components/ROICalculator';
+import { TestimonialsCarousel } from '@/components/TestimonialsCarousel';
+import { TrustBadges } from '@/components/TrustBadges';
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -532,25 +534,20 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Testimonial */}
+        {/* Testimonials Carousel */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <Quote className="h-12 w-12 text-primary/20 mx-auto mb-6" />
-              <blockquote className="text-2xl md:text-3xl font-medium text-gray-900 mb-6">
-                "PRWeb: $400. Result: 2 clicks, zero coverage.<br className="hidden md:block" />
-                PRBuild: $19. Result: TechCrunch DM'd us."
-              </blockquote>
-              <div className="flex items-center justify-center gap-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <span className="text-primary font-bold">SK</span>
-                </div>
-                <div className="text-left">
-                  <div className="font-semibold text-gray-900">Sarah Kim</div>
-                  <div className="text-sm text-gray-600">Head of Marketing, TechFlow (Series A)</div>
-                </div>
-              </div>
-            </div>
+            <h2 className="text-3xl font-bold text-center mb-12">
+              What Our Customers Say
+            </h2>
+            <TestimonialsCarousel />
+          </div>
+        </section>
+
+        {/* Trust Badges */}
+        <section className="py-8 bg-gray-50 border-y border-gray-100">
+          <div className="container mx-auto px-4">
+            <TrustBadges />
           </div>
         </section>
 
@@ -611,6 +608,7 @@ export default function LandingPage() {
                 <li><Link href="/for/saas" className="hover:text-white">For SaaS</Link></li>
                 <li><Link href="/for/agencies" className="hover:text-white">For Agencies</Link></li>
                 <li><Link href="/for/ecommerce" className="hover:text-white">For E-commerce</Link></li>
+                <li><Link href="/for/nonprofits" className="hover:text-white">For Nonprofits</Link></li>
               </ul>
             </div>
 
@@ -619,10 +617,10 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/resources/press-release-template" className="hover:text-white">Press Release Template</Link></li>
                 <li><Link href="/resources/how-to-write-press-release" className="hover:text-white">How to Write a PR</Link></li>
+                <li><Link href="/resources/press-release-examples" className="hover:text-white">Press Release Examples</Link></li>
+                <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
                 <li><Link href="/compare/prweb" className="hover:text-white">vs PRWeb</Link></li>
                 <li><Link href="/compare/pr-newswire" className="hover:text-white">vs PR Newswire</Link></li>
-                <li><Link href="/compare/business-wire" className="hover:text-white">vs Business Wire</Link></li>
-                <li><Link href="/compare/globenewswire" className="hover:text-white">vs GlobeNewswire</Link></li>
                 <li><Link href="/compare/cision" className="hover:text-white">vs Cision</Link></li>
               </ul>
             </div>
