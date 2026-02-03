@@ -4,6 +4,19 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
+  // Skip middleware for static files and SEO files
+  if (
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname === '/site.webmanifest' ||
+    pathname.endsWith('.ico') ||
+    pathname.endsWith('.png') ||
+    pathname.endsWith('.jpg') ||
+    pathname.endsWith('.svg')
+  ) {
+    return NextResponse.next();
+  }
+
   // Public routes that don't require authentication
   const publicRoutes = ['/', '/login', '/signup', '/showcase', '/privacy', '/terms', '/about', '/contact', '/journalist'];
   const isPublicRoute = publicRoutes.some(route => 
