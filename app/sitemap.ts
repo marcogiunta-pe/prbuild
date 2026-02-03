@@ -4,6 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://prbuild.vercel.app';
   
   return [
+    // Core pages
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -34,12 +35,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    // Comparison pages (high SEO value)
     {
       url: `${baseUrl}/compare/prweb`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/compare/pr-newswire`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    // Use case pages
+    {
+      url: `${baseUrl}/for/startups`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    // Resource pages
+    {
+      url: `${baseUrl}/resources/press-release-template`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    // Legal pages
     {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
