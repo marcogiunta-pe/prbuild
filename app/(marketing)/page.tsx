@@ -609,6 +609,7 @@ export default function LandingPage() {
                 <li><Link href="/for/agencies" className="hover:text-white">For Agencies</Link></li>
                 <li><Link href="/for/ecommerce" className="hover:text-white">For E-commerce</Link></li>
                 <li><Link href="/for/nonprofits" className="hover:text-white">For Nonprofits</Link></li>
+                <li><Link href="/for/healthcare" className="hover:text-white">For Healthcare</Link></li>
               </ul>
             </div>
 
@@ -618,16 +619,18 @@ export default function LandingPage() {
                 <li><Link href="/resources/press-release-template" className="hover:text-white">Press Release Template</Link></li>
                 <li><Link href="/resources/how-to-write-press-release" className="hover:text-white">How to Write a PR</Link></li>
                 <li><Link href="/resources/press-release-examples" className="hover:text-white">Press Release Examples</Link></li>
+                <li><Link href="/resources/pr-distribution-checklist" className="hover:text-white">Distribution Checklist</Link></li>
                 <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
                 <li><Link href="/compare/prweb" className="hover:text-white">vs PRWeb</Link></li>
-                <li><Link href="/compare/pr-newswire" className="hover:text-white">vs PR Newswire</Link></li>
                 <li><Link href="/compare/cision" className="hover:text-white">vs Cision</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/about" className="hover:text-white">About</Link></li>
+                <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
                 <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
                 <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
                 <li><Link href="/journalist/subscribe" className="hover:text-white">For Journalists</Link></li>
