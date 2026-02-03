@@ -31,7 +31,6 @@ export default function LandingPage() {
             </Link>
             <Link href="/showcase" className="text-sm font-medium text-gray-600 hover:text-primary">
               Showcase
-              <Badge variant="secondary" className="ml-1 text-xs">Soon</Badge>
             </Link>
             <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary">
               Login
@@ -597,7 +596,7 @@ export default function LandingPage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            <p>© 2026 PRBuild. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} PRBuild. All rights reserved.</p>
           </div>
         </div>
       </footer>
