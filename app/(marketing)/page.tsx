@@ -10,6 +10,7 @@ import { CheckCircle, FileText, Users, Send, Zap, Target, Shield, ArrowRight, Ch
 import { PricingSection } from '@/components/landing/pricing-section';
 import { ExitIntentPopup } from '@/components/ExitIntent';
 import { StickyCTA } from '@/components/StickyCTA';
+import { AnimatedStatsBanner } from '@/components/AnimatedStats';
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -209,6 +210,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Animated Stats Banner */}
+        <AnimatedStatsBanner />
 
         {/* Pain Points Section */}
         <section className="py-20 bg-gray-50">
@@ -560,15 +564,18 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-12 bg-gray-900 text-gray-400">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
+          <div className="grid md:grid-cols-6 gap-8">
+            <div className="md:col-span-2">
               <Link href="/" className="flex items-center space-x-2 mb-4">
                 <FileText className="h-6 w-6 text-white" />
                 <span className="text-xl font-bold text-white">PRBuild</span>
               </Link>
-              <p className="text-sm">
-                AI-powered press releases with human quality control.
+              <p className="text-sm mb-4">
+                AI-powered press releases with human quality control. 16 journalist personas review every release.
               </p>
+              <Link href="/referral" className="text-sm text-secondary hover:text-secondary/80">
+                Referral Program: Give $10, Get $10 →
+              </Link>
             </div>
             
             <div>
@@ -577,14 +584,27 @@ export default function LandingPage() {
                 <li><Link href="#features" className="hover:text-white">Features</Link></li>
                 <li><Link href="#pricing" className="hover:text-white">Pricing</Link></li>
                 <li><Link href="/showcase" className="hover:text-white">Showcase</Link></li>
+                <li><Link href="/signup" className="hover:text-white">Start Free Trial</Link></li>
               </ul>
             </div>
             
             <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <h4 className="text-white font-semibold mb-4">Use Cases</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/about" className="hover:text-white">About</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+                <li><Link href="/for/startups" className="hover:text-white">For Startups</Link></li>
+                <li><Link href="/for/agencies" className="hover:text-white">For Agencies</Link></li>
+                <li><Link href="/for/ecommerce" className="hover:text-white">For E-commerce</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/resources/press-release-template" className="hover:text-white">Press Release Template</Link></li>
+                <li><Link href="/resources/how-to-write-press-release" className="hover:text-white">How to Write a PR</Link></li>
+                <li><Link href="/compare/prweb" className="hover:text-white">PRBuild vs PRWeb</Link></li>
+                <li><Link href="/compare/pr-newswire" className="hover:text-white">PRBuild vs PR Newswire</Link></li>
+                <li><Link href="/compare/business-wire" className="hover:text-white">PRBuild vs Business Wire</Link></li>
               </ul>
             </div>
             
@@ -593,6 +613,7 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
                 <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
+                <li><Link href="/journalist/subscribe" className="hover:text-white">For Journalists</Link></li>
               </ul>
             </div>
           </div>
