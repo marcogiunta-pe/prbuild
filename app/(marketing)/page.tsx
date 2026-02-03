@@ -11,6 +11,7 @@ import { PricingSection } from '@/components/landing/pricing-section';
 import { ExitIntentPopup } from '@/components/ExitIntent';
 import { StickyCTA } from '@/components/StickyCTA';
 import { AnimatedStatsBanner } from '@/components/AnimatedStats';
+import { ROICalculator } from '@/components/ROICalculator';
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -516,6 +517,21 @@ export default function LandingPage() {
         {/* Pricing */}
         <PricingSection />
 
+        {/* ROI Calculator */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Calculate Your Savings
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                See how much you could save by switching to PRBuild.
+              </p>
+            </div>
+            <ROICalculator />
+          </div>
+        </section>
+
         {/* Testimonial */}
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
@@ -592,6 +608,7 @@ export default function LandingPage() {
               <h4 className="text-white font-semibold mb-4">Use Cases</h4>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/for/startups" className="hover:text-white">For Startups</Link></li>
+                <li><Link href="/for/saas" className="hover:text-white">For SaaS</Link></li>
                 <li><Link href="/for/agencies" className="hover:text-white">For Agencies</Link></li>
                 <li><Link href="/for/ecommerce" className="hover:text-white">For E-commerce</Link></li>
               </ul>
@@ -602,9 +619,11 @@ export default function LandingPage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/resources/press-release-template" className="hover:text-white">Press Release Template</Link></li>
                 <li><Link href="/resources/how-to-write-press-release" className="hover:text-white">How to Write a PR</Link></li>
-                <li><Link href="/compare/prweb" className="hover:text-white">PRBuild vs PRWeb</Link></li>
-                <li><Link href="/compare/pr-newswire" className="hover:text-white">PRBuild vs PR Newswire</Link></li>
-                <li><Link href="/compare/business-wire" className="hover:text-white">PRBuild vs Business Wire</Link></li>
+                <li><Link href="/compare/prweb" className="hover:text-white">vs PRWeb</Link></li>
+                <li><Link href="/compare/pr-newswire" className="hover:text-white">vs PR Newswire</Link></li>
+                <li><Link href="/compare/business-wire" className="hover:text-white">vs Business Wire</Link></li>
+                <li><Link href="/compare/globenewswire" className="hover:text-white">vs GlobeNewswire</Link></li>
+                <li><Link href="/compare/cision" className="hover:text-white">vs Cision</Link></li>
               </ul>
             </div>
             
