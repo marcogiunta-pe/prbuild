@@ -58,7 +58,7 @@ Required variables:
 - `STRIPE_PRO_PRICE_ID` - Stripe price ID for $39 plan
 - `OPENAI_API_KEY` - OpenAI API key
 - `RESEND_API_KEY` - Resend API key
-- `NEXT_PUBLIC_APP_URL` - Your app URL (http://localhost:3000 for dev)
+- `NEXT_PUBLIC_APP_URL` - Your app URL (http://localhost:8765 for dev)
 
 ### 3. Set Up Supabase Database
 
@@ -83,7 +83,7 @@ Required variables:
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Open [http://localhost:8765](http://localhost:8765)
 
 ## Project Structure
 

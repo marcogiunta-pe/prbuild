@@ -62,9 +62,9 @@ export const analytics = {
     trackEvent('signup_completed', 'signup', plan);
   },
 
-  // CTA tracking
-  ctaClicked: (location: string, text: string) => {
-    trackEvent('cta_clicked', 'engagement', `${location}: ${text}`);
+  // CTA tracking (use data-cta on links/buttons)
+  ctaClicked: (location: string, text?: string) => {
+    trackEvent('cta_clicked', 'engagement', text ? `${location}: ${text}` : location);
   },
 
   // Pricing
@@ -126,5 +126,17 @@ export const analytics = {
     trackEvent('error_occurred', 'error', `${errorType}: ${errorMessage}`);
   },
 };
+
+/** Call when a CTA with data-cta is clicked. */
+export function trackCTA(ctaId: string, label?: string) {
+  if (typeof window === 'undefined') return;
+  analytics.ctaClicked(ctaId, label);
+  if (typeof (window as unknown as { plausible?: (name: string, opts?: { props: Record<string, string> }) => void }).plausible === 'function') {
+    (window as unknown as { plausible: (name: string, opts?: { props: Record<string, string> }) => void }).plausible('cta_click', { props: { cta: ctaId } });
+  }
+  if (typeof (window as unknown as { posthog?: { capture: (name: string, props: Record<string, string>) => void } }).posthog?.capture === 'function') {
+    (window as unknown as { posthog: { capture: (name: string, props: Record<string, string>) => void } }).posthog.capture('cta_click', { cta: ctaId });
+  }
+}
 
 export default analytics;

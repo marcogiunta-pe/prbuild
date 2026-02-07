@@ -55,6 +55,25 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        "fade-up": {
+          "0%": { opacity: "0", transform: "translateY(16px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { boxShadow: "0 0 20px rgba(13, 148, 136, 0.15)" },
+          "50%": { boxShadow: "0 0 40px rgba(13, 148, 136, 0.25)" },
+        },
+      },
+      animation: {
+        "fade-up": "fade-up 0.4s ease-out forwards",
+        marquee: "marquee 25s linear infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
+      },
     },
   },
   plugins: [],
