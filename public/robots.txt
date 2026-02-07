@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://prbuild.vercel.app/sitemap.xml
+Sitemap: https://prbuild.com/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /admin/

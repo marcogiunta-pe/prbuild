@@ -47,7 +47,7 @@ const faqs = [
   },
   {
     q: 'I\'m a journalist. How do I get added to your list?',
-    a: 'Visit prbuild.vercel.app/journalist/subscribe to opt-in to receive press releases in your beat areas. You can unsubscribe anytime.',
+    a: 'Visit prbuild.com/journalist/subscribe to opt-in to receive press releases in your beat areas. You can unsubscribe anytime.',
   },
 ];
 

@@ -26,7 +26,7 @@ Then it deploys and gives you a URL like `https://prbuild-xxx.vercel.app`.
 npx vercel --prod
 ```
 
-This deploys to your main production URL (e.g. `prbuild.vercel.app`).
+This deploys to your main production URL (e.g. `prbuild.com`).
 
 ---
 
@@ -53,10 +53,17 @@ In Vercel Dashboard → Project → Settings → Environment Variables, add:
 - `NEXT_PUBLIC_STRIPE_*_MONTHLY` / `*_YEARLY` (all 6 price IDs)
 - `OPENAI_API_KEY`
 - `RESEND_API_KEY`
-- `NEXT_PUBLIC_APP_URL` → your Vercel URL (e.g. `https://prbuild.vercel.app`)
+- `NEXT_PUBLIC_APP_URL` → your Vercel URL (e.g. `https://prbuild.com`)
 
 ---
 
-## Custom domain
+## Custom domain: prbuild.com
 
-In Vercel Dashboard → Project → Settings → Domains, add your domain (e.g. `prbuild.com`).
+1. **Vercel:** Project → **Settings** → **Domains** → **Add** → enter `prbuild.com`
+2. **DNS:** At your domain registrar, add the records Vercel shows:
+   - **A record:** `@` → `76.76.21.21` (Vercel's IP)
+   - **CNAME:** `www` → `cname.vercel-dns.com`
+   - Or use Vercel nameservers if offered
+3. **Supabase:** Add `https://prbuild.com` and `https://www.prbuild.com` to Auth → URL Configuration (redirect URLs)
+4. **Stripe:** Add `https://prbuild.com` to Allowed redirect URLs
+5. **Env:** In Vercel, set `NEXT_PUBLIC_APP_URL` = `https://prbuild.com`

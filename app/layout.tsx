@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://prbuild.vercel.app'),
+  metadataBase: new URL('https://prbuild.com'),
   title: {
     default: 'PRBuild - Professional Press Releases That Get Coverage',
     template: '%s | PRBuild'
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://prbuild.vercel.app',
+    url: 'https://prbuild.com',
     siteName: 'PRBuild',
     title: 'PRBuild - Professional Press Releases That Get Coverage',
     description: 'AI-powered press release writing with human quality control. 16 journalist personas review every release. First release free.',
@@ -83,7 +83,7 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
   
   alternates: {
-    canonical: 'https://prbuild.vercel.app',
+    canonical: 'https://prbuild.com',
   },
   
   category: 'technology',

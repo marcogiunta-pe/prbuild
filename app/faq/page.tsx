@@ -96,7 +96,7 @@ const faqCategories = [
       },
       {
         q: 'Where is my release published?',
-        a: 'Every release is published on our public Showcase (prbuild.vercel.app/showcase), distributed to our journalist email list, and sent to category-specific newsletter subscribers.',
+        a: 'Every release is published on our public Showcase (prbuild.com/showcase), distributed to our journalist email list, and sent to category-specific newsletter subscribers.',
       },
     ],
   },
