@@ -26,7 +26,15 @@ const PRICE_IDS: Record<string, Record<BillingInterval, string>> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const { plan, interval = 'monthly', userId } = await request.json();
+    const supabase = await createClient();
+
+    // Require authentication - never trust userId from request body
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { plan, interval = 'monthly' } = await request.json();
 
     if (!plan || !PRICE_IDS[plan]) {
       return NextResponse.json(
@@ -43,22 +51,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-    
-    // Get user profile
+    // Get user profile (use authenticated user's ID)
     const { data: profile } = await supabase
       .from('profiles')
       .select('email, stripe_customer_id')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single();
+
+    const email = profile?.email ?? user.email;
+    if (!email) {
+      return NextResponse.json(
+        { error: 'Profile must have an email to create checkout' },
+        { status: 400 }
+      );
+    }
 
     let customerId = profile?.stripe_customer_id;
 
     // Create Stripe customer if doesn't exist
-    if (!customerId && profile?.email) {
+    if (!customerId) {
       const customer = await stripe.customers.create({
-        email: profile.email,
-        metadata: { userId },
+        email,
+        metadata: { userId: user.id },
       });
       customerId = customer.id;
 
@@ -66,7 +80,7 @@ export async function POST(request: NextRequest) {
       await supabase
         .from('profiles')
         .update({ stripe_customer_id: customerId })
-        .eq('id', userId);
+        .eq('id', user.id);
     }
 
     // Create checkout session for subscription
@@ -83,13 +97,13 @@ export async function POST(request: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/new-request?session_id={CHECKOUT_SESSION_ID}&plan=${plan}&interval=${interval}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
       metadata: {
-        userId,
+        userId: user.id,
         plan,
         interval,
       },
       subscription_data: {
         metadata: {
-          userId,
+          userId: user.id,
           plan,
           interval,
         },

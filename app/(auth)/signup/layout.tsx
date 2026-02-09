@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Start Free Trial | PRBuild',
     description: 'Your first press release free. No credit card. AI writing, journalist panel review, 23% pickup rate.',
-    url: 'https://prbuild.com/signup',
+    url: 'https://prbuild.ai/signup',
   },
-  alternates: { canonical: 'https://prbuild.com/signup' },
+  alternates: { canonical: 'https://prbuild.ai/signup' },
 };
 
 export default function SignupLayout({ children }: { children: React.ReactNode }) {

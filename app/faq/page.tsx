@@ -96,7 +96,7 @@ const faqCategories = [
       },
       {
         q: 'Where is my release published?',
-        a: 'Every release is published on our public Showcase (prbuild.com/showcase), distributed to our journalist email list, and sent to category-specific newsletter subscribers.',
+        a: 'Every release is published on our public Showcase (prbuild.ai/showcase), distributed to our journalist email list, and sent to category-specific newsletter subscribers.',
       },
     ],
   },
@@ -162,7 +162,7 @@ export default function FAQPage() {
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Everything you need to know about PRBuild. Can't find your answer? 
-            Email us at support@prbuild.com.
+            Email us at support@prbuild.ai.
           </p>
         </div>
       </section>
@@ -203,9 +203,9 @@ export default function FAQPage() {
           <p className="text-lg text-gray-600 mb-8">
             We're here to help. Email us and we'll get back to you within 24 hours.
           </p>
-          <a href="mailto:support@prbuild.com">
+          <a href="mailto:support@prbuild.ai">
             <Button size="lg" variant="outline">
-              Email support@prbuild.com
+              Email support@prbuild.ai
             </Button>
           </a>
         </div>

@@ -108,7 +108,7 @@ export default function NewRequestPage() {
       const response = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan, interval: billingInterval, userId }),
+        body: JSON.stringify({ plan, interval: billingInterval }),
       });
 
       const data = await response.json();

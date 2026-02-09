@@ -75,7 +75,7 @@ export function HeroMockup() {
           </div>
           <div className="flex-1 flex justify-center">
             <div className="bg-white/80 dark:bg-gray-900/80 rounded-md px-2 sm:px-4 py-1.5 text-[10px] sm:text-xs text-gray-500 shadow-inner max-w-[140px] sm:max-w-xs w-full text-center truncate">
-              app.prbuild.com/dashboard
+              app.prbuild.ai/dashboard
             </div>
           </div>
           <div className="w-12" />

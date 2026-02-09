@@ -5,13 +5,13 @@ export function OrganizationSchema() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'PRBuild',
-    url: 'https://prbuild.com',
-    logo: 'https://prbuild.com/logo.png',
+    url: 'https://prbuild.ai',
+    logo: 'https://prbuild.ai/logo.png',
     description: 'AI-powered press release writing with human quality control',
     foundingDate: '2024',
     contactPoint: {
       '@type': 'ContactPoint',
-      email: 'support@prbuild.com',
+      email: 'support@prbuild.ai',
       contactType: 'customer service'
     },
     sameAs: [
@@ -126,10 +126,10 @@ export function WebsiteSchema() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'PRBuild',
-    url: 'https://prbuild.com',
+    url: 'https://prbuild.ai',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://prbuild.com/showcase?q={search_term_string}',
+      target: 'https://prbuild.ai/showcase?q={search_term_string}',
       'query-input': 'required name=search_term_string'
     }
   };

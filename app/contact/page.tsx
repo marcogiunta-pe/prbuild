@@ -17,21 +17,21 @@ const contactOptions = [
     icon: Mail,
     title: 'General Inquiries',
     description: 'Questions about PRBuild or how it works?',
-    contact: 'hello@prbuild.com',
+    contact: 'hello@prbuild.ai',
     response: 'We respond within 24 hours',
   },
   {
     icon: MessageSquare,
     title: 'Customer Support',
     description: 'Need help with your account or releases?',
-    contact: 'support@prbuild.com',
+    contact: 'support@prbuild.ai',
     response: 'We respond within 4 hours',
   },
   {
     icon: Clock,
     title: 'Sales & Enterprise',
     description: 'Agency pricing or custom solutions?',
-    contact: 'sales@prbuild.com',
+    contact: 'sales@prbuild.ai',
     response: 'We respond within 24 hours',
   },
 ];
@@ -43,11 +43,11 @@ const faqs = [
   },
   {
     q: 'Do you offer phone support?',
-    a: 'Not currently. We\'ve found email support allows us to give more thoughtful, detailed responses. For urgent issues, email support@prbuild.com with "URGENT" in the subject.',
+    a: 'Not currently. We\'ve found email support allows us to give more thoughtful, detailed responses. For urgent issues, email support@prbuild.ai with "URGENT" in the subject.',
   },
   {
     q: 'I\'m a journalist. How do I get added to your list?',
-    a: 'Visit prbuild.com/journalist/subscribe to opt-in to receive press releases in your beat areas. You can unsubscribe anytime.',
+    a: 'Visit prbuild.ai/journalist/subscribe to opt-in to receive press releases in your beat areas. You can unsubscribe anytime.',
   },
 ];
 

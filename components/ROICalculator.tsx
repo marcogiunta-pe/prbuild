@@ -107,7 +107,7 @@ export function ROICalculator() {
   const prbuildWidth = (prbuildCost / maxCost) * 100;
 
   const shareText = `I could save $${annualSavings.toLocaleString()}/year switching to @PRBuild 🤯`;
-  const shareUrl = 'https://prbuild.com';
+  const shareUrl = 'https://prbuild.ai';
   const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
 
   const handleShare = useCallback(async () => {

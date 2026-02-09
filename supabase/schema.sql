@@ -272,6 +272,12 @@ CREATE POLICY "Admins manage showcase" ON public.showcase_releases
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
+-- Newsletter sends - admins only
+CREATE POLICY "Admins manage newsletter sends" ON public.newsletter_sends
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
 -- Journalist subscribers - admins only
 CREATE POLICY "Admins manage journalists" ON public.journalist_subscribers
   FOR ALL USING (

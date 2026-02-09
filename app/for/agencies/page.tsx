@@ -247,7 +247,7 @@ export default function AgenciesPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href={tier.price === 'Custom' ? 'mailto:sales@prbuild.com' : '/signup'}>
+                <Link href={tier.price === 'Custom' ? 'mailto:sales@prbuild.ai' : '/signup'}>
                   <Button 
                     className={`w-full ${tier.popular ? 'bg-white text-primary hover:bg-gray-100' : 'bg-secondary hover:bg-secondary/90'}`}
                   >

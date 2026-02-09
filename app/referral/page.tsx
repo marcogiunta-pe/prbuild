@@ -168,7 +168,7 @@ export default function ReferralPage() {
             </p>
             <div className="bg-gray-100 rounded-xl p-4 flex items-center gap-3">
               <div className="flex-1 text-left text-gray-400 text-sm truncate">
-                https://prbuild.com/r/your-unique-code
+                https://prbuild.ai/r/your-unique-code
               </div>
               <Button variant="outline" size="sm" disabled>
                 <Copy className="w-4 h-4 mr-2" />

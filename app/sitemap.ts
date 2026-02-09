@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://prbuild.com';
+  const baseUrl = 'https://prbuild.ai';
   
   return [
     // Core pages

@@ -79,8 +79,29 @@ export async function PATCH(
 
     const body = await request.json();
     
-    // Remove fields that shouldn't be updated directly
-    const { id, client_id, created_at, ...updates } = body;
+    // Whitelist allowed fields to prevent mass assignment
+    const clientAllowedFields = [
+      'client_feedback', 'client_feedback_at', 'client_edited_content',
+      'status', // only for client_feedback, client_approved
+      'admin_refined_content', 'pending_rewrite_content', // when accepting/rejecting rewrite
+    ] as const;
+    const adminAllowedFields = [
+      ...clientAllowedFields,
+      'admin_notes', 'admin_reviewed_by', 'admin_reviewed_at',
+      'ai_selected_headline', 'category', 'tags', 'industry',
+      'quality_score', 'quality_notes', 'quality_reviewed_by', 'quality_reviewed_at',
+      'final_content', 'final_approved_at', 'sent_to_client_at',
+    ] as const;
+    
+    const isAdmin = profile?.role === 'admin';
+    const allowedFields = isAdmin ? adminAllowedFields : clientAllowedFields;
+    const updates: Record<string, unknown> = {};
+    for (const key of allowedFields) {
+      if (body[key] !== undefined) {
+        if (!isAdmin && key === 'status' && !['client_feedback', 'client_approved'].includes(body[key])) continue;
+        updates[key] = body[key];
+      }
+    }
 
     const { data: updated, error } = await supabase
       .from('release_requests')
@@ -94,6 +115,10 @@ export async function PATCH(
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
     }
 
     // Log activity
