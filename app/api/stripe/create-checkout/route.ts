@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
+import { getAppUrl } from '@/lib/app-url';
 import { BillingInterval } from '@/types';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -94,8 +95,8 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/new-request?session_id={CHECKOUT_SESSION_ID}&plan=${plan}&interval=${interval}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing`,
+      success_url: `${getAppUrl()}/dashboard/new-request?session_id={CHECKOUT_SESSION_ID}&plan=${plan}&interval=${interval}`,
+      cancel_url: `${getAppUrl()}/pricing`,
       metadata: {
         userId: user.id,
         plan,

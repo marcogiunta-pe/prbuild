@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, CheckCircle, Loader2, Mail } from 'lucide-react';
+import { PRODUCTION_APP_URL } from '@/lib/app-url';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -22,10 +23,8 @@ export default function ForgotPasswordPage() {
 
     try {
       const supabase = createClient();
-      const redirectTo =
-        typeof window !== 'undefined'
-          ? `${window.location.origin}/reset-password`
-          : `${process.env.NEXT_PUBLIC_APP_URL || ''}/reset-password`;
+      // Always use production URL so the email link never points to localhost
+      const redirectTo = `${PRODUCTION_APP_URL}/reset-password`;
 
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo,

@@ -1,5 +1,6 @@
 // lib/email.ts
 import { Resend } from 'resend';
+import { getAppUrl } from './app-url';
 
 // Lazy-load Resend to avoid build errors when API key is not set
 let resend: Resend | null = null;
@@ -25,7 +26,8 @@ export async function sendJournalistVerificationEmail(
   email: string,
   verificationToken: string
 ) {
-  const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/journalist/verify?token=${verificationToken}`;
+  const baseUrl = getAppUrl();
+  const verifyUrl = `${baseUrl}/api/journalist/verify?token=${verificationToken}`;
 
   const { data, error } = await getResend().emails.send({
     from: FROM_EMAIL,
@@ -90,17 +92,18 @@ export async function sendNewsletterEmail(
   releases: NewsletterRelease[],
   unsubscribeToken: string
 ) {
-  const unsubscribeUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/journalist/unsubscribe?token=${unsubscribeToken}`;
+  const baseUrl = getAppUrl();
+  const unsubscribeUrl = `${baseUrl}/api/journalist/unsubscribe?token=${unsubscribeToken}`;
 
   const releaseHtml = releases.map(release => `
     <div style="border-bottom: 1px solid #eee; padding: 20px 0;">
       <div style="font-size: 12px; color: #6366f1; text-transform: uppercase; margin-bottom: 8px;">${release.category} • ${release.company_name}</div>
       <h3 style="margin: 0 0 8px; font-size: 18px;">
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/showcase/${release.id}" style="color: #333; text-decoration: none;">${release.headline}</a>
+        <a href="${baseUrl}/showcase/${release.id}" style="color: #333; text-decoration: none;">${release.headline}</a>
       </h3>
       ${release.subhead ? `<p style="color: #666; margin: 0 0 8px; font-style: italic;">${release.subhead}</p>` : ''}
       <p style="color: #555; margin: 0; font-size: 14px;">${release.summary}</p>
-      <a href="${process.env.NEXT_PUBLIC_APP_URL}/showcase/${release.id}" style="color: #6366f1; font-size: 14px; text-decoration: none;">Read full release →</a>
+      <a href="${baseUrl}/showcase/${release.id}" style="color: #6366f1; font-size: 14px; text-decoration: none;">Read full release →</a>
     </div>
   `).join('');
 
@@ -133,7 +136,7 @@ export async function sendNewsletterEmail(
             
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
               <p style="margin: 0 0 10px;">Want to submit your own press release?</p>
-              <a href="${process.env.NEXT_PUBLIC_APP_URL}/signup" style="color: #6366f1; font-weight: 600;">Get started with PRBuild →</a>
+              <a href="${baseUrl}/signup" style="color: #6366f1; font-weight: 600;">Get started with PRBuild →</a>
             </div>
             
             <div class="footer">
@@ -218,7 +221,7 @@ export const notifications = {
       'Your Press Release Draft is Ready',
       `Great news! The draft for your ${companyName} press release is ready for review. Our team has crafted it based on your input, and it's been through our journalist panel critique.`,
       'Review Your Draft',
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/my-releases/${releaseId}`
+      `${getAppUrl()}/dashboard/my-releases/${releaseId}`
     ),
 
   feedbackReceived: (email: string, releaseId: string) =>
@@ -227,7 +230,7 @@ export const notifications = {
       'Feedback Received - We\'re On It',
       'Thanks for your feedback! Our team is reviewing your comments and will update the draft shortly.',
       'View Release',
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/my-releases/${releaseId}`
+      `${getAppUrl()}/dashboard/my-releases/${releaseId}`
     ),
 
   releasePublished: (email: string, releaseId: string, showcaseId: string) =>
@@ -236,7 +239,7 @@ export const notifications = {
       'Your Press Release is Live! 🎉',
       'Congratulations! Your press release has been published to our showcase and distributed to journalists in your industry.',
       'View Published Release',
-      `${process.env.NEXT_PUBLIC_APP_URL}/showcase/${showcaseId}`
+      `${getAppUrl()}/showcase/${showcaseId}`
     ),
 
   approvalNeeded: (email: string, releaseId: string) =>
@@ -245,6 +248,6 @@ export const notifications = {
       'Action Required: Please Review Your Draft',
       'Your press release draft is waiting for your approval. Please review it and let us know if you\'d like any changes.',
       'Review Now',
-      `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/my-releases/${releaseId}`
+      `${getAppUrl()}/dashboard/my-releases/${releaseId}`
     ),
 };

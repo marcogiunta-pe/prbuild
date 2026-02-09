@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { getAppUrl } from '@/lib/app-url';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ export default async function ShowcaseDetailPage({ params }: { params: { id: str
     .update({ view_count: (release.view_count || 0) + 1 })
     .eq('id', params.id);
 
-  const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL}/showcase/${release.id}`;
+  const shareUrl = `${getAppUrl()}/showcase/${release.id}`;
   const shareText = encodeURIComponent(release.headline);
 
   return (
