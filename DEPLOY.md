@@ -58,6 +58,22 @@ In Vercel Dashboard → Project → Settings → Environment Variables, add:
 
 ---
 
+## Resend API sync (invites / Jarvis emails)
+
+If invite emails fail or you see errors about the sender:
+
+1. **Resend dashboard** → [resend.com](https://resend.com) → **API Keys**
+   - Create a new key if needed; copy it.
+2. **Vercel** → Project → **Settings** → **Environment Variables**
+   - Set `RESEND_API_KEY` to the key from step 1 (Redeploy after changing).
+3. **Resend** → **Domains**
+   - Add and verify your domain (e.g. `prbuild.ai`) so you can send from `@prbuild.ai`.
+4. **Vercel** → Environment Variables
+   - Set `NOTIFICATIONS_FROM_EMAIL` to a verified address, e.g. `Jarvis <noreply@prbuild.ai>` (must match a verified domain in Resend).
+5. **Redeploy** after changing any env var so the new value is used.
+
+---
+
 ## Custom domain: prbuild.ai
 
 1. **Vercel:** Project → **Settings** → **Domains** → **Add** → enter `prbuild.ai`

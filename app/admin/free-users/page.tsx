@@ -34,18 +34,21 @@ export default function FreeUsersPage() {
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
-  /** Always show a string; never [object Object] */
+  /** Always show a string; never [object Object]. Extracts message from nested Resend/API errors. */
   const inviteMessageText = (() => {
     if (inviteMessage == null || inviteMessage === '') return '';
     if (typeof inviteMessage === 'string') return inviteMessage;
-    if (typeof inviteMessage === 'object' && inviteMessage !== null && 'message' in inviteMessage) {
-      const m = (inviteMessage as { message: unknown }).message;
-      if (typeof m === 'string') return m;
-      if (typeof m === 'object' && m !== null) return JSON.stringify(m);
-      return String(m ?? '');
+    if (typeof inviteMessage !== 'object' || inviteMessage === null) return String(inviteMessage);
+    const m = (inviteMessage as { message?: unknown }).message;
+    if (typeof m === 'string') return m;
+    if (typeof m === 'object' && m !== null) {
+      const s = JSON.stringify(m);
+      return s === '{}' ? 'Failed to send. Check Resend API key and sender domain (NOTIFICATIONS_FROM_EMAIL).' : s;
     }
-    return JSON.stringify(inviteMessage);
+    const s = JSON.stringify(inviteMessage);
+    return s === '{}' || s === '[object Object]' ? 'Failed to send invite. Check Resend API key and sender in Vercel env.' : s;
   })();
+  const safeInviteMessageText = inviteMessageText === '[object Object]' ? 'Failed to send invite. Check Resend API key and sender domain.' : inviteMessageText;
 
   useEffect(() => {
     loadFreeUsers();
@@ -205,9 +208,9 @@ export default function FreeUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {inviteMessageText !== '' && (
-            <p className={`text-sm p-3 rounded-lg ${inviteMessageText.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
-              {inviteMessageText}
+          {safeInviteMessageText !== '' && (
+            <p className={`text-sm p-3 rounded-lg ${safeInviteMessageText.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+              {safeInviteMessageText}
             </p>
           )}
           <div className="flex flex-wrap items-end gap-3">
