@@ -158,13 +158,18 @@ export default function AdminRequestDetailPage({ params }: { params: { id: strin
     if (!error) {
       // Send email notification to client
       try {
-        await fetch('/api/notifications/draft-ready', {
+        const notifRes = await fetch('/api/notifications/draft-ready', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ releaseId: release.id }),
         });
+        const notifData = await notifRes.json().catch(() => ({}));
+        if (!notifRes.ok) {
+          alert(`Status updated, but the notification email failed to send: ${notifData.error || notifRes.statusText}. Check RESEND_API_KEY in Vercel.`);
+        }
       } catch (emailErr) {
         console.error('Failed to send email notification:', emailErr);
+        alert('Status updated, but the notification email could not be sent. Check the console and RESEND_API_KEY.');
       }
       
       await loadRelease();

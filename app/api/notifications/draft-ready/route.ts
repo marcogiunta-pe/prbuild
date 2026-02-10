@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Client email not found' }, { status: 404 });
     }
 
-    // Send the notification email
+    // Send the notification email (requires RESEND_API_KEY on Vercel)
     await notifications.draftReady(
       clientProfile.email,
       release.id,
@@ -59,9 +59,10 @@ export async function POST(request: NextRequest) {
       message: `Notification sent to ${clientProfile.email}`,
     });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to send notification';
     console.error('Error sending notification:', error);
     return NextResponse.json(
-      { error: 'Failed to send notification' },
+      { error: message },
       { status: 500 }
     );
   }

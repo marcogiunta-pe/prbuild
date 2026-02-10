@@ -30,7 +30,14 @@ export default function LoginPage() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        const msg = signInError.message;
+        if (msg.toLowerCase().includes('invalid') && msg.toLowerCase().includes('credential')) {
+          setError(
+            'Invalid email or password. If you just signed up, check your inbox for a confirmation link. You can also use "Forgot password?" below.'
+          );
+        } else {
+          setError(msg);
+        }
         setLoading(false);
         return;
       }

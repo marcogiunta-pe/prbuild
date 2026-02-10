@@ -52,7 +52,8 @@ In Vercel Dashboard → Project → Settings → Environment Variables, add:
 - `STRIPE_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_STRIPE_*_MONTHLY` / `*_YEARLY` (all 6 price IDs)
 - `OPENAI_API_KEY`
-- `RESEND_API_KEY`
+- `RESEND_API_KEY` → **Required for client notification emails** (e.g. “draft ready” when you send to client). Without it, status still updates but the client won’t get the email. Get a key at [resend.com](https://resend.com).
+- `NOTIFICATIONS_FROM_EMAIL` (optional) → Sender for authorization/notification emails from prbuild.ai (e.g. draft ready). Example: `Jarvis <noreply@prbuild.ai>`. If unset, uses `FROM_EMAIL` or the default.
 - `NEXT_PUBLIC_APP_URL` → your Vercel URL (e.g. `https://prbuild.ai`)
 
 ---
@@ -64,6 +65,6 @@ In Vercel Dashboard → Project → Settings → Environment Variables, add:
    - **A record:** `@` → `76.76.21.21` (Vercel's IP)
    - **CNAME:** `www` → `cname.vercel-dns.com`
    - Or use Vercel nameservers if offered
-3. **Supabase:** Add `https://prbuild.ai` and `https://www.prbuild.ai` to Auth → URL Configuration (redirect URLs)
+3. **Supabase:** Add `https://prbuild.ai` and `https://www.prbuild.ai` to Auth → URL Configuration (redirect URLs). If clients get "Invalid login credentials" right after signup, go to **Authentication → Providers → Email** and turn **OFF** "Confirm email" so users can log in without clicking a confirmation link.
 4. **Stripe:** Add `https://prbuild.ai` to Allowed redirect URLs
 5. **Env:** In Vercel, set `NEXT_PUBLIC_APP_URL` = `https://prbuild.ai`

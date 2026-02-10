@@ -27,6 +27,7 @@ export default function FreeUsersPage() {
   const [searchResults, setSearchResults] = useState<FreeUser[]>([]);
   const [searching, setSearching] = useState(false);
   const [releasesToGrant, setReleasesToGrant] = useState<Record<string, number>>({});
+  const [unlimitedToGrant, setUnlimitedToGrant] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     loadFreeUsers();
@@ -61,7 +62,8 @@ export default function FreeUsersPage() {
   };
 
   const addFreeUser = async (user: FreeUser) => {
-    const releases = releasesToGrant[user.id] || 3;
+    const unlimited = unlimitedToGrant[user.id];
+    const releases = unlimited ? -1 : (releasesToGrant[user.id] ?? 3);
     const supabase = createClient();
     
     const { error } = await supabase
@@ -100,6 +102,18 @@ export default function FreeUsersPage() {
     const { error } = await supabase
       .from('profiles')
       .update({ free_releases_remaining: releases })
+      .eq('id', userId);
+
+    if (!error) {
+      await loadFreeUsers();
+    }
+  };
+
+  const setUnlimited = async (userId: string, unlimited: boolean) => {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ free_releases_remaining: unlimited ? -1 : 0 })
       .eq('id', userId);
 
     if (!error) {
@@ -160,17 +174,27 @@ export default function FreeUsersPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <label className="flex items-center gap-1.5 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={unlimitedToGrant[user.id] || false}
+                        onChange={(e) => setUnlimitedToGrant(prev => ({ ...prev, [user.id]: e.target.checked }))}
+                        className="rounded border-gray-300"
+                      />
+                      Unlimited
+                    </label>
                     <div className="flex items-center gap-1">
                       <Input
                         type="number"
                         min="1"
-                        max="100"
-                        value={releasesToGrant[user.id] || 3}
+                        max="999"
+                        value={releasesToGrant[user.id] ?? 3}
                         onChange={(e) => setReleasesToGrant(prev => ({ 
                           ...prev, 
                           [user.id]: parseInt(e.target.value) || 3 
                         }))}
                         className="w-16 h-8"
+                        disabled={unlimitedToGrant[user.id]}
                       />
                       <span className="text-sm text-gray-500">releases</span>
                     </div>
@@ -221,15 +245,28 @@ export default function FreeUsersPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="flex items-center gap-2">
-                      <Label className="text-sm">Releases:</Label>
-                      <Input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={user.free_releases_remaining}
-                        onChange={(e) => updateReleases(user.id, parseInt(e.target.value) || 0)}
-                        className="w-16 h-8"
-                      />
+                      <label className="flex items-center gap-1.5 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={user.free_releases_remaining === -1}
+                          onChange={(e) => setUnlimited(user.id, e.target.checked)}
+                          className="rounded border-gray-300"
+                        />
+                        Unlimited
+                      </label>
+                      {user.free_releases_remaining !== -1 && (
+                        <>
+                          <Label className="text-sm">Releases:</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="999"
+                            value={user.free_releases_remaining}
+                            onChange={(e) => updateReleases(user.id, parseInt(e.target.value) || 0)}
+                            className="w-16 h-8"
+                          />
+                        </>
+                      )}
                     </div>
                     <Button 
                       variant="ghost" 

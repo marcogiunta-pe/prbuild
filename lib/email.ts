@@ -18,6 +18,9 @@ function getResend(): Resend {
 // Use your verified domain in production, or onboarding@resend.dev for testing
 const FROM_EMAIL = process.env.FROM_EMAIL || 'PRBuild <onboarding@resend.dev>';
 
+// Authorization/notification emails (e.g. draft ready) – e.g. "Jarvis <noreply@prbuild.ai>"
+const NOTIFICATIONS_FROM = process.env.NOTIFICATIONS_FROM_EMAIL || FROM_EMAIL;
+
 // ============================================
 // Journalist Emails
 // ============================================
@@ -170,7 +173,7 @@ export async function sendClientNotification(
   ctaUrl?: string
 ) {
   const { data, error } = await getResend().emails.send({
-    from: FROM_EMAIL,
+    from: NOTIFICATIONS_FROM,
     to: email,
     subject: `PRBuild: ${subject}`,
     html: `

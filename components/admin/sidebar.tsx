@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { 
   FileText, 
   Users, 
+  UserCircle,
   Mail, 
   Globe, 
   BarChart3,
@@ -22,6 +23,12 @@ const navItems = [
     href: '/admin/requests',
     icon: FileText,
     description: 'Manage PR requests',
+  },
+  {
+    title: 'Users',
+    href: '/admin/users',
+    icon: UserCircle,
+    description: 'All registered users',
   },
   {
     title: 'Showcase',
