@@ -151,7 +151,7 @@ export default function FreeUsersPage() {
           msg = err;
         } else if (err && typeof err === 'object') {
           const m = (err as { message?: unknown }).message;
-          msg = typeof m === 'string' ? m : typeof m === 'object' && m !== null ? JSON.stringify(m) : String(m ?? res.statusText || 'Failed to send invite');
+          msg = typeof m === 'string' ? m : typeof m === 'object' && m !== null ? JSON.stringify(m) : String(m ?? (res.statusText || 'Failed to send invite'));
         } else {
           msg = res.statusText || 'Failed to send invite';
         }
