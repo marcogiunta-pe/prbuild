@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, Gift, Trash2, Search, Loader2 } from 'lucide-react';
+import { UserPlus, Gift, Trash2, Search, Loader2, Mail } from 'lucide-react';
 
 interface FreeUser {
   id: string;
@@ -28,6 +28,11 @@ export default function FreeUsersPage() {
   const [searching, setSearching] = useState(false);
   const [releasesToGrant, setReleasesToGrant] = useState<Record<string, number>>({});
   const [unlimitedToGrant, setUnlimitedToGrant] = useState<Record<string, boolean>>({});
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteReleases, setInviteReleases] = useState(3);
+  const [inviteUnlimited, setInviteUnlimited] = useState(false);
+  const [inviteSending, setInviteSending] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadFreeUsers();
@@ -121,6 +126,33 @@ export default function FreeUsersPage() {
     }
   };
 
+  const sendInvite = async () => {
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviteSending(true);
+    setInviteMessage(null);
+    try {
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          freeReleases: inviteUnlimited ? -1 : inviteReleases,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setInviteMessage(`Invite sent to ${email}. They'll get ${inviteUnlimited ? 'unlimited' : inviteReleases} free release(s) when they sign up.`);
+        setInviteEmail('');
+      } else {
+        setInviteMessage(data.error || 'Failed to send invite');
+      }
+    } catch {
+      setInviteMessage('Failed to send invite');
+    }
+    setInviteSending(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -137,6 +169,65 @@ export default function FreeUsersPage() {
           Manage users who receive free access to PRBuild
         </p>
       </div>
+
+      {/* Invite by email (Jarvis sends the email) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Invite by email
+          </CardTitle>
+          <CardDescription>
+            Send an invite to someone who doesn&apos;t have an account yet. Jarvis will email them a signup link; when they sign up with that email, they&apos;ll get free access.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {inviteMessage && (
+            <p className={`text-sm p-3 rounded-lg ${inviteMessage.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+              {inviteMessage}
+            </p>
+          )}
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="flex-1 min-w-[200px] space-y-1">
+              <Label className="text-sm">Email</Label>
+              <Input
+                type="email"
+                placeholder="colleague@company.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                disabled={inviteSending}
+              />
+            </div>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={inviteUnlimited}
+                onChange={(e) => setInviteUnlimited(e.target.checked)}
+                className="rounded border-gray-300"
+              />
+              <span className="text-sm">Unlimited</span>
+            </label>
+            {!inviteUnlimited && (
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={999}
+                  value={inviteReleases}
+                  onChange={(e) => setInviteReleases(parseInt(e.target.value) || 3)}
+                  className="w-16 h-9"
+                  disabled={inviteSending}
+                />
+                <span className="text-sm text-gray-500">releases</span>
+              </div>
+            )}
+            <Button onClick={sendInvite} disabled={inviteSending || !inviteEmail.trim()}>
+              {inviteSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4 mr-1" />}
+              Send invite
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Add Free User */}
       <Card>

@@ -1,17 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2, Mail, Lock, User, Building, Check } from 'lucide-react';
+import { AlertCircle, Loader2, Mail, Lock, User, Building, Check, Gift } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -21,6 +22,25 @@ export default function SignupPage() {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [inviteToken, setInviteToken] = useState<string | null>(null);
+  const [inviteReleases, setInviteReleases] = useState<number | null>(null);
+
+  useEffect(() => {
+    const token = searchParams.get('invite');
+    if (!token) return;
+    setInviteToken(token);
+    fetch(`/api/invite?token=${encodeURIComponent(token)}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.email) {
+          setFormData((prev) => ({ ...prev, email: data.email }));
+          setInviteReleases(data.free_releases_remaining ?? 3);
+        } else {
+          setInviteToken(null);
+        }
+      })
+      .catch(() => setInviteToken(null));
+  }, [searchParams]);
 
   const updateField = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -63,7 +83,6 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        // Update the profile with company name (trigger creates basic profile)
         await supabase
           .from('profiles')
           .update({
@@ -71,6 +90,14 @@ export default function SignupPage() {
             company_name: formData.companyName,
           })
           .eq('id', data.user.id);
+
+        if (inviteToken) {
+          await fetch('/api/invite/accept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: inviteToken }),
+          });
+        }
 
         router.refresh();
         router.push('/dashboard/my-releases');
@@ -117,6 +144,14 @@ export default function SignupPage() {
           <CardDescription>
             Start creating professional press releases today
           </CardDescription>
+          {inviteToken && inviteReleases != null && (
+            <div className="flex items-center justify-center gap-2 p-3 mt-2 rounded-lg bg-green-50 text-green-800 text-sm">
+              <Gift className="h-4 w-4 flex-shrink-0" />
+              <span>
+                You&apos;re invited — you&apos;ll get {inviteReleases === -1 ? 'unlimited' : inviteReleases} free release{inviteReleases === 1 ? '' : 's'} when you sign up.
+              </span>
+            </div>
+          )}
         </CardHeader>
 
         <form onSubmit={handleSignup}>

@@ -254,3 +254,60 @@ export const notifications = {
       `${getAppUrl()}/dashboard/my-releases/${releaseId}`
     ),
 };
+
+// ============================================
+// Free user invite (sent by Jarvis / NOTIFICATIONS_FROM)
+// ============================================
+
+export async function sendInviteEmail(
+  email: string,
+  inviteToken: string,
+  freeReleases: number
+) {
+  const baseUrl = getAppUrl();
+  const signupUrl = `${baseUrl}/signup?invite=${encodeURIComponent(inviteToken)}`;
+  const releasesText = freeReleases === -1 ? 'unlimited' : `${freeReleases} free`;
+
+  const { data, error } = await getResend().emails.send({
+    from: NOTIFICATIONS_FROM,
+    to: email,
+    subject: "You're invited to PRBuild",
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+            .logo { font-size: 24px; font-weight: bold; color: #6366f1; margin-bottom: 30px; }
+            .button { display: inline-block; background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+            .footer { margin-top: 40px; font-size: 14px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">📰 PRBuild</div>
+            <h2>You're invited</h2>
+            <p>You've been invited to try PRBuild and get <strong>${releasesText} press release${freeReleases === -1 ? 's' : freeReleases === 1 ? '' : 's'}</strong>.</p>
+            <p>Sign up with this email to claim your free access:</p>
+            <p style="margin: 30px 0;">
+              <a href="${signupUrl}" class="button">Accept invite & sign up</a>
+            </p>
+            <p>Or copy this link:</p>
+            <p style="word-break: break-all; color: #666;">${signupUrl}</p>
+            <div class="footer">
+              <p>If you didn't expect this invite, you can ignore this email.</p>
+              <p>© ${new Date().getFullYear()} PRBuild</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  });
+
+  if (error) {
+    console.error('Failed to send invite email:', error);
+    throw error;
+  }
+  return data;
+}

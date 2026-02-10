@@ -227,6 +227,16 @@ CREATE TABLE public.prompt_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Free user invites (admin sends invite email; recipient signs up and gets free access)
+CREATE TABLE public.invites (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  email TEXT NOT NULL,
+  token TEXT NOT NULL UNIQUE,
+  free_releases_remaining INTEGER NOT NULL DEFAULT 3,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  used_at TIMESTAMPTZ
+);
+
 -- Row Level Security Policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.release_requests ENABLE ROW LEVEL SECURITY;
@@ -234,6 +244,7 @@ ALTER TABLE public.showcase_releases ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.journalist_subscribers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.newsletter_sends ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activity_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invites ENABLE ROW LEVEL SECURITY;
 
 -- Profiles policies
 CREATE POLICY "Users can view own profile" ON public.profiles
@@ -259,6 +270,12 @@ CREATE POLICY "Admins see all requests" ON public.release_requests
   );
 
 CREATE POLICY "Admins manage all profiles" ON public.profiles
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+-- Invites: admins only (service role used for public token lookup in API)
+CREATE POLICY "Admins manage invites" ON public.invites
   FOR ALL USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
