@@ -145,7 +145,13 @@ export default function FreeUsersPage() {
         setInviteMessage(`Invite sent to ${email}. They'll get ${inviteUnlimited ? 'unlimited' : inviteReleases} free release(s) when they sign up.`);
         setInviteEmail('');
       } else {
-        const msg = typeof data?.error === 'string' ? data.error : res.statusText || 'Failed to send invite';
+        const err = data?.error;
+        const msg =
+          typeof err === 'string'
+            ? err
+            : err && typeof err === 'object' && 'message' in err
+              ? String((err as { message?: unknown }).message)
+              : res.statusText || 'Failed to send invite';
         setInviteMessage(msg);
       }
     } catch (e) {
@@ -184,8 +190,8 @@ export default function FreeUsersPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {inviteMessage && (
-            <p className={`text-sm p-3 rounded-lg ${inviteMessage.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
-              {inviteMessage}
+            <p className={`text-sm p-3 rounded-lg ${String(inviteMessage).startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+              {String(inviteMessage)}
             </p>
           )}
           <div className="flex flex-wrap items-end gap-3">
