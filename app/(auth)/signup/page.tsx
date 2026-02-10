@@ -72,8 +72,8 @@ export default function SignupPage() {
           })
           .eq('id', data.user.id);
 
-        router.push('/dashboard/my-releases');
         router.refresh();
+        router.push('/dashboard/my-releases');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');

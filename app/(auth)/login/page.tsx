@@ -36,19 +36,17 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        // Check user role to redirect appropriately
+        // Refresh so the server sees the new session cookie before we redirect
+        router.refresh();
+
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
 
-        if (profile?.role === 'admin') {
-          router.push('/admin/requests');
-        } else {
-          router.push('/dashboard/my-releases');
-        }
-        router.refresh();
+        const destination = profile?.role === 'admin' ? '/admin/requests' : '/dashboard/my-releases';
+        router.push(destination);
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
