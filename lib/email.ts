@@ -21,6 +21,9 @@ const FROM_EMAIL = process.env.FROM_EMAIL || 'PRBuild <onboarding@resend.dev>';
 // Authorization/notification emails (e.g. draft ready) – e.g. "Jarvis <noreply@prbuild.ai>"
 const NOTIFICATIONS_FROM = process.env.NOTIFICATIONS_FROM_EMAIL || FROM_EMAIL;
 
+// Invite emails: use Resend default so invites work without domain verification (set INVITE_FROM_EMAIL for custom sender)
+const INVITE_FROM = process.env.INVITE_FROM_EMAIL || 'PRBuild <onboarding@resend.dev>';
+
 // ============================================
 // Journalist Emails
 // ============================================
@@ -269,7 +272,7 @@ export async function sendInviteEmail(
   const releasesText = freeReleases === -1 ? 'unlimited' : `${freeReleases} free`;
 
   const { data, error } = await getResend().emails.send({
-    from: NOTIFICATIONS_FROM,
+    from: INVITE_FROM,
     to: email,
     subject: "You're invited to PRBuild",
     html: `
