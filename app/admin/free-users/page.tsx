@@ -34,6 +34,16 @@ export default function FreeUsersPage() {
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
+  /** Always show a string; never [object Object] */
+  const inviteMessageText =
+    inviteMessage == null || inviteMessage === ''
+      ? ''
+      : typeof inviteMessage === 'string'
+        ? inviteMessage
+        : typeof inviteMessage === 'object' && inviteMessage !== null && 'message' in inviteMessage
+          ? String((inviteMessage as { message: unknown }).message)
+          : JSON.stringify(inviteMessage);
+
   useEffect(() => {
     loadFreeUsers();
   }, []);
@@ -146,16 +156,16 @@ export default function FreeUsersPage() {
         setInviteEmail('');
       } else {
         const err = data?.error;
-        let msg: string;
         if (typeof err === 'string') {
-          msg = err;
+          setInviteMessage(err);
         } else if (err && typeof err === 'object') {
           const m = (err as { message?: unknown }).message;
-          msg = typeof m === 'string' ? m : typeof m === 'object' && m !== null ? JSON.stringify(m) : String(m ?? (res.statusText || 'Failed to send invite'));
+          setInviteMessage(
+            typeof m === 'string' ? m : typeof m === 'object' && m !== null ? JSON.stringify(m) : (res.statusText || 'Failed to send invite')
+          );
         } else {
-          msg = res.statusText || 'Failed to send invite';
+          setInviteMessage(res.statusText || 'Failed to send invite');
         }
-        setInviteMessage(typeof msg === 'string' ? msg : 'Failed to send invite');
       }
     } catch (e) {
       setInviteMessage(e instanceof Error ? e.message : 'Failed to send invite');
@@ -192,9 +202,9 @@ export default function FreeUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {inviteMessage != null && inviteMessage !== '' && (
-            <p className={`text-sm p-3 rounded-lg ${String(inviteMessage).startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
-              {typeof inviteMessage === 'string' ? inviteMessage : JSON.stringify(inviteMessage)}
+          {inviteMessageText !== '' && (
+            <p className={`text-sm p-3 rounded-lg ${inviteMessageText.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+              {inviteMessageText}
             </p>
           )}
           <div className="flex flex-wrap items-end gap-3">
