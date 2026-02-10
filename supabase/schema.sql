@@ -227,15 +227,19 @@ CREATE TABLE public.prompt_configs (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Free user invites (admin sends invite email; recipient signs up and gets free access)
+-- Free user invites: admin-added (approved_at set) or public request (approved_at null until admin approves)
 CREATE TABLE public.invites (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email TEXT NOT NULL,
   token TEXT NOT NULL UNIQUE,
   free_releases_remaining INTEGER NOT NULL DEFAULT 3,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  used_at TIMESTAMPTZ
+  used_at TIMESTAMPTZ,
+  approved_at TIMESTAMPTZ
 );
+-- Migration for existing DBs:
+--   ALTER TABLE public.invites ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
+--   UPDATE public.invites SET approved_at = created_at WHERE approved_at IS NULL;
 
 -- Row Level Security Policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;

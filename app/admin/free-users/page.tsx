@@ -7,7 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, Gift, Trash2, Search, Loader2, Mail } from 'lucide-react';
+import { UserPlus, Gift, Trash2, Search, Loader2, Mail, Clock, CheckCircle } from 'lucide-react';
+
+interface PendingInvite {
+  id: string;
+  email: string;
+  created_at: string;
+  free_releases_remaining?: number;
+}
 
 interface FreeUser {
   id: string;
@@ -33,6 +40,9 @@ export default function FreeUsersPage() {
   const [inviteUnlimited, setInviteUnlimited] = useState(false);
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
+  const [lastSetPasswordLink, setLastSetPasswordLink] = useState<string | null>(null);
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
+  const [approvingId, setApprovingId] = useState<string | null>(null);
 
   const inviteMessageText = (() => {
     if (inviteMessage == null || inviteMessage === '') return '';
@@ -46,7 +56,19 @@ export default function FreeUsersPage() {
 
   useEffect(() => {
     loadFreeUsers();
+    loadPendingInvites();
   }, []);
+
+  const loadPendingInvites = async () => {
+    try {
+      const res = await fetch('/api/admin/pending-invites');
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.invites)) setPendingInvites(data.invites);
+      else setPendingInvites([]);
+    } catch {
+      setPendingInvites([]);
+    }
+  };
 
   const loadFreeUsers = async () => {
     const supabase = createClient();
@@ -141,6 +163,7 @@ export default function FreeUsersPage() {
     if (!email) return;
     setInviteSending(true);
     setInviteMessage(null);
+    setLastSetPasswordLink(null);
     try {
       const res = await fetch('/api/admin/invite', {
         method: 'POST',
@@ -152,8 +175,9 @@ export default function FreeUsersPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setInviteMessage(data?.message ?? `Added ${email}. They can sign up with this email to get access.`);
+        setInviteMessage(data?.message ?? `Added ${email}. Share the set-password link with them.`);
         setInviteEmail('');
+        if (typeof data?.setPasswordLink === 'string') setLastSetPasswordLink(data.setPasswordLink);
       } else {
         const err = data?.error;
         if (typeof err === 'string') {
@@ -173,6 +197,31 @@ export default function FreeUsersPage() {
     setInviteSending(false);
   };
 
+  const approvePending = async (inviteId: string) => {
+    setApprovingId(inviteId);
+    setInviteMessage(null);
+    setLastSetPasswordLink(null);
+    try {
+      const res = await fetch('/api/admin/invite/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: inviteId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setInviteMessage(data?.message ?? 'Approved. Share the set-password link with them.');
+        if (typeof data?.setPasswordLink === 'string') setLastSetPasswordLink(data.setPasswordLink);
+        setPendingInvites((prev) => prev.filter((p) => p.id !== inviteId));
+      } else {
+        setInviteMessage(data?.error ?? 'Failed to approve');
+      }
+    } catch (e) {
+      setInviteMessage(e instanceof Error ? e.message : 'Failed to approve');
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -190,6 +239,50 @@ export default function FreeUsersPage() {
         </p>
       </div>
 
+      {/* Pending requests (from /request-free-access) */}
+      {pendingInvites.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-amber-600" />
+              Pending requests
+              <Badge variant="secondary">{pendingInvites.length}</Badge>
+            </CardTitle>
+            <CardDescription>
+              People who requested free access via the request link. Approve to let them set a password and sign in.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y rounded-lg border">
+              {pendingInvites.map((inv) => (
+                <div key={inv.id} className="flex items-center justify-between p-3">
+                  <div>
+                    <p className="font-medium">{inv.email}</p>
+                    <p className="text-xs text-gray-500">
+                      Requested {new Date(inv.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => approvePending(inv.id)}
+                    disabled={approvingId === inv.id}
+                  >
+                    {approvingId === inv.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Approve
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Add by email — no email sent; they sign up and get access */}
       <Card>
         <CardHeader>
@@ -198,14 +291,34 @@ export default function FreeUsersPage() {
             Add by email
           </CardTitle>
           <CardDescription>
-            Add an email for someone who doesn&apos;t have an account yet. No email is sent. When they sign up with this email, they&apos;ll get the free releases.
+            Add an email for someone who doesn&apos;t have an account yet. No email is sent. Share the set-password link with them so they can create an account and sign in.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {safeInviteMessageText !== '' && (
-            <p className={`text-sm p-3 rounded-lg ${safeInviteMessageText.startsWith('Added') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
-              {safeInviteMessageText}
-            </p>
+            <div className={`text-sm p-3 rounded-lg ${safeInviteMessageText.startsWith('Added') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+              <p>{safeInviteMessageText}</p>
+              {lastSetPasswordLink && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <Label className="text-green-800 font-medium">Set-password link:</Label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={lastSetPasswordLink}
+                    className="flex-1 min-w-[200px] rounded border border-green-300 bg-white px-2 py-1.5 text-xs text-gray-800"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="border-green-600 text-green-800 hover:bg-green-100"
+                    onClick={() => navigator.clipboard.writeText(lastSetPasswordLink)}
+                  >
+                    Copy
+                  </Button>
+                </div>
+              )}
+            </div>
           )}
           <div className="flex flex-wrap items-end gap-3">
             <div className="flex-1 min-w-[200px] space-y-1">

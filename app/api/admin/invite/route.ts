@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { getAppUrl } from '@/lib/app-url';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
         email,
         token,
         free_releases_remaining: releases,
+        approved_at: new Date().toISOString(),
       });
 
     if (insertError) {
@@ -49,7 +51,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg + hint }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, message: `Added ${email}. They can sign up with this email to get access.` });
+    const setPasswordLink = `${getAppUrl()}/set-password?token=${token}`;
+    return NextResponse.json({
+      success: true,
+      message: `Added ${email}. Share the set-password link with them so they can create an account and sign in.`,
+      setPasswordLink,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to add';
     return NextResponse.json({ error: message }, { status: 500 });
