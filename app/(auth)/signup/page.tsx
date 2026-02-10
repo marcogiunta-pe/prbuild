@@ -91,13 +91,11 @@ export default function SignupPage() {
           })
           .eq('id', data.user.id);
 
-        if (inviteToken) {
-          await fetch('/api/invite/accept', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: inviteToken }),
-          });
-        }
+        await fetch('/api/invite/accept', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: inviteToken ? JSON.stringify({ token: inviteToken }) : '{}',
+        });
 
         router.refresh();
         router.push('/dashboard/my-releases');

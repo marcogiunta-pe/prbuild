@@ -34,21 +34,15 @@ export default function FreeUsersPage() {
   const [inviteSending, setInviteSending] = useState(false);
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
-  /** Always show a string; never [object Object]. Extracts message from nested Resend/API errors. */
   const inviteMessageText = (() => {
     if (inviteMessage == null || inviteMessage === '') return '';
     if (typeof inviteMessage === 'string') return inviteMessage;
     if (typeof inviteMessage !== 'object' || inviteMessage === null) return String(inviteMessage);
     const m = (inviteMessage as { message?: unknown }).message;
     if (typeof m === 'string') return m;
-    if (typeof m === 'object' && m !== null) {
-      const s = JSON.stringify(m);
-      return s === '{}' ? 'Failed to send. Check Resend API key and sender domain (NOTIFICATIONS_FROM_EMAIL).' : s;
-    }
-    const s = JSON.stringify(inviteMessage);
-    return s === '{}' || s === '[object Object]' ? 'Failed to send invite. Check Resend API key and sender in Vercel env.' : s;
+    return JSON.stringify(inviteMessage);
   })();
-  const safeInviteMessageText = inviteMessageText === '[object Object]' ? 'Failed to send invite. Check Resend API key and sender domain.' : inviteMessageText;
+  const safeInviteMessageText = inviteMessageText === '[object Object]' ? 'Something went wrong.' : inviteMessageText;
 
   useEffect(() => {
     loadFreeUsers();
@@ -158,7 +152,7 @@ export default function FreeUsersPage() {
       });
       const data = await res.json().catch(() => ({}));
       if (res.ok) {
-        setInviteMessage(`Invite sent to ${email}. They'll get ${inviteUnlimited ? 'unlimited' : inviteReleases} free release(s) when they sign up.`);
+        setInviteMessage(data?.message ?? `Added ${email}. They can sign up with this email to get access.`);
         setInviteEmail('');
       } else {
         const err = data?.error;
@@ -196,20 +190,20 @@ export default function FreeUsersPage() {
         </p>
       </div>
 
-      {/* Invite by email (Jarvis sends the email) */}
+      {/* Add by email — no email sent; they sign up and get access */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Invite by email
+            Add by email
           </CardTitle>
           <CardDescription>
-            Send an invite to someone who doesn&apos;t have an account yet. Jarvis will email them a signup link; when they sign up with that email, they&apos;ll get free access.
+            Add an email for someone who doesn&apos;t have an account yet. No email is sent. When they sign up with this email, they&apos;ll get the free releases.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {safeInviteMessageText !== '' && (
-            <p className={`text-sm p-3 rounded-lg ${safeInviteMessageText.startsWith('Invite sent') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
+            <p className={`text-sm p-3 rounded-lg ${safeInviteMessageText.startsWith('Added') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-700'}`}>
               {safeInviteMessageText}
             </p>
           )}
@@ -248,8 +242,8 @@ export default function FreeUsersPage() {
               </div>
             )}
             <Button onClick={sendInvite} disabled={inviteSending || !inviteEmail.trim()}>
-              {inviteSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4 mr-1" />}
-              Send invite
+              {inviteSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4 mr-1" />}
+              Add
             </Button>
           </div>
         </CardContent>

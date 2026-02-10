@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server';
-import { sendInviteEmail } from '@/lib/email';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
@@ -50,21 +49,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg + hint }, { status: 500 });
     }
 
-    try {
-      await sendInviteEmail(email, token, releases);
-    } catch (emailErr) {
-      const message = emailErr instanceof Error ? emailErr.message : String(emailErr);
-      const hint = message.includes('RESEND_API_KEY')
-        ? ' Add RESEND_API_KEY in Vercel (and optionally NOTIFICATIONS_FROM_EMAIL for Jarvis).'
-        : message.includes('from') || message.includes('domain')
-        ? ' Verify your sender domain in Resend, or set NOTIFICATIONS_FROM_EMAIL to a verified address.'
-        : '';
-      return NextResponse.json({ error: message + hint }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, message: `Invite sent to ${email}` });
+    return NextResponse.json({ success: true, message: `Added ${email}. They can sign up with this email to get access.` });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to send invite';
+    const message = err instanceof Error ? err.message : 'Failed to add';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

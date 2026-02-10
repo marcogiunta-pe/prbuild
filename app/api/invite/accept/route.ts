@@ -10,28 +10,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const token = (body.token as string)?.trim();
-    if (!token) {
-      return NextResponse.json({ error: 'Token required' }, { status: 400 });
-    }
-
-    const admin = createAdminClient();
-    const { data: invite, error: inviteError } = await admin
-      .from('invites')
-      .select('id, email, free_releases_remaining')
-      .eq('token', token)
-      .is('used_at', null)
-      .single();
-
-    if (inviteError || !invite) {
-      return NextResponse.json({ error: 'Invalid or already used invite' }, { status: 400 });
-    }
-
-    const inviteEmail = (invite.email as string).trim().toLowerCase();
     const userEmail = (user.email || '').trim().toLowerCase();
-    if (inviteEmail !== userEmail) {
-      return NextResponse.json({ error: 'Invite email does not match your account' }, { status: 400 });
+    const admin = createAdminClient();
+
+    const body = await request.json().catch(() => ({}));
+    const token = (body.token as string)?.trim();
+
+    let invite: { id: string; email: string; free_releases_remaining: number } | null = null;
+
+    if (token) {
+      const { data, error } = await admin
+        .from('invites')
+        .select('id, email, free_releases_remaining')
+        .eq('token', token)
+        .is('used_at', null)
+        .single();
+      if (!error && data) {
+        const inviteEmail = (data.email as string).trim().toLowerCase();
+        if (inviteEmail === userEmail) invite = data;
+      }
+    }
+
+    if (!invite) {
+      const { data, error } = await admin
+        .from('invites')
+        .select('id, email, free_releases_remaining')
+        .eq('email', userEmail)
+        .is('used_at', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!error && data) invite = data;
+    }
+
+    if (!invite) {
+      return NextResponse.json({ success: true });
     }
 
     const { error: updateProfileError } = await supabase
