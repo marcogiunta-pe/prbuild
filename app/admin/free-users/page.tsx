@@ -145,10 +145,11 @@ export default function FreeUsersPage() {
         setInviteMessage(`Invite sent to ${email}. They'll get ${inviteUnlimited ? 'unlimited' : inviteReleases} free release(s) when they sign up.`);
         setInviteEmail('');
       } else {
-        setInviteMessage(data.error || 'Failed to send invite');
+        const msg = typeof data?.error === 'string' ? data.error : res.statusText || 'Failed to send invite';
+        setInviteMessage(msg);
       }
-    } catch {
-      setInviteMessage('Failed to send invite');
+    } catch (e) {
+      setInviteMessage(e instanceof Error ? e.message : 'Failed to send invite');
     }
     setInviteSending(false);
   };

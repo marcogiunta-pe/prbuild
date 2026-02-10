@@ -43,10 +43,24 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
+      const msg = insertError.message || '';
+      const hint = msg.includes('does not exist') || msg.includes('relation')
+        ? ' Create the invites table in Supabase (run the SQL from DEPLOY/schema).'
+        : '';
+      return NextResponse.json({ error: msg + hint }, { status: 500 });
     }
 
-    await sendInviteEmail(email, token, releases);
+    try {
+      await sendInviteEmail(email, token, releases);
+    } catch (emailErr) {
+      const message = emailErr instanceof Error ? emailErr.message : String(emailErr);
+      const hint = message.includes('RESEND_API_KEY')
+        ? ' Add RESEND_API_KEY in Vercel (and optionally NOTIFICATIONS_FROM_EMAIL for Jarvis).'
+        : message.includes('from') || message.includes('domain')
+        ? ' Verify your sender domain in Resend, or set NOTIFICATIONS_FROM_EMAIL to a verified address.'
+        : '';
+      return NextResponse.json({ error: message + hint }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true, message: `Invite sent to ${email}` });
   } catch (err) {
