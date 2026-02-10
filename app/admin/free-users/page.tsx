@@ -35,14 +35,17 @@ export default function FreeUsersPage() {
   const [inviteMessage, setInviteMessage] = useState<string | null>(null);
 
   /** Always show a string; never [object Object] */
-  const inviteMessageText =
-    inviteMessage == null || inviteMessage === ''
-      ? ''
-      : typeof inviteMessage === 'string'
-        ? inviteMessage
-        : typeof inviteMessage === 'object' && inviteMessage !== null && 'message' in inviteMessage
-          ? String((inviteMessage as { message: unknown }).message)
-          : JSON.stringify(inviteMessage);
+  const inviteMessageText = (() => {
+    if (inviteMessage == null || inviteMessage === '') return '';
+    if (typeof inviteMessage === 'string') return inviteMessage;
+    if (typeof inviteMessage === 'object' && inviteMessage !== null && 'message' in inviteMessage) {
+      const m = (inviteMessage as { message: unknown }).message;
+      if (typeof m === 'string') return m;
+      if (typeof m === 'object' && m !== null) return JSON.stringify(m);
+      return String(m ?? '');
+    }
+    return JSON.stringify(inviteMessage);
+  })();
 
   useEffect(() => {
     loadFreeUsers();
