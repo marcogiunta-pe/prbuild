@@ -63,7 +63,7 @@ export default async function DashboardLayout({
             user={{
               email: user.email || '',
               fullName: displayName,
-              role: profile?.role,
+              role: profile?.role ?? 'client',
             }}
           />
         </div>
