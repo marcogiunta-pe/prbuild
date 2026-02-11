@@ -52,13 +52,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create account' }, { status: 500 });
     }
 
-    await admin
+    const userId = userData.user.id;
+    const releases = invite.free_releases_remaining ?? 3;
+
+    // Upsert profile so free user is set even if the auth trigger is slow or failed
+    const { error: profileError } = await admin
       .from('profiles')
-      .update({
-        is_free_user: true,
-        free_releases_remaining: invite.free_releases_remaining,
-      })
-      .eq('id', userData.user.id);
+      .upsert(
+        {
+          id: userId,
+          email,
+          is_free_user: true,
+          free_releases_remaining: releases,
+        },
+        { onConflict: 'id' }
+      );
+
+    if (profileError) {
+      return NextResponse.json(
+        { error: `Account created but could not set free access. Please contact support. (${profileError.message})` },
+        { status: 500 }
+      );
+    }
 
     await admin
       .from('invites')

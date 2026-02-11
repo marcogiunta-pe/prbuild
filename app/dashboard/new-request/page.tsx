@@ -30,6 +30,9 @@ export default function NewRequestPage() {
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly');
+  const [isFreeUser, setIsFreeUser] = useState(false);
+  const [freeReleasesRemaining, setFreeReleasesRemaining] = useState(0);
+  const [isFreeRelease, setIsFreeRelease] = useState(false);
 
   const [formData, setFormData] = useState({
     plan: '' as Plan | '',
@@ -70,10 +73,10 @@ export default function NewRequestPage() {
       if (user) {
         setUserId(user.id);
         
-        // Pre-fill from profile
+        // Pre-fill from profile + check free user status
         const { data: profile } = await supabase
           .from('profiles')
-          .select('company_name, company_website, full_name, email')
+          .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining')
           .eq('id', user.id)
           .single();
           
@@ -85,6 +88,8 @@ export default function NewRequestPage() {
             mediaContactName: profile.full_name || '',
             mediaContactEmail: profile.email || '',
           }));
+          setIsFreeUser(!!profile.is_free_user);
+          setFreeReleasesRemaining(profile.free_releases_remaining ?? 0);
         }
       }
     };
@@ -93,6 +98,12 @@ export default function NewRequestPage() {
 
   const updateField = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleUseFreeRelease = () => {
+    setFormData(prev => ({ ...prev, plan: 'starter' }));
+    setIsFreeRelease(true);
+    setStep('company');
   };
 
   const handleSelectPlan = async (plan: Plan) => {
@@ -133,7 +144,9 @@ export default function NewRequestPage() {
 
     try {
       const supabase = createClient();
-      
+      const amountPaid = isFreeRelease ? 0 : PRICING[formData.plan as Plan][billingInterval].priceInCents;
+      const stripePaymentId = isFreeRelease ? null : undefined;
+
       const { data, error: insertError } = await supabase
         .from('release_requests')
         .insert({
@@ -157,13 +170,21 @@ export default function NewRequestPage() {
           industry: formData.industry || null,
           supporting_context: formData.supportingContext || null,
           plan: formData.plan,
-          amount_paid: PRICING[formData.plan as Plan][billingInterval].priceInCents,
+          amount_paid: amountPaid,
+          stripe_payment_id: stripePaymentId,
           status: 'submitted',
         })
         .select()
         .single();
 
       if (insertError) throw insertError;
+
+      if (isFreeRelease && freeReleasesRemaining !== -1) {
+        await supabase
+          .from('profiles')
+          .update({ free_releases_remaining: Math.max(0, freeReleasesRemaining - 1) })
+          .eq('id', userId);
+      }
 
       router.push(`/dashboard/my-releases/${data.id}`);
     } catch (err: any) {
@@ -229,6 +250,29 @@ export default function NewRequestPage() {
       {/* Step: Select Plan */}
       {step === 'plan' && (
         <div>
+          {/* Free user option - skip payment */}
+          {isFreeUser && (freeReleasesRemaining > 0 || freeReleasesRemaining === -1) && (
+            <Card className="mb-6 border-green-300 bg-green-50/50">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-green-800">Use your free release</h3>
+                    <p className="text-sm text-green-700 mt-1">
+                      You have {freeReleasesRemaining === -1 ? 'unlimited' : freeReleasesRemaining} free release{freeReleasesRemaining === 1 ? '' : 's'} remaining.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={handleUseFreeRelease}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    Create free release
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <p className="text-sm text-gray-600 mb-4">Or choose a plan:</p>
           {/* Billing Toggle */}
           <div className="flex items-center justify-center gap-4 mb-6">
             <button

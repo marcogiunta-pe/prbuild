@@ -71,15 +71,19 @@ export default function FreeUsersPage() {
   };
 
   const loadFreeUsers = async () => {
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('is_free_user', true)
-      .order('created_at', { ascending: false });
-
-    setFreeUsers(data || []);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/admin/free-users');
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && Array.isArray(data.users)) {
+        setFreeUsers(data.users);
+      } else {
+        setFreeUsers([]);
+      }
+    } catch {
+      setFreeUsers([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const searchUsers = async () => {
