@@ -22,7 +22,7 @@ export async function addInviteByEmail(formData: FormData): Promise<{ ok: boolea
     const admin = await ensureAdmin();
     const email = (formData.get('email') as string)?.trim().toLowerCase();
     const unlimited = formData.get('unlimited') === 'on';
-    const releases = unlimited ? -1 : Math.max(1, parseInt(String(formData.get('releases') || '3') || '3');
+    const releases = unlimited ? -1 : Math.max(1, Number(formData.get('releases')) || 3);
     if (!email) return { ok: false, message: 'Email is required' };
     const token = crypto.randomBytes(24).toString('hex');
     await admin.from('invites').insert({
