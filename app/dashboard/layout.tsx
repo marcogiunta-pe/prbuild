@@ -24,6 +24,8 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single();
 
+  const displayName = profile?.full_name ?? user.user_metadata?.full_name ?? user.user_metadata?.name;
+
   // Redirect admin users to admin dashboard
   if (profile?.role === 'admin') {
     redirect('/admin/requests');
@@ -42,7 +44,7 @@ export default async function DashboardLayout({
           <UserNav 
             user={{
               email: user.email || '',
-              fullName: profile?.full_name,
+              fullName: displayName,
               role: profile?.role,
             }}
           />
