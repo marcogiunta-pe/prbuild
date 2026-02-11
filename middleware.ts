@@ -121,7 +121,9 @@ export async function middleware(request: NextRequest) {
       .eq('id', session.user.id)
       .single();
 
-    if (profile?.role !== 'admin') {
+    // Only redirect when we have positive confirmation they're NOT admin.
+    // If profile is null (Edge fetch failed), let through - layout will verify.
+    if (profile && profile.role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard/my-releases', request.url));
     }
   }
