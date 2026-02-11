@@ -2,12 +2,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
 import {
   buildIndustryPanelPrompt,
   parsePanelCritiqueResponse,
 } from '@/lib/prompts/panel-critique';
 import { getPanelCritiquePrompts } from '@/lib/prompts';
+import { requireAdmin } from '@/lib/auth';
 
 const RequestSchema = z.object({
   releaseRequestId: z.string().uuid('Invalid release request ID'),
@@ -21,23 +21,11 @@ function getOpenAIClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // Check admin auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-      
-    if (profile?.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
+    const { user, supabase } = auth;
 
     const body = await request.json().catch(() => ({}));
     const parsed_body = RequestSchema.safeParse(body);

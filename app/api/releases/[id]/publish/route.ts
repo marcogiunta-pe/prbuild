@@ -1,6 +1,6 @@
 // app/api/releases/[id]/publish/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
 
 // POST - Publish a release to the showcase
 export async function POST(
@@ -8,23 +8,11 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Check admin role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
+    const { user, supabase } = auth;
 
     // Get the release
     const { data: release, error: fetchError } = await supabase

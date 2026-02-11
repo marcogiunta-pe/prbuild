@@ -1,30 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
 import { getAppUrl } from '@/lib/app-url';
 import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    let profile: { role?: string } | null = null;
-    const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    profile = p;
-    if (!profile && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      try {
-        const adminCheck = createAdminClient();
-        const { data } = await adminCheck.from('profiles').select('role').eq('id', user.id).single();
-        profile = data;
-      } catch {
-        /* ignore */
-      }
-    }
-    if (!profile || profile.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
 

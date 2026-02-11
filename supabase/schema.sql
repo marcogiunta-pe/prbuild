@@ -12,7 +12,7 @@ CREATE TABLE public.profiles (
   company_name TEXT,
   company_website TEXT,
   role TEXT DEFAULT 'client' CHECK (role IN ('client', 'admin', 'journalist_reviewer')),
-  stripe_customer_id TEXT,
+  stripe_customer_id TEXT UNIQUE,
   stripe_subscription_id TEXT,
   current_plan TEXT,
   billing_interval TEXT,
@@ -76,7 +76,7 @@ CREATE TABLE public.release_requests (
   rewrite_used BOOLEAN DEFAULT FALSE,
   client_edited_content TEXT,
   admin_notes TEXT,
-  admin_reviewed_by UUID REFERENCES public.profiles(id),
+  admin_reviewed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   admin_reviewed_at TIMESTAMPTZ,
   
   -- Client Feedback
@@ -90,7 +90,7 @@ CREATE TABLE public.release_requests (
   -- Quality Review
   quality_score INTEGER,
   quality_notes TEXT,
-  quality_reviewed_by UUID REFERENCES public.profiles(id),
+  quality_reviewed_by UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   quality_reviewed_at TIMESTAMPTZ,
   
   -- Categorization (for showcase)
@@ -184,7 +184,7 @@ CREATE TABLE public.newsletter_sends (
 CREATE TABLE public.activity_log (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   release_request_id UUID REFERENCES public.release_requests(id),
-  user_id UUID REFERENCES public.profiles(id),
+  user_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   action TEXT NOT NULL,
   details JSONB,
   created_at TIMESTAMPTZ DEFAULT NOW()

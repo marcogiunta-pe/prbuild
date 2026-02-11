@@ -1,29 +1,17 @@
 // app/api/newsletter/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { sendNewsletterEmail } from '@/lib/email';
+import { requireAdmin } from '@/lib/auth';
 
 // GET - List newsletter sends (admin only)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
 
-    const { data: newsletters, error } = await supabase
+    const { data: newsletters, error } = await auth.supabase
       .from('newsletter_sends')
       .select('id, subject, category, recipient_count, open_count, click_count, sent_at')
       .order('sent_at', { ascending: false })
@@ -44,22 +32,11 @@ export async function GET(request: NextRequest) {
 // POST - Send a newsletter (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    if (profile?.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
+    const { supabase } = auth;
 
     const body = await request.json();
     

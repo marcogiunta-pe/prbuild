@@ -2,9 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
-import { createClient } from '@/lib/supabase/server';
 import { PanelFeedback } from '@/types';
 import { getRewritePrompts } from '@/lib/prompts';
+import { requireAuth } from '@/lib/auth';
 
 const RequestSchema = z.object({
   releaseRequestId: z.string().uuid('Invalid release request ID'),
@@ -18,13 +18,11 @@ function getOpenAIClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // Check auth - can be client or admin
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    const auth = await requireAuth();
+    if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const { user, supabase } = auth;
 
     const body = await request.json().catch(() => ({}));
     const parsed_body = RequestSchema.safeParse(body);

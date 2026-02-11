@@ -1,26 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { requireAdmin } from '@/lib/auth';
 
 /** Admin only: search profiles by email (is_free_user = false). Uses service role so we find everyone. */
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  let profile: { role?: string } | null = null;
-  const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  profile = p;
-  if (!profile && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    try {
-      const ac = createAdminClient();
-      const { data } = await ac.from('profiles').select('role').eq('id', user.id).single();
-      profile = data;
-    } catch { /* ignore */ }
-  }
-  if (!profile || profile.role !== 'admin') {
+  const auth = await requireAdmin();
+  if (!auth) {
     return NextResponse.json({ error: 'Admin only' }, { status: 403 });
   }
 

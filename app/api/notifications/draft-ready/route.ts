@@ -1,27 +1,15 @@
 // app/api/notifications/draft-ready/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { notifications } from '@/lib/email';
+import { requireAdmin } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    
-    // Check admin auth
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-    
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-      
-    if (profile?.role !== 'admin') {
+    const auth = await requireAdmin();
+    if (!auth) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
+    const { supabase } = auth;
 
     const { releaseId } = await request.json();
 
