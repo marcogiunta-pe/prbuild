@@ -45,6 +45,7 @@ export default function FreeUsersPage() {
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [approvingId, setApprovingId] = useState<string | null>(null);
   const [grantError, setGrantError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const inviteMessageText = (() => {
     if (inviteMessage == null || inviteMessage === '') return '';
@@ -73,16 +74,21 @@ export default function FreeUsersPage() {
   };
 
   const loadFreeUsers = async () => {
+    setLoadError(null);
     try {
-      const res = await fetch('/api/admin/free-users');
+      const res = await fetch(`/api/admin/free-users?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && Array.isArray(data.users)) {
-        setFreeUsers(data.users);
+      if (res.ok) {
+        const list = Array.isArray(data?.users) ? data.users : [];
+        setFreeUsers(list);
       } else {
         setFreeUsers([]);
+        const err = data?.error || (res.status === 403 ? 'Admin access required' : res.status === 401 ? 'Please sign in' : `Failed to load (${res.status})`);
+        setLoadError(typeof err === 'string' ? err : 'Failed to load free users');
       }
-    } catch {
+    } catch (e) {
       setFreeUsers([]);
+      setLoadError(e instanceof Error ? e.message : 'Failed to load free users');
     } finally {
       setLoading(false);
     }
@@ -456,18 +462,34 @@ export default function FreeUsersPage() {
       {/* Current Free Users */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Gift className="h-5 w-5 text-green-600" />
-            Current Free Users
-            <Badge variant="secondary">{freeUsers.length}</Badge>
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-green-600" />
+              Current Free Users
+              <Badge variant="secondary">{freeUsers.length}</Badge>
+            </CardTitle>
+            <Button size="sm" variant="outline" onClick={() => { setLoading(true); loadFreeUsers(); }}>
+              Refresh
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          {freeUsers.length === 0 ? (
+          {loadError && (
+            <div className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm flex items-center justify-between gap-2 flex-wrap">
+              <span className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                {loadError}
+              </span>
+              <Button size="sm" variant="outline" onClick={() => { setLoading(true); loadFreeUsers(); }}>
+                Retry
+              </Button>
+            </div>
+          )}
+          {freeUsers.length === 0 && !loadError ? (
             <p className="text-gray-500 text-center py-8">
               No free users yet. Search above to add users to the free program.
             </p>
-          ) : (
+          ) : freeUsers.length > 0 ? (
             <div className="divide-y">
               {freeUsers.map(user => (
                 <div key={user.id} className="py-3 flex items-center justify-between">
@@ -529,7 +551,7 @@ export default function FreeUsersPage() {
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
         </CardContent>
       </Card>
     </div>

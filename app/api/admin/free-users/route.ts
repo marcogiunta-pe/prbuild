@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 /** Admin only: list profiles with is_free_user = true, plus approved invites awaiting signup. */
 export async function GET() {
   const supabase = await createClient();
@@ -10,52 +12,69 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (profile?.role !== 'admin') {
+  let profile: { role?: string } | null = null;
+  const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  profile = p;
+  if (!profile && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const admin = createAdminClient();
+      const { data } = await admin.from('profiles').select('role').eq('id', user.id).single();
+      profile = data;
+    } catch {
+      /* ignore */
+    }
+  }
+  if (!profile || profile.role !== 'admin') {
     return NextResponse.json({ error: 'Admin only' }, { status: 403 });
   }
 
   const cols = 'id, email, full_name, company_name, is_free_user, free_releases_remaining, created_at';
   let lastError: { message: string } | null = null;
 
+  let users: Array<{ id: string; email: string; full_name: string | null; company_name: string | null; is_free_user: boolean; free_releases_remaining: number; created_at: string }> = [];
+  const fetchProfiles = async (
+    client: Awaited<ReturnType<typeof createClient>> | ReturnType<typeof createAdminClient>
+  ) => {
+    const { data, error } = await client
+      .from('profiles')
+      .select(cols)
+      .order('created_at', { ascending: false });
+    if (error) {
+      lastError = error;
+      return [];
+    }
+    return (data || []).filter((p) => p.is_free_user === true || p.is_free_user === 'true');
+  };
+
   try {
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const admin = createAdminClient();
-      const { data, error } = await admin
-        .from('profiles')
-        .select(cols)
-        .eq('is_free_user', true)
-        .order('created_at', { ascending: false });
-      if (!error) {
-        return NextResponse.json({ users: data || [] });
-      }
-      lastError = error;
+      users = await fetchProfiles(admin);
     }
   } catch {
     /* fallback */
   }
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .select(cols)
-    .eq('is_free_user', true)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    return NextResponse.json({ error: error.message || lastError?.message || 'Failed to fetch' }, { status: 500 });
+  if (users.length === 0) {
+    const fallback = await fetchProfiles(supabase);
+    if (fallback.length > 0) {
+      users = fallback;
+    } else if (lastError) {
+      return NextResponse.json({ error: lastError.message || 'Failed to fetch' }, { status: 500 });
+    }
   }
 
-  const users = data || [];
-
-  // Also include approved invites awaiting signup (no profile yet)
+  // Also include approved invites awaiting signup (no profile yet) — use admin client to bypass RLS
   let invited: Array<{ id: string; email: string; full_name: null; company_name: null; is_free_user: true; free_releases_remaining: number; created_at: string; _invite?: true }> = [];
   try {
-    const { data: invitesData } = await supabase
+    let inviteClient: Awaited<ReturnType<typeof createClient>> | ReturnType<typeof createAdminClient> = supabase;
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        inviteClient = createAdminClient();
+      } catch {
+        /* use supabase fallback */
+      }
+    }
+    const { data: invitesData } = await inviteClient
       .from('invites')
       .select('id, email, free_releases_remaining, created_at')
       .not('approved_at', 'is', null)
