@@ -24,6 +24,7 @@ interface FreeUser {
   is_free_user: boolean;
   free_releases_remaining: number;
   created_at: string;
+  _invite?: true; // approved invite awaiting set-password
 }
 
 export default function FreeUsersPage() {
@@ -473,45 +474,57 @@ export default function FreeUsersPage() {
                   <div>
                     <p className="font-medium">{user.email}</p>
                     <p className="text-sm text-gray-500">
-                      {user.full_name || 'No name'} • {user.company_name || 'No company'}
+                      {user._invite ? (
+                        <span className="text-amber-600">Awaiting signup — share set-password link</span>
+                      ) : (
+                        `${user.full_name || 'No name'} • ${user.company_name || 'No company'}`
+                      )}
                     </p>
                     <p className="text-xs text-gray-400">
                       Added {new Date(user.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <label className="flex items-center gap-1.5 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={user.free_releases_remaining === -1}
-                          onChange={(e) => setUnlimited(user.id, e.target.checked)}
-                          className="rounded border-gray-300"
-                        />
-                        Unlimited
-                      </label>
-                      {user.free_releases_remaining !== -1 && (
-                        <>
-                          <Label className="text-sm">Releases:</Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            max="999"
-                            value={user.free_releases_remaining}
-                            onChange={(e) => updateReleases(user.id, parseInt(e.target.value) || 0)}
-                            className="w-16 h-8"
-                          />
-                        </>
-                      )}
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => removeFreeUser(user.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {user._invite ? (
+                      <Badge variant="outline" className="text-amber-600 border-amber-300">
+                        Pending signup
+                      </Badge>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <label className="flex items-center gap-1.5 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={user.free_releases_remaining === -1}
+                              onChange={(e) => setUnlimited(user.id, e.target.checked)}
+                              className="rounded border-gray-300"
+                            />
+                            Unlimited
+                          </label>
+                          {user.free_releases_remaining !== -1 && (
+                            <>
+                              <Label className="text-sm">Releases:</Label>
+                              <Input
+                                type="number"
+                                min="0"
+                                max="999"
+                                value={user.free_releases_remaining}
+                                onChange={(e) => updateReleases(user.id, parseInt(e.target.value) || 0)}
+                                className="w-16 h-8"
+                              />
+                            </>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeFreeUser(user.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
