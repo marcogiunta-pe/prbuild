@@ -12,7 +12,6 @@ import { AnimatedStatsBanner } from '@/components/AnimatedStats';
 import { TrustBadges } from '@/components/TrustBadges';
 import { AnimateOnScroll } from '@/components/landing/AnimateOnScroll';
 import { LogoBar } from '@/components/landing/LogoBar';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { HeroMockup } from '@/components/landing/HeroMockup';
 import { BeforeAfterComparison } from '@/components/landing/BeforeAfterComparison';
 import { PressReleasePreview } from '@/components/landing/PressReleasePreview';
@@ -95,7 +94,6 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center space-x-2">
-            <ThemeToggle />
             <Link href="/signup" className="hidden sm:block" data-cta="nav-signup">
               <Button className="bg-secondary hover:bg-secondary/90 min-h-[44px]">
                 Start Free Trial

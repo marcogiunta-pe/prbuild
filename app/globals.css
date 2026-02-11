@@ -23,23 +23,6 @@
     --ring: 213 52% 24%;
     --radius: 0.5rem;
   }
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 40% 98%;
-    --primary: 213 52% 24%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 174 85% 29%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 213 52% 24%;
-  }
 }
 
 @layer base {
@@ -53,10 +36,6 @@
     @apply bg-background text-foreground text-base;
     background-color: #ffffff;
     color: #1e293b;
-  }
-  .dark body {
-    background-color: #0f172a;
-    color: #f8fafc;
   }
   @media (max-width: 640px) {
     html { font-size: 16px; }
@@ -82,10 +61,6 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
 }
-
-.dark ::-webkit-scrollbar-track { background: #1f2937; }
-.dark ::-webkit-scrollbar-thumb { background: #4b5563; }
-.dark ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
 
 /* Focus visible for a11y */
 :focus-visible {
