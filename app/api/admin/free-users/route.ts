@@ -29,7 +29,7 @@ export async function GET() {
   }
 
   const cols = 'id, email, full_name, company_name, is_free_user, free_releases_remaining, created_at';
-  let lastError: { message: string } | null = null;
+  let lastError: { message?: string } | null = null;
 
   let users: Array<{ id: string; email: string; full_name: string | null; company_name: string | null; is_free_user: boolean; free_releases_remaining: number; created_at: string }> = [];
   const fetchProfiles = async (
@@ -59,7 +59,8 @@ export async function GET() {
     if (fallback.length > 0) {
       users = fallback;
     } else if (lastError) {
-      return NextResponse.json({ error: lastError.message || 'Failed to fetch' }, { status: 500 });
+      const errMsg = 'message' in lastError ? String(lastError.message) : 'Failed to fetch';
+      return NextResponse.json({ error: errMsg }, { status: 500 });
     }
   }
 
