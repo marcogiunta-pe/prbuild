@@ -73,7 +73,32 @@ export async function removeFree(userId: string): Promise<{ ok: boolean; message
 export async function deleteUser(userId: string): Promise<{ ok: boolean; message: string }> {
   try {
     const admin = await ensureAdmin();
-    await admin.auth.admin.deleteUser(userId);
+
+    // Delete in order: profile FKs block auth delete. Clean dependent rows first.
+    await admin.from('release_requests').update({ admin_reviewed_by: null, quality_reviewed_by: null }).or(`admin_reviewed_by.eq.${userId},quality_reviewed_by.eq.${userId}`);
+
+    const { data: requests } = await admin.from('release_requests').select('id').eq('client_id', userId);
+    const requestIds = (requests || []).map((r) => r.id);
+
+    if (requestIds.length > 0) {
+      await admin.from('activity_log').delete().in('release_request_id', requestIds);
+      await admin.from('showcase_releases').delete().in('release_request_id', requestIds);
+    }
+    await admin.from('activity_log').delete().eq('user_id', userId);
+    await admin.from('release_requests').delete().eq('client_id', userId);
+
+    const { data: features } = await admin.from('feature_requests').select('id').eq('submitted_by', userId);
+    const featureIds = (features || []).map((f) => f.id);
+    if (featureIds.length > 0) {
+      await admin.from('feature_votes').delete().in('feature_request_id', featureIds);
+    }
+    await admin.from('feature_votes').delete().eq('user_id', userId);
+    await admin.from('feature_requests').delete().eq('submitted_by', userId);
+    await admin.from('profiles').delete().eq('id', userId);
+
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+
     revalidatePath('/admin/users');
     return { ok: true, message: 'User deleted' };
   } catch (e) {

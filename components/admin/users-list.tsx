@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, Search, Mail, User, Shield, AlertCircle, UserPlus, Gift, Trash2, Loader2 } from 'lucide-react';
+import { Users, Search, Mail, User, Shield, AlertCircle, UserPlus, Gift, Trash2, Loader2, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { addUser, grantFree, removeFree, deleteUser } from '@/app/admin/users/actions';
 
@@ -134,11 +134,26 @@ export function AdminUsersClient({
           {addResult && (
             <div className={`mt-4 p-4 rounded-lg ${addResult.ok ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30'}`}>
               <p className="font-medium">{addResult.message}</p>
-              {addResult.tempPassword && (
-                <div className="mt-2 flex items-center gap-2">
-                  <code className="bg-slate-800 px-3 py-2 rounded text-sm font-mono">{addResult.tempPassword}</code>
-                  <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(addResult.tempPassword!)}>
-                    Copy
+              {addResult.ok && addResult.tempPassword && addResult.email && (
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <code className="bg-slate-800 px-3 py-2 rounded text-sm font-mono">{addResult.tempPassword}</code>
+                    <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(addResult.tempPassword!)} className="border-slate-600 text-slate-300">
+                      Copy password
+                    </Button>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-slate-600 text-slate-300"
+                    onClick={() => {
+                      const loginUrl = `${typeof window !== 'undefined' ? window.location.origin : 'https://prbuild.ai'}/login`;
+                      const msg = `You're set up on PRBuild. Sign in here:\n\n${loginUrl}\n\nEmail: ${addResult.email}\nTemporary password: ${addResult.tempPassword}\n\nYou'll be asked to set a new password on first login.`;
+                      navigator.clipboard.writeText(msg);
+                    }}
+                  >
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy message to send
                   </Button>
                 </div>
               )}
