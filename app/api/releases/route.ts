@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     const { data: releases, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error querying releases:', error);
+      return NextResponse.json({ error: 'Failed to fetch releases' }, { status: 500 });
     }
 
     return NextResponse.json({ releases });
@@ -80,7 +81,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error creating release:', error);
+      return NextResponse.json({ error: 'Failed to create release' }, { status: 500 });
     }
 
     // Log activity

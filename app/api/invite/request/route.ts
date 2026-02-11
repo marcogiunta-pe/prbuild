@@ -43,7 +43,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      return NextResponse.json({ error: error.message || 'Request failed' }, { status: 500 });
+      console.error('Error creating invite request:', error);
+      return NextResponse.json({ error: 'Request failed' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest) {
       message: 'Request submitted. You can sign in once an admin approves your request.',
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Request failed';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Error in invite request:', err);
+    return NextResponse.json({ error: 'Request failed' }, { status: 500 });
   }
 }

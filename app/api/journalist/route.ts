@@ -30,7 +30,8 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error fetching journalist subscribers:', error);
+      return NextResponse.json({ error: 'Failed to fetch journalists' }, { status: 500 });
     }
 
     return NextResponse.json({ journalists });
@@ -87,7 +88,8 @@ export async function POST(request: NextRequest) {
       if (error.code === '23505') {
         return NextResponse.json({ error: 'Email already subscribed' }, { status: 409 });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error subscribing journalist:', error);
+      return NextResponse.json({ error: 'Failed to subscribe' }, { status: 500 });
     }
 
     // Send verification email

@@ -12,14 +12,15 @@ export async function GET(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Find and verify the subscriber
+    // Find and verify the subscriber (only if not already verified to prevent replay)
     const { data: subscriber, error } = await supabase
       .from('journalist_subscribers')
-      .update({ 
+      .update({
         is_verified: true,
         verification_token: null,
       })
       .eq('verification_token', token)
+      .eq('is_verified', false)
       .select()
       .single();
 

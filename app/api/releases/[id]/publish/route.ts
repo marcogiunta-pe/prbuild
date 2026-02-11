@@ -74,7 +74,8 @@ export async function POST(
       .single();
 
     if (insertError) {
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
+      console.error('Error publishing to showcase:', insertError);
+      return NextResponse.json({ error: 'Failed to publish release' }, { status: 500 });
     }
 
     // Update release status

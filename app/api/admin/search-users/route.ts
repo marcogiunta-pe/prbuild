@@ -38,7 +38,8 @@ export async function GET(request: NextRequest) {
     .limit(10);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Error searching users:', error);
+    return NextResponse.json({ error: 'Failed to search users' }, { status: 500 });
   }
 
   return NextResponse.json({ users: users || [] });

@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
       .order('sent_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error fetching newsletters:', error);
+      return NextResponse.json({ error: 'Failed to fetch newsletters' }, { status: 500 });
     }
 
     return NextResponse.json({ newsletters });
@@ -124,10 +125,11 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error logging newsletter send:', error);
+      return NextResponse.json({ error: 'Failed to log newsletter send' }, { status: 500 });
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       newsletter,
       recipientCount,

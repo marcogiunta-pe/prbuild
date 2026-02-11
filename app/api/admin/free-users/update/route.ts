@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
   if (action === 'remove') {
     const { error } = await admin.from('profiles').update({ is_free_user: false, free_releases_remaining: 0 }).eq('id', userId);
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) { console.error('Error removing free user:', error); return NextResponse.json({ error: 'Failed to remove free access' }, { status: 500 }); }
     return NextResponse.json({ success: true });
   }
 
@@ -42,6 +42,6 @@ export async function POST(request: NextRequest) {
     .update({ free_releases_remaining: releases })
     .eq('id', userId);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) { console.error('Error updating free user:', error); return NextResponse.json({ error: 'Failed to update free access' }, { status: 500 }); }
   return NextResponse.json({ success: true });
 }

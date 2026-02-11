@@ -45,7 +45,8 @@ export async function POST(request: NextRequest) {
     .eq('id', userId);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Error granting free access:', error);
+    return NextResponse.json({ error: 'Failed to grant free access' }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

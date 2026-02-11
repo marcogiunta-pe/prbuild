@@ -50,11 +50,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      const msg = insertError.message || '';
-      const hint = msg.includes('does not exist') || msg.includes('relation')
-        ? ' Create the invites table in Supabase (run the SQL from DEPLOY/schema).'
-        : '';
-      return NextResponse.json({ error: msg + hint }, { status: 500 });
+      console.error('Error creating invite:', insertError);
+      return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 });
     }
 
     const setPasswordLink = `${getAppUrl()}/set-password?token=${token}`;
@@ -64,7 +61,7 @@ export async function POST(request: NextRequest) {
       setPasswordLink,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to add';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Error in invite creation:', err);
+    return NextResponse.json({ error: 'Failed to create invite' }, { status: 500 });
   }
 }

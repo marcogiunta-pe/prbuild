@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
       .eq('id', invite.id);
 
     if (updateError) {
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
+      console.error('Error approving invite:', updateError);
+      return NextResponse.json({ error: 'Failed to approve invite' }, { status: 500 });
     }
 
     const setPasswordLink = `${getAppUrl()}/set-password?token=${invite.token}`;
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       setPasswordLink,
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Failed to approve';
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error('Error in invite approval:', err);
+    return NextResponse.json({ error: 'Failed to approve invite' }, { status: 500 });
   }
 }

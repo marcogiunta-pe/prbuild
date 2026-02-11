@@ -114,7 +114,8 @@ export async function PATCH(
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('Error updating release:', error);
+      return NextResponse.json({ error: 'Failed to update release' }, { status: 500 });
     }
 
     if (Object.keys(updates).length === 0) {
