@@ -82,8 +82,16 @@ export default function NewRequestPage() {
           mediaContactName: profile.full_name || '',
           mediaContactEmail: profile.email || '',
         }));
-        setIsFreeUser(!!profile.is_free_user);
-        setFreeReleasesRemaining(profile.free_releases_remaining ?? 0);
+        const free = !!profile.is_free_user;
+        const remaining = profile.free_releases_remaining ?? 0;
+        setIsFreeUser(free);
+        setFreeReleasesRemaining(remaining);
+        // Free users skip the plan step entirely — go straight to the form
+        if (free && (remaining > 0 || remaining === -1) && !searchParams.get('session_id')) {
+          setFormData(prev => ({ ...prev, plan: 'starter' }));
+          setIsFreeRelease(true);
+          setStep('company');
+        }
       }
     };
     getUser();

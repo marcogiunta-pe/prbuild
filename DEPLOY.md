@@ -74,6 +74,24 @@ If invite emails fail or you see errors about the sender:
 
 ---
 
+## Supabase: existing database
+
+If you get **"relation already exists"** when running `schema.sql`, your database already has the tables. **Do not run the full schema**. Run only migrations:
+
+**Supabase → SQL Editor → New query**, then run:
+
+```sql
+-- Invites: approved_at for request-free-access flow
+ALTER TABLE public.invites ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
+UPDATE public.invites SET approved_at = created_at WHERE approved_at IS NULL;
+```
+
+**Function search path (linter fix):** Run `supabase/migrations/20250212_fix_function_search_path.sql` to fix the Function Search Path Mutable warning.
+
+**Leaked password protection:** Enable in Supabase Dashboard → **Authentication** → **Settings** → **Security** → turn on **Leaked password protection**.
+
+---
+
 ## Custom domain: prbuild.ai
 
 1. **Vercel:** Project → **Settings** → **Domains** → **Add** → enter `prbuild.ai`

@@ -43,6 +43,7 @@ export default function FreeUsersPage() {
   const [lastSetPasswordLink, setLastSetPasswordLink] = useState<string | null>(null);
   const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
   const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [grantError, setGrantError] = useState<string | null>(null);
 
   const inviteMessageText = (() => {
     if (inviteMessage == null || inviteMessage === '') return '';
@@ -88,77 +89,81 @@ export default function FreeUsersPage() {
 
   const searchUsers = async () => {
     if (!searchEmail.trim()) return;
-    
     setSearching(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .ilike('email', `%${searchEmail}%`)
-      .eq('is_free_user', false)
-      .limit(10);
-
-    setSearchResults(data || []);
-    setSearching(false);
+    try {
+      const res = await fetch(`/api/admin/search-users?q=${encodeURIComponent(searchEmail.trim())}`);
+      const data = await res.json().catch(() => ({}));
+      setSearchResults(res.ok && Array.isArray(data.users) ? data.users : []);
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
   };
 
   const addFreeUser = async (user: FreeUser) => {
+    setGrantError(null);
     const unlimited = unlimitedToGrant[user.id];
     const releases = unlimited ? -1 : (releasesToGrant[user.id] ?? 3);
-    const supabase = createClient();
-    
-    const { error } = await supabase
-      .from('profiles')
-      .update({ 
-        is_free_user: true,
-        free_releases_remaining: releases
-      })
-      .eq('id', user.id);
-
-    if (!error) {
-      setSearchResults(prev => prev.filter(u => u.id !== user.id));
-      await loadFreeUsers();
+    try {
+      const res = await fetch('/api/admin/grant-free', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, freeReleases: releases, unlimited }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setSearchResults(prev => prev.filter(u => u.id !== user.id));
+        await loadFreeUsers();
+      } else {
+        setGrantError(data?.error ?? 'Failed to grant free access');
+      }
+    } catch (e) {
+      setGrantError(e instanceof Error ? e.message : 'Failed to grant free access');
     }
   };
 
   const removeFreeUser = async (userId: string) => {
     if (!confirm('Remove this user from the free program?')) return;
-    
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('profiles')
-      .update({ 
-        is_free_user: false,
-        free_releases_remaining: 0
-      })
-      .eq('id', userId);
-
-    if (!error) {
-      await loadFreeUsers();
+    setGrantError(null);
+    try {
+      const res = await fetch('/api/admin/free-users/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'remove' }),
+      });
+      if (res.ok) await loadFreeUsers();
+      else setGrantError((await res.json().catch(() => ({}))).error ?? 'Failed');
+    } catch (e) {
+      setGrantError(e instanceof Error ? e.message : 'Failed');
     }
   };
 
   const updateReleases = async (userId: string, releases: number) => {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('profiles')
-      .update({ free_releases_remaining: releases })
-      .eq('id', userId);
-
-    if (!error) {
-      await loadFreeUsers();
+    setGrantError(null);
+    try {
+      const res = await fetch('/api/admin/free-users/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'update', freeReleasesRemaining: releases }),
+      });
+      if (res.ok) await loadFreeUsers();
+    } catch {
+      /* ignore */
     }
   };
 
   const setUnlimited = async (userId: string, unlimited: boolean) => {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('profiles')
-      .update({ free_releases_remaining: unlimited ? -1 : 0 })
-      .eq('id', userId);
-
-    if (!error) {
-      await loadFreeUsers();
+    setGrantError(null);
+    try {
+      const res = await fetch('/api/admin/free-users/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action: 'update', unlimited }),
+      });
+      if (res.ok) await loadFreeUsers();
+    } catch {
+      /* ignore */
     }
   };
 
@@ -378,6 +383,9 @@ export default function FreeUsersPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {grantError && (
+            <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{grantError}</p>
+          )}
           <div className="flex gap-2">
             <Input
               placeholder="Search by email..."

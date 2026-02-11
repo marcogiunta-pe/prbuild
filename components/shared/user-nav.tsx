@@ -36,7 +36,14 @@ export function UserNav({ user }: UserNavProps) {
           <User className="h-4 w-4 text-primary" />
         </div>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-medium">{user.fullName || 'User'}</p>
+          <p className="text-sm font-medium flex items-center gap-2">
+            {user.fullName || 'User'}
+            {user.role && (
+              <span className="text-xs font-normal px-1.5 py-0.5 rounded bg-primary/10 text-primary capitalize">
+                {user.role}
+              </span>
+            )}
+          </p>
           <p className="text-xs text-gray-500">{user.email}</p>
         </div>
         <ChevronDown className="h-4 w-4 text-gray-500" />
