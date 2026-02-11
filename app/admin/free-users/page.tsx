@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, Gift, Trash2, Search, Loader2, Mail, Clock, CheckCircle } from 'lucide-react';
+import { UserPlus, Gift, Trash2, Search, Loader2, Mail, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface PendingInvite {
   id: string;
