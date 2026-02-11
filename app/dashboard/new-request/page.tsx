@@ -66,31 +66,24 @@ export default function NewRequestPage() {
       setStep('company');
     }
 
-    // Get current user
+    // Get current user + profile (use /api/me so free user status is accurate)
     const getUser = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        setUserId(user.id);
-        
-        // Pre-fill from profile + check free user status
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining')
-          .eq('id', user.id)
-          .single();
-          
-        if (profile) {
-          setFormData(prev => ({
-            ...prev,
-            companyName: profile.company_name || '',
-            companyWebsite: profile.company_website || '',
-            mediaContactName: profile.full_name || '',
-            mediaContactEmail: profile.email || '',
-          }));
-          setIsFreeUser(!!profile.is_free_user);
-          setFreeReleasesRemaining(profile.free_releases_remaining ?? 0);
-        }
+      if (!user) return;
+      setUserId(user.id);
+      const res = await fetch('/api/me');
+      if (res.ok) {
+        const profile = await res.json();
+        setFormData(prev => ({
+          ...prev,
+          companyName: profile.company_name || '',
+          companyWebsite: profile.company_website || '',
+          mediaContactName: profile.full_name || '',
+          mediaContactEmail: profile.email || '',
+        }));
+        setIsFreeUser(!!profile.is_free_user);
+        setFreeReleasesRemaining(profile.free_releases_remaining ?? 0);
       }
     };
     getUser();
