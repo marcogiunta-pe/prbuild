@@ -1,9 +1,14 @@
 // app/api/ai/rewrite-from-panel/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { PanelFeedback } from '@/types';
 import { getRewritePrompts } from '@/lib/prompts';
+
+const RequestSchema = z.object({
+  releaseRequestId: z.string().uuid('Invalid release request ID'),
+});
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -21,7 +26,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { releaseRequestId } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const parsed_body = RequestSchema.safeParse(body);
+    if (!parsed_body.success) {
+      return NextResponse.json({ error: parsed_body.error.errors[0].message }, { status: 400 });
+    }
+    const { releaseRequestId } = parsed_body.data;
 
     // Fetch the release request
     const { data: release, error } = await supabase

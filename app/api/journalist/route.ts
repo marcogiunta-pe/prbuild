@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { sendJournalistVerificationEmail } from '@/lib/email';
+import { rateLimit, getRateLimitKey } from '@/lib/rate-limit';
 
 // GET - List journalist subscribers (admin only)
 export async function GET(request: NextRequest) {
@@ -42,6 +43,15 @@ export async function GET(request: NextRequest) {
 // POST - Subscribe a journalist (public)
 export async function POST(request: NextRequest) {
   try {
+    const ip = getRateLimitKey(request);
+    const { success, retryAfter } = rateLimit(`journalist:${ip}`, { maxRequests: 5, windowMs: 60 * 60 * 1000 });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
+
     const body = await request.json();
     
     if (!body.email) {

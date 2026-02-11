@@ -1,12 +1,17 @@
 // app/api/ai/panel-critique/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { 
-  buildIndustryPanelPrompt, 
+import {
+  buildIndustryPanelPrompt,
   parsePanelCritiqueResponse,
 } from '@/lib/prompts/panel-critique';
 import { getPanelCritiquePrompts } from '@/lib/prompts';
+
+const RequestSchema = z.object({
+  releaseRequestId: z.string().uuid('Invalid release request ID'),
+});
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -34,7 +39,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin only' }, { status: 403 });
     }
 
-    const { releaseRequestId } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const parsed_body = RequestSchema.safeParse(body);
+    if (!parsed_body.success) {
+      return NextResponse.json({ error: parsed_body.error.errors[0].message }, { status: 400 });
+    }
+    const { releaseRequestId } = parsed_body.data;
 
     // Fetch the release request
     const { data: release, error } = await supabase

@@ -2,6 +2,16 @@
 import { Resend } from 'resend';
 import { getAppUrl } from './app-url';
 
+/** Escape HTML special characters to prevent XSS in email templates */
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // Lazy-load Resend to avoid build errors when API key is not set
 let resend: Resend | null = null;
 
@@ -103,13 +113,13 @@ export async function sendNewsletterEmail(
 
   const releaseHtml = releases.map(release => `
     <div style="border-bottom: 1px solid #eee; padding: 20px 0;">
-      <div style="font-size: 12px; color: #6366f1; text-transform: uppercase; margin-bottom: 8px;">${release.category} • ${release.company_name}</div>
+      <div style="font-size: 12px; color: #6366f1; text-transform: uppercase; margin-bottom: 8px;">${escapeHtml(release.category)} &bull; ${escapeHtml(release.company_name)}</div>
       <h3 style="margin: 0 0 8px; font-size: 18px;">
-        <a href="${baseUrl}/showcase/${release.id}" style="color: #333; text-decoration: none;">${release.headline}</a>
+        <a href="${baseUrl}/showcase/${encodeURIComponent(release.id)}" style="color: #333; text-decoration: none;">${escapeHtml(release.headline)}</a>
       </h3>
-      ${release.subhead ? `<p style="color: #666; margin: 0 0 8px; font-style: italic;">${release.subhead}</p>` : ''}
-      <p style="color: #555; margin: 0; font-size: 14px;">${release.summary}</p>
-      <a href="${baseUrl}/showcase/${release.id}" style="color: #6366f1; font-size: 14px; text-decoration: none;">Read full release →</a>
+      ${release.subhead ? `<p style="color: #666; margin: 0 0 8px; font-style: italic;">${escapeHtml(release.subhead)}</p>` : ''}
+      <p style="color: #555; margin: 0; font-size: 14px;">${escapeHtml(release.summary)}</p>
+      <a href="${baseUrl}/showcase/${encodeURIComponent(release.id)}" style="color: #6366f1; font-size: 14px; text-decoration: none;">Read full release &rarr;</a>
     </div>
   `).join('');
 
@@ -136,7 +146,7 @@ export async function sendNewsletterEmail(
               <p style="color: #666; margin: 0;">Your curated press release digest</p>
             </div>
             
-            <h2 style="margin-bottom: 20px;">${subject}</h2>
+            <h2 style="margin-bottom: 20px;">${escapeHtml(subject)}</h2>
             
             ${releases.length > 0 ? releaseHtml : '<p>No new releases this period. Check back soon!</p>'}
             
@@ -194,11 +204,11 @@ export async function sendClientNotification(
         <body>
           <div class="container">
             <div class="logo">📰 PRBuild</div>
-            <h2>${subject}</h2>
-            <p>${message}</p>
+            <h2>${escapeHtml(subject)}</h2>
+            <p>${escapeHtml(message)}</p>
             ${ctaText && ctaUrl ? `
               <p style="margin: 30px 0;">
-                <a href="${ctaUrl}" class="button">${ctaText}</a>
+                <a href="${ctaUrl}" class="button">${escapeHtml(ctaText)}</a>
               </p>
             ` : ''}
             <div class="footer">
@@ -291,7 +301,7 @@ export async function sendInviteEmail(
           <div class="container">
             <div class="logo">📰 PRBuild</div>
             <h2>You're invited</h2>
-            <p>You've been invited to try PRBuild and get <strong>${releasesText} press release${freeReleases === -1 ? 's' : freeReleases === 1 ? '' : 's'}</strong>.</p>
+            <p>You've been invited to try PRBuild and get <strong>${escapeHtml(releasesText)} press release${freeReleases === -1 ? 's' : freeReleases === 1 ? '' : 's'}</strong>.</p>
             <p>Sign up with this email to claim your free access:</p>
             <p style="margin: 30px 0;">
               <a href="${signupUrl}" class="button">Accept invite & sign up</a>
