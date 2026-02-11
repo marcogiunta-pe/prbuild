@@ -8,8 +8,17 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-  if (profile?.role !== 'admin') return NextResponse.json({ error: 'Admin only' }, { status: 403 });
+  let profile: { role?: string } | null = null;
+  const { data: p } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  profile = p;
+  if (!profile && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const ac = createAdminClient();
+      const { data } = await ac.from('profiles').select('role').eq('id', user.id).single();
+      profile = data;
+    } catch { /* ignore */ }
+  }
+  if (!profile || profile.role !== 'admin') return NextResponse.json({ error: 'Admin only' }, { status: 403 });
 
   const body = await request.json().catch(() => ({}));
   const userId = (body.userId as string)?.trim();
