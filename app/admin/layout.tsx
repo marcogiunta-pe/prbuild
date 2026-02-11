@@ -19,12 +19,28 @@ export default async function AdminLayout({
     redirect('/login');
   }
 
-  const admin = createAdminClient();
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('full_name, role')
-    .eq('id', user.id)
-    .single();
+  let profile: { full_name?: string; role?: string } | null = null;
+  try {
+    if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const admin = createAdminClient();
+      const { data } = await admin
+        .from('profiles')
+        .select('full_name, role')
+        .eq('id', user.id)
+        .single();
+      profile = data;
+    }
+  } catch {
+    // Fallback to regular client if admin client fails
+  }
+  if (!profile) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('full_name, role')
+      .eq('id', user.id)
+      .single();
+    profile = data;
+  }
 
   // Only allow admin users
   if (profile?.role !== 'admin') {
