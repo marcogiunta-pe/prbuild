@@ -59,7 +59,7 @@ export async function GET() {
     if (fallback.length > 0) {
       users = fallback;
     } else if (lastError) {
-      const errMsg = 'message' in lastError ? String(lastError.message) : 'Failed to fetch';
+      const errMsg = String((lastError as Error).message || 'Failed to fetch');
       return NextResponse.json({ error: errMsg }, { status: 500 });
     }
   }
