@@ -21,7 +21,6 @@ export async function GET() {
   }
 
   const cols = 'id, email, full_name, company_name, is_free_user, free_releases_remaining, created_at';
-  let users: Awaited<ReturnType<typeof supabase.from<'profiles'>>>['data'] = [];
   let lastError: { message: string } | null = null;
 
   try {
