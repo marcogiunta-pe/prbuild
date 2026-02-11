@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Settings, ChevronDown } from 'lucide-react';
+import { LogOut, User, Settings, ChevronDown, Shield } from 'lucide-react';
 
 interface UserNavProps {
   user: {
@@ -66,6 +66,19 @@ export function UserNav({ user }: UserNavProps) {
                   </span>
                 )}
               </div>
+              
+              {user.role === 'admin' && (
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    router.push('/admin/requests');
+                  }}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-secondary hover:bg-secondary/10 rounded-md font-medium"
+                >
+                  <Shield className="h-4 w-4" />
+                  Admin Panel
+                </button>
+              )}
               
               <button
                 onClick={() => {
