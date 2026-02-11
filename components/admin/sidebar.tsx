@@ -11,7 +11,6 @@ import {
   BarChart3,
   Settings,
   Shield,
-  Gift,
   Lightbulb,
   Wand2
 } from 'lucide-react';
@@ -47,12 +46,6 @@ const navItems = [
     href: '/admin/newsletters',
     icon: Mail,
     description: 'Email campaigns',
-  },
-  {
-    title: 'Free Users',
-    href: '/admin/free-users',
-    icon: Gift,
-    description: 'Manage free access',
   },
   {
     title: 'Feedback',

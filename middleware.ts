@@ -94,6 +94,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  // Force password reset: redirect to /change-password unless already there
+  if (session?.user?.user_metadata?.force_password_reset === true && pathname !== '/change-password') {
+    return NextResponse.redirect(new URL('/change-password', request.url));
+  }
+
   // If user is logged in and trying to access auth pages
   if (session && (pathname === '/login' || pathname === '/signup')) {
     // Check role to redirect to appropriate dashboard
@@ -143,6 +148,7 @@ export const config = {
     '/forgot-password',
     '/reset-password',
     '/set-password',
+    '/change-password',
     '/request-free-access',
     '/dashboard/:path*',
     '/admin/:path*',
