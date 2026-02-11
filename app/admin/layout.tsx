@@ -42,8 +42,9 @@ export default async function AdminLayout({
     profile = data;
   }
 
-  // Only allow admin users
-  if (profile?.role !== 'admin') {
+  // Only redirect when we have positive confirmation they're NOT admin.
+  // If profile is null (fetch failed), don't redirect - middleware already verified admin access.
+  if (profile && profile.role !== 'admin') {
     redirect('/dashboard/my-releases');
   }
 
