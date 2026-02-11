@@ -40,8 +40,9 @@ export default function AdminJournalistsPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('journalist_subscribers')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('id, email, name, outlet, beat, categories, frequency, is_verified, verification_token, unsubscribe_token, created_at')
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (data) {
       setJournalists(data);

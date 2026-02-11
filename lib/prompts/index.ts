@@ -9,21 +9,26 @@ interface PromptConfig {
   user_prompt_template: string;
 }
 
-// Cache for prompts to avoid repeated DB calls
-let promptCache: Record<string, PromptConfig> = {};
-let cacheTimestamp = 0;
-const CACHE_TTL = 60000; // 1 minute cache
+interface CacheEntry {
+  data: PromptConfig;
+  fetchedAt: number;
+}
+
+// Cache for prompts to avoid repeated DB calls (per-key TTL)
+let promptCache: Record<string, CacheEntry> = {};
+const CACHE_TTL = 30_000; // 30 seconds — short enough for admin edits to propagate quickly
+const MAX_CACHE_ENTRIES = 20;
 
 export async function getPromptConfig(promptKey: string): Promise<PromptConfig | null> {
-  // Check cache first
   const now = Date.now();
-  if (promptCache[promptKey] && now - cacheTimestamp < CACHE_TTL) {
-    return promptCache[promptKey];
+  const cached = promptCache[promptKey];
+  if (cached && now - cached.fetchedAt < CACHE_TTL) {
+    return cached.data;
   }
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('prompt_configs')
       .select('prompt_key, system_prompt, user_prompt_template')
       .eq('prompt_key', promptKey)
@@ -31,8 +36,11 @@ export async function getPromptConfig(promptKey: string): Promise<PromptConfig |
       .single();
 
     if (data) {
-      promptCache[promptKey] = data;
-      cacheTimestamp = now;
+      // Evict entire cache if it grows too large to prevent memory leaks
+      if (Object.keys(promptCache).length >= MAX_CACHE_ENTRIES) {
+        promptCache = {};
+      }
+      promptCache[promptKey] = { data, fetchedAt: now };
       return data;
     }
   } catch (error) {
@@ -187,5 +195,4 @@ Please rewrite the press release addressing the feedback while maintaining the c
 // Clear cache (useful after prompt updates)
 export function clearPromptCache() {
   promptCache = {};
-  cacheTimestamp = 0;
 }

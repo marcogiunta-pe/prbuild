@@ -25,8 +25,9 @@ export async function GET(request: NextRequest) {
 
     const { data: newsletters, error } = await supabase
       .from('newsletter_sends')
-      .select('*')
-      .order('sent_at', { ascending: false });
+      .select('id, subject, category, recipient_count, open_count, click_count, sent_at')
+      .order('sent_at', { ascending: false })
+      .limit(100);
 
     if (error) {
       console.error('Error fetching newsletters:', error);
@@ -66,10 +67,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Subject is required' }, { status: 400 });
     }
 
-    // Get journalists matching the category filter
+    // Get journalists matching the category filter (only fields needed for sending)
     let journalistQuery = supabase
       .from('journalist_subscribers')
-      .select('*')
+      .select('email, unsubscribe_token, categories')
       .eq('is_verified', true);
 
     if (body.category) {

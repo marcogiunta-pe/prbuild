@@ -18,7 +18,10 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
-    let query = supabase.from('release_requests').select('*');
+    // Select only the columns needed for the list view (avoids transferring large JSONB fields)
+    let query = supabase.from('release_requests').select(
+      'id, client_id, company_name, company_website, announcement_type, news_hook, industry, plan, amount_paid, status, ai_selected_headline, ai_subhead, created_at, updated_at, sent_to_client_at, published_at'
+    );
 
     // If not admin, only show own releases
     if (profile?.role !== 'admin') {

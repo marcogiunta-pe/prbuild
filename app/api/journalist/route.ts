@@ -26,8 +26,9 @@ export async function GET(request: NextRequest) {
 
     const { data: journalists, error } = await supabase
       .from('journalist_subscribers')
-      .select('*')
-      .order('created_at', { ascending: false });
+      .select('id, email, name, outlet, beat, categories, frequency, is_verified, created_at')
+      .order('created_at', { ascending: false })
+      .limit(500);
 
     if (error) {
       console.error('Error fetching journalist subscribers:', error);

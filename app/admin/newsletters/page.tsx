@@ -49,8 +49,9 @@ export default function AdminNewslettersPage() {
     const supabase = createClient();
     const { data, error } = await supabase
       .from('newsletter_sends')
-      .select('*')
-      .order('sent_at', { ascending: false });
+      .select('id, subject, category, release_ids, recipient_count, open_count, click_count, sent_at')
+      .order('sent_at', { ascending: false })
+      .limit(100);
 
     if (data) {
       setNewsletters(data);

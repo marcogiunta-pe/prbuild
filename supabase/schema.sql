@@ -241,6 +241,14 @@ CREATE TABLE public.invites (
 --   ALTER TABLE public.invites ADD COLUMN IF NOT EXISTS approved_at TIMESTAMPTZ;
 --   UPDATE public.invites SET approved_at = created_at WHERE approved_at IS NULL;
 
+-- Performance indexes
+CREATE INDEX IF NOT EXISTS idx_release_requests_client_id ON public.release_requests(client_id);
+CREATE INDEX IF NOT EXISTS idx_release_requests_status ON public.release_requests(status);
+CREATE INDEX IF NOT EXISTS idx_journalist_subscribers_is_verified ON public.journalist_subscribers(is_verified);
+CREATE INDEX IF NOT EXISTS idx_profiles_stripe_customer_id ON public.profiles(stripe_customer_id);
+CREATE INDEX IF NOT EXISTS idx_invites_email ON public.invites(email);
+CREATE INDEX IF NOT EXISTS idx_activity_log_release_request_id ON public.activity_log(release_request_id);
+
 -- Row Level Security Policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.release_requests ENABLE ROW LEVEL SECURITY;
