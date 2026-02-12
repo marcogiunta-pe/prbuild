@@ -10,7 +10,7 @@
     --card-foreground: 222 47% 11%;
     --primary: 213 52% 24%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 174 85% 29%;
+    --secondary: 170 85% 26%;
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
@@ -31,6 +31,8 @@
   }
   html {
     scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
   }
   body {
     @apply bg-background text-foreground text-base;
@@ -116,6 +118,9 @@
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

@@ -52,7 +52,7 @@ export function PricingSection() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setInterval('monthly')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-medium transition-colors min-h-[44px] touch-manipulation ${
                 interval === 'monthly'
                   ? 'bg-primary text-white'
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
@@ -86,7 +86,7 @@ export function PricingSection() {
               <AnimateOnScroll key={key} delay={i * 80} variant="scale">
               <Card
                 key={key}
-                className={`relative bg-white border-gray-200 ${isPopular ? 'border-secondary border-2 shadow-lg scale-105' : ''}`}
+                className={`relative bg-white border-gray-200 ${isPopular ? 'border-secondary border-2 shadow-lg md:scale-105' : ''}`}
               >
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -106,7 +106,10 @@ export function PricingSection() {
                     )}
                     {interval === 'monthly' && (
                       <div className="text-sm text-gray-500 mt-1">
-                        or ${plan.yearly.price}/year (save ${('savings' in yearlyPricing ? yearlyPricing.savings : 0)})
+                        or ${plan.yearly.price}/year{' '}
+                        <span className="inline-flex items-center font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full text-xs">
+                          Save ${('savings' in yearlyPricing ? yearlyPricing.savings : 0)}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -182,9 +185,9 @@ export function PricingSection() {
               Frequently Asked Questions
             </h3>
             <div className="flex justify-center gap-2">
-              <button onClick={expandAll} className="text-sm text-primary hover:underline">Expand all</button>
+              <button onClick={expandAll} className="text-sm text-primary hover:underline min-h-[44px] px-3 py-2 touch-manipulation">Expand all</button>
               <span className="text-gray-400">|</span>
-              <button onClick={collapseAll} className="text-sm text-primary hover:underline">Collapse all</button>
+              <button onClick={collapseAll} className="text-sm text-primary hover:underline min-h-[44px] px-3 py-2 touch-manipulation">Collapse all</button>
             </div>
           </div>
           <div className="space-y-4">

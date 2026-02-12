@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertCircle, Loader2, Mail, Lock, User, Building, Check, Gift } from 'lucide-react';
+import { AlertCircle, Loader2, Mail, Lock, User, Building, Check, Gift, Eye, EyeOff } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -18,8 +18,8 @@ export default function SignupPage() {
     email: '',
     companyName: '',
     password: '',
-    confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [inviteToken, setInviteToken] = useState<string | null>(null);
@@ -49,11 +49,6 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
 
     if (formData.password.length < 8) {
       setError('Password must be at least 8 characters');
@@ -138,6 +133,18 @@ export default function SignupPage() {
         </ul>
       </div>
 
+      {/* Mobile trust line */}
+      <div className="lg:hidden w-full max-w-md mb-4">
+        <ul className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+          {features.map((feature) => (
+            <li key={feature} className="flex items-center gap-2">
+              <Check className="h-3 w-3 text-secondary flex-shrink-0" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {/* Signup form */}
       <Card className="w-full max-w-md shadow-xl border-0 bg-white/80 backdrop-blur">
         <CardHeader className="space-y-1 text-center">
@@ -158,7 +165,7 @@ export default function SignupPage() {
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-lg">
+              <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-lg" role="alert">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>
@@ -221,34 +228,26 @@ export default function SignupPage() {
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={formData.password}
                   onChange={(e) => updateField('password', e.target.value)}
-                  className="pl-10"
+                  className="pl-10 pr-10"
                   required
                   disabled={loading}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
               <p className="text-xs text-gray-500">Must be at least 8 characters</p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={formData.confirmPassword}
-                  onChange={(e) => updateField('confirmPassword', e.target.value)}
-                  className="pl-10"
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </div>
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
@@ -263,7 +262,7 @@ export default function SignupPage() {
                   Creating account...
                 </>
               ) : (
-                'Create account'
+                'Create Account — It\'s Free'
               )}
             </Button>
 

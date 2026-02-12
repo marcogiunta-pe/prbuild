@@ -48,20 +48,29 @@ export function ExitIntentPopup() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isVisible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsVisible(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible]);
+
   if (!isVisible) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300"
       onClick={() => setIsVisible(false)}
     >
       <div
-        className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-200 border border-gray-200"
+        className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-300 border border-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -91,7 +100,7 @@ export function ExitIntentPopup() {
             onClick={() => setIsVisible(false)}
             className="mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
-            No thanks, I'll pay $400 for PRWeb instead
+            Maybe later
           </button>
         </div>
       </div>

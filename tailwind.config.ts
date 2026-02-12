@@ -29,7 +29,7 @@ const config: Config = {
           900: "#0C1A2E",
         },
         secondary: {
-          DEFAULT: "#0D9488",
+          DEFAULT: "#0B7A6F",
           foreground: "#FFFFFF",
         },
         destructive: {

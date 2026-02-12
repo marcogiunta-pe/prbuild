@@ -40,12 +40,14 @@ export function PRScoreQuiz() {
     } else {
       setCurrentCatIndex((prev) => prev + 1);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function handlePrev() {
     if (!isFirstCategory) {
       setCurrentCatIndex((prev) => prev - 1);
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function handleRetake() {
@@ -60,6 +62,32 @@ export function PRScoreQuiz() {
 
   return (
     <div className="space-y-6">
+      {/* Category stepper dots */}
+      <div className="flex items-center justify-center gap-3">
+        {checklistCategories.map((cat, i) => {
+          const catStart = checklistCategories.slice(0, i).reduce((sum, c) => sum + c.items.length, 0);
+          const catDone = cat.items.every((_, j) => answers[catStart + j] !== undefined);
+          const isCurrent = i === currentCatIndex;
+          return (
+            <div key={i} className="flex items-center gap-3">
+              <div
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  isCurrent
+                    ? 'bg-primary ring-2 ring-primary/30'
+                    : catDone
+                    ? 'bg-green-500'
+                    : 'bg-gray-300'
+                }`}
+                aria-label={`${cat.title}${isCurrent ? ' (current)' : catDone ? ' (completed)' : ''}`}
+              />
+              {i < checklistCategories.length - 1 && (
+                <div className={`w-8 h-0.5 ${catDone ? 'bg-green-500' : 'bg-gray-300'}`} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
       {/* Progress */}
       <div>
         <div className="flex items-center justify-between text-sm text-gray-500 mb-2">
@@ -116,11 +144,11 @@ export function PRScoreQuiz() {
                   <h3 className="font-semibold text-gray-900 mb-1">{item.title}</h3>
                   <p className="text-sm text-gray-600">{item.description}</p>
                 </div>
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex gap-3 flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => setAnswer(globalIndex, true)}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                    className={`w-11 h-11 rounded-lg flex items-center justify-center transition-colors touch-manipulation ${
                       answer === true
                         ? 'bg-green-500 text-white'
                         : 'bg-gray-100 text-gray-400 hover:bg-green-100 hover:text-green-600'
@@ -132,7 +160,7 @@ export function PRScoreQuiz() {
                   <button
                     type="button"
                     onClick={() => setAnswer(globalIndex, false)}
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                    className={`w-11 h-11 rounded-lg flex items-center justify-center transition-colors touch-manipulation ${
                       answer === false
                         ? 'bg-red-500 text-white'
                         : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-600'

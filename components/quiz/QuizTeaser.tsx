@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Check, X } from 'lucide-react';
+import { ArrowRight, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { checklistCategories } from '@/data/checklist';
 
@@ -42,12 +42,9 @@ export function QuizTeaser() {
               <p className="font-medium text-gray-900">{item.title}</p>
               <p className="text-xs text-gray-500">{item.category}</p>
             </div>
-            <div className="flex gap-1.5 flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-green-100 text-green-500 flex items-center justify-center">
-                <Check className="w-4 h-4" />
-              </div>
-              <div className="w-8 h-8 rounded-lg bg-red-100 text-red-500 flex items-center justify-center">
-                <X className="w-4 h-4" />
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center">
+                <HelpCircle className="w-4 h-4" />
               </div>
             </div>
           </div>

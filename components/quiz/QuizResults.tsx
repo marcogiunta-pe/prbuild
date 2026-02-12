@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, X, Lock, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Check, X, ArrowRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { EmailCapture } from '@/components/EmailCapture';
-import { checklistCategories, type ChecklistCategory } from '@/data/checklist';
+import { checklistCategories, TOTAL_ITEMS, type ChecklistCategory } from '@/data/checklist';
 
 interface QuizResultsProps {
   answers: Record<number, boolean>;
@@ -86,8 +87,7 @@ export function QuizResults({ answers, onRetake }: QuizResultsProps) {
 
   const { totalScore, categoryScores, weakestCategory } = computeResults(answers);
   const { label, color, bgColor } = getScoreLabel(totalScore);
-  const totalItems = 23;
-  const pct = Math.round((totalScore / totalItems) * 100);
+  const pct = Math.round((totalScore / TOTAL_ITEMS) * 100);
 
   // Top 3 priority fixes (from missed items across all categories)
   const allMissed = categoryScores.flatMap((cs) => cs.missedItems);
@@ -103,7 +103,7 @@ export function QuizResults({ answers, onRetake }: QuizResultsProps) {
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="text-6xl font-bold text-gray-900">{totalScore}</div>
           <div className="text-left">
-            <div className="text-2xl text-gray-400 font-light">/ {totalItems}</div>
+            <div className="text-2xl text-gray-400 font-light">/ {TOTAL_ITEMS}</div>
             <div className={`text-lg font-semibold ${color}`}>{label}</div>
           </div>
         </div>
@@ -291,12 +291,12 @@ export function QuizResults({ answers, onRetake }: QuizResultsProps) {
         <Button variant="outline" onClick={onRetake}>
           Retake Quiz
         </Button>
-        <a href="/signup">
+        <Link href="/signup">
           <Button className="bg-secondary hover:bg-secondary/90">
-            Let Us Handle All 23
+            Let Us Handle All {TOTAL_ITEMS}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
-        </a>
+        </Link>
       </div>
     </div>
   );

@@ -102,7 +102,7 @@ export function EmailCapture({
         <p className="text-gray-600 mb-6">{description}</p>
 
         {status === 'success' ? (
-          <div className="flex items-center gap-2 text-green-600 font-medium">
+          <div className="flex items-center gap-2 text-green-600 font-medium" aria-live="polite">
             <Check className="w-5 h-5" />
             <span>{successMessage}</span>
           </div>
@@ -120,7 +120,7 @@ export function EmailCapture({
               disabled={status === 'loading'}
             />
             {status === 'error' && (
-              <p className="text-red-500 text-sm">{errorMessage}</p>
+              <p className="text-red-500 text-sm" role="alert">{errorMessage}</p>
             )}
             <Button
               type="submit"
@@ -151,7 +151,7 @@ export function EmailCapture({
       <p className="text-gray-600 mb-6">{description}</p>
 
       {status === 'success' ? (
-        <div className="flex items-center gap-2 text-green-600 font-medium py-3">
+        <div className="flex items-center gap-2 text-green-600 font-medium py-3" aria-live="polite">
           <Check className="w-5 h-5" />
           <span>{successMessage}</span>
         </div>
@@ -184,7 +184,7 @@ export function EmailCapture({
       )}
 
       {status === 'error' && (
-        <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
+        <p className="text-red-500 text-sm mt-2" role="alert">{errorMessage}</p>
       )}
     </div>
   );

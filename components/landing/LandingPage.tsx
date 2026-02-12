@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, FileText, Users, Send, Zap, Target, Shield, ArrowRight, Check, Star, Menu, X, AlertTriangle } from 'lucide-react';
 import { PricingSection } from '@/components/landing/pricing-section';
 import { AnimatedStatsBanner } from '@/components/AnimatedStats';
-import { TrustBadges } from '@/components/TrustBadges';
+import { TrustBadges, TrustBadgesCompact } from '@/components/TrustBadges';
 import { AnimateOnScroll } from '@/components/landing/AnimateOnScroll';
 import { LogoBar } from '@/components/landing/LogoBar';
 import { HeroMockup } from '@/components/landing/HeroMockup';
@@ -25,6 +25,7 @@ const SocialProofTicker = dynamic(() => import('@/components/landing/SocialProof
 const QuizTeaser = dynamic(() => import('@/components/quiz/QuizTeaser').then((m) => ({ default: m.QuizTeaser })), { ssr: false });
 
 const NAV_SECTIONS = [
+  { id: 'how-it-works', label: 'How It Works' },
   { id: 'features', label: 'Features' },
   { id: 'pricing', label: 'Pricing' },
 ];
@@ -159,13 +160,13 @@ export default function LandingPage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                 <Link href="/signup" data-cta="hero-signup">
-                  <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-lg px-8">
+                  <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-lg px-8 min-h-[44px] touch-manipulation">
                     Get Your First Release Free
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-                <Link href="#features" data-cta="hero-how-it-works">
-                  <Button size="lg" variant="outline" className="text-lg px-8">
+                <Link href="#how-it-works" data-cta="hero-how-it-works">
+                  <Button size="lg" variant="outline" className="text-lg px-8 min-h-[44px] touch-manipulation">
                     See how it works
                   </Button>
                 </Link>
@@ -173,7 +174,7 @@ export default function LandingPage() {
 
               <p className="text-sm text-gray-500 mb-8">No credit card required • Setup in 2 minutes</p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-600 mb-12">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-600 mb-8">
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
                   Written in 24–48 hours
@@ -187,6 +188,8 @@ export default function LandingPage() {
                   Sent to journalists who actually want it
                 </div>
               </div>
+
+              <TrustBadgesCompact />
             </div>
 
             {/* Product Mockup — parallax tilt, pulse glow, animated score */}
@@ -287,7 +290,7 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works */}
-        <section className="py-20 bg-gray-50">
+        <section id="how-it-works" className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -408,6 +411,12 @@ export default function LandingPage() {
 
         <PressReleasePreview />
 
+        <section className="py-8 bg-gray-50 border-y border-gray-100">
+          <div className="container mx-auto px-4">
+            <TrustBadges />
+          </div>
+        </section>
+
         <PricingSection />
 
         <section className="py-20 bg-gray-50">
@@ -426,7 +435,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-20 bg-gray-50">
+        <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <SectionErrorBoundary sectionName="Quiz Teaser">
               <AnimateOnScroll>
@@ -444,12 +453,6 @@ export default function LandingPage() {
             <SectionErrorBoundary sectionName="Testimonials">
               <TestimonialsGrid />
             </SectionErrorBoundary>
-          </div>
-        </section>
-
-        <section className="py-8 bg-gray-50 border-y border-gray-100">
-          <div className="container mx-auto px-4">
-            <TrustBadges />
           </div>
         </section>
 
