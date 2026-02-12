@@ -19,6 +19,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { PRICING, ANNOUNCEMENT_TYPES, INDUSTRIES, Plan, AnnouncementType, Industry, QuoteSource, BillingInterval } from '@/types';
+import { HelpTip } from '@/components/dashboard/HelpTip';
 
 type Step = 'plan' | 'company' | 'announcement' | 'quotes' | 'contact' | 'review';
 
@@ -218,7 +219,10 @@ export default function NewRequestPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">New Press Release Request</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">New Press Release Request</h1>
+          <HelpTip text="Fill out each section and we'll write your release. Average time: 5 minutes." />
+        </div>
         <p className="text-gray-600 mt-1">Tell us about your announcement and we'll create a professional press release.</p>
       </div>
 
@@ -359,7 +363,10 @@ export default function NewRequestPage() {
       {step === 'company' && (
         <Card>
           <CardHeader>
-            <CardTitle>Company Information</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Company Information</CardTitle>
+              <HelpTip text="Basic info about your company so we can write an accurate release." />
+            </div>
             <CardDescription>Tell us about your company</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -417,7 +424,10 @@ export default function NewRequestPage() {
       {step === 'announcement' && (
         <Card>
           <CardHeader>
-            <CardTitle>Announcement Details</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Announcement Details</CardTitle>
+              <HelpTip text="The core of your press release — what happened and why it matters." />
+            </div>
             <CardDescription>What are you announcing?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -517,7 +527,10 @@ export default function NewRequestPage() {
       {step === 'quotes' && (
         <Card>
           <CardHeader>
-            <CardTitle>Quote Sources</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Quote Sources</CardTitle>
+              <HelpTip text="Quotes add credibility. We'll draft them if you leave the quote field blank." />
+            </div>
             <CardDescription>Add people who can be quoted in the release (optional but recommended — releases with quotes get 30% more pickups)</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -596,7 +609,10 @@ export default function NewRequestPage() {
       {step === 'contact' && (
         <Card>
           <CardHeader>
-            <CardTitle>Media Contact & Call to Action</CardTitle>
+            <div className="flex items-center gap-2">
+              <CardTitle>Media Contact & Call to Action</CardTitle>
+              <HelpTip text="This info goes at the bottom of your release for journalist follow-up." />
+            </div>
             <CardDescription>Who should journalists contact, and what should readers do next?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

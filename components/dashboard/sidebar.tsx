@@ -10,11 +10,13 @@ const navItems = [
     title: 'My Releases',
     href: '/dashboard/my-releases',
     icon: FileText,
+    guide: 'my-releases',
   },
   {
     title: 'New Request',
     href: '/dashboard/new-request',
     icon: PlusCircle,
+    guide: 'new-request',
   },
   {
     title: 'Feedback',
@@ -40,6 +42,7 @@ export function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              data-guide={item.guide}
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                 isActive
@@ -55,7 +58,7 @@ export function DashboardSidebar() {
       </nav>
 
       {/* Help section */}
-      <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+      <div className="mt-8 p-4 bg-gray-50 rounded-lg" data-guide="help">
         <h4 className="font-medium text-sm text-gray-900 mb-2">Need help?</h4>
         <p className="text-xs text-gray-600 mb-3">
           Our team is here to help you create effective press releases.

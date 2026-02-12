@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, FileText, ChevronDown } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FAQContent } from '@/components/FAQContent';
 
 export const metadata: Metadata = {
   title: 'FAQ - Frequently Asked Questions | PRBuild',
@@ -162,7 +163,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Everything you need to know about PRBuild. Can't find your answer? 
+            Everything you need to know about PRBuild. Can't find your answer?
             Email us at support@prbuild.ai.
           </p>
         </div>
@@ -171,29 +172,7 @@ export default function FAQPage() {
       {/* FAQ Categories */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto space-y-12">
-            {faqCategories.map((category, categoryIndex) => (
-              <div key={categoryIndex}>
-                <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">
-                  {category.name}
-                </h2>
-                <div className="space-y-4">
-                  {category.questions.map((faq, faqIndex) => (
-                    <div key={faqIndex} className="border border-gray-200 rounded-xl overflow-hidden">
-                      <div className="p-6">
-                        <h3 className="font-semibold text-lg text-gray-900 mb-3">
-                          {faq.q}
-                        </h3>
-                        <p className="text-gray-600 leading-relaxed">
-                          {faq.a}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <FAQContent faqCategories={faqCategories} />
         </div>
       </section>
 

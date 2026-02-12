@@ -8,6 +8,8 @@ import { ReleaseStatus } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
 import { WelcomeModal } from '@/components/dashboard/WelcomeModal';
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
+import { DashboardGuide } from '@/components/dashboard/DashboardGuide';
+import { HelpTip } from '@/components/dashboard/HelpTip';
 
 const statusConfig: Record<ReleaseStatus, { label: string; color: string; icon: any }> = {
   submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Clock },
@@ -68,10 +70,14 @@ export default async function MyReleasesPage() {
   return (
     <div className="max-w-5xl">
       {showWelcomeModal && <WelcomeModal />}
+      {showWelcomeModal && <DashboardGuide />}
 
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Press Releases</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-900">My Press Releases</h1>
+            <HelpTip text="Releases move through stages: Submitted → Draft Ready → Panel Reviewed → Published." />
+          </div>
           <p className="text-gray-600 mt-1">Track and manage your press release requests</p>
         </div>
         <Link href="/dashboard/new-request">
