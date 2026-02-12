@@ -35,7 +35,7 @@ const benefits = [
   {
     icon: Users,
     title: 'Journalist Feedback',
-    description: '16 journalist personas review your release. Know what works before you hit send.',
+    description: 'Our journalist panel reviews your release. Know what works before you hit send.',
   },
   {
     icon: Zap,
@@ -265,7 +265,7 @@ export default function StartupsPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
-                  <span>16 journalist reviews</span>
+                  <span>Journalist panel review</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />

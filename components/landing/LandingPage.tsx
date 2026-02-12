@@ -96,7 +96,7 @@ export default function LandingPage() {
           <div className="flex items-center space-x-2">
             <Link href="/signup" className="hidden sm:block" data-cta="nav-signup">
               <Button className="bg-secondary hover:bg-secondary/90 min-h-[44px]">
-                Start Free Trial
+                Get Your Free Release
               </Button>
             </Link>
             <button
@@ -131,7 +131,7 @@ export default function LandingPage() {
               </Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="mt-2" data-cta="mobile-signup">
                 <Button className="w-full bg-secondary hover:bg-secondary/90 min-h-[44px] touch-manipulation">
-                  Start Free Trial
+                  Get Your Free Release
                 </Button>
               </Link>
             </nav>
@@ -356,7 +356,7 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
                 { icon: FileText, title: 'AI + Human Writing', description: 'AI does the heavy lifting. Humans make it not sound like AI. Best of both.' },
-                { icon: Users, title: '16 Journalist Reviewers', description: 'Tech reporter. Business editor. Lifestyle writer. They all review your release before you see it.' },
+                { icon: Users, title: 'Journalist Panel Review', description: '"The lead buries the news. Move the revenue figure to sentence one." — That\'s the kind of feedback you get before journalists ever see it.' },
                 { icon: CheckCircle, title: 'Quality Score', description: 'See your release rated on newsworthiness, clarity, and "would I actually publish this?"' },
                 { icon: Shield, title: 'Human Quality Check', description: 'A real person reviews every release before it goes out. No garbage gets through.' },
                 { icon: Send, title: 'Opt-in Distribution', description: 'Sent to journalists who raised their hand and said "yes, send me this type of news."' },
@@ -372,6 +372,36 @@ export default function LandingPage() {
                   </div>
                 </AnimateOnScroll>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Objection Handling */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                &ldquo;How can it be good at $9/month?&rdquo;
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                PRWeb charges $400 because they have a sales team, office space, and legacy infrastructure.
+                We use AI for the first draft and humans for the hard part — editing, journalist feedback,
+                and quality control. Lower overhead, same result. That&apos;s it.
+              </p>
+              <div className="grid sm:grid-cols-3 gap-4 text-sm">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="font-semibold text-gray-900 mb-1">AI handles</div>
+                  <div className="text-gray-600">First draft, formatting, AP style</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="font-semibold text-gray-900 mb-1">Humans handle</div>
+                  <div className="text-gray-600">Editing, tone, newsworthiness</div>
+                </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <div className="font-semibold text-gray-900 mb-1">You get</div>
+                  <div className="text-gray-600">Professional output at startup prices</div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -455,7 +485,7 @@ export default function LandingPage() {
                 <li><Link href="#pricing" className="hover:text-white">Pricing</Link></li>
                 <li><Link href="/showcase" className="hover:text-white">Showcase</Link></li>
                 <li><Link href="/compare" className="hover:text-white">Compare</Link></li>
-                <li><Link href="/signup" className="hover:text-white">Start Free Trial</Link></li>
+                <li><Link href="/signup" className="hover:text-white">Get Your Free Release</Link></li>
               </ul>
             </div>
 

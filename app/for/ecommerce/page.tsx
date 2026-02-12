@@ -205,7 +205,7 @@ export default function EcommercePage() {
               {[
                 { step: '1', title: 'Share Your News', desc: 'Tell us about your product, launch, or milestone.' },
                 { step: '2', title: 'We Write', desc: 'Our AI + human team crafts your press release.' },
-                { step: '3', title: 'Journalist Review', desc: '16 personas review for newsworthiness.' },
+                { step: '3', title: 'Journalist Review', desc: 'Our panel reviews for newsworthiness.' },
                 { step: '4', title: 'Get Coverage', desc: 'Distribute to relevant media outlets.' },
               ].map((item) => (
                 <div key={item.step} className="text-center">

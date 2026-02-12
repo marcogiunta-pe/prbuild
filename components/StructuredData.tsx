@@ -76,7 +76,7 @@ export function FAQSchema() {
   const faqs = [
     {
       question: 'What do I get with my first free release?',
-      answer: 'Your first press release includes professional AI + human writing, review by 16 journalist personas, unlimited revisions, showcase publication, and newsletter distribution to opted-in journalists. No credit card required.'
+      answer: 'Your first press release includes professional AI + human writing, review by our journalist panel, unlimited revisions, showcase publication, and newsletter distribution to opted-in journalists. No credit card required.'
     },
     {
       question: 'How is this different from PRWeb or PR Newswire?',
@@ -88,7 +88,7 @@ export function FAQSchema() {
     },
     {
       question: 'What if I\'m not happy with my press release?',
-      answer: 'We offer unlimited revisions until you\'re satisfied. Our process includes feedback from 16 journalist personas, so you\'ll see exactly what needs improvement before approving.'
+      answer: 'We offer unlimited revisions until you\'re satisfied. Our process includes feedback from our journalist panel, so you\'ll see exactly what needs improvement before approving.'
     },
     {
       question: 'Who are the 16 journalist personas?',

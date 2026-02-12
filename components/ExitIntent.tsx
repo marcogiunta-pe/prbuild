@@ -77,7 +77,7 @@ export function ExitIntentPopup() {
           </h2>
           <ul className="text-gray-600 mb-6 space-y-2 text-left max-w-xs mx-auto">
             <li className="flex items-center gap-2">✓ Written in 24 hours</li>
-            <li className="flex items-center gap-2">✓ Reviewed by 16 journalists</li>
+            <li className="flex items-center gap-2">✓ Reviewed by our journalist panel</li>
             <li className="flex items-center gap-2">✓ No credit card required</li>
           </ul>
 

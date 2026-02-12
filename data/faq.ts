@@ -1,7 +1,7 @@
 export const FAQ_ITEMS = [
   {
     question: "What do I get with my first free release?",
-    answer: "Your first press release includes everything: professional AI-assisted writing, review by our 16-persona journalist panel, unlimited revisions until you're happy, publication to our showcase, and distribution to journalists in your industry. No credit card required."
+    answer: "Your first press release includes everything: professional AI-assisted writing, review by our journalist panel, unlimited revisions until you're happy, publication to our showcase, and distribution to journalists in your industry. No credit card required."
   },
   {
     question: "How is this different from PRWeb or PR Newswire?",

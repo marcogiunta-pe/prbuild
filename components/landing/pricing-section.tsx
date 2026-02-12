@@ -127,7 +127,7 @@ export function PricingSection() {
                       className={`w-full ${isPopular ? 'bg-secondary hover:bg-secondary/90' : ''}`}
                       variant={isPopular ? 'default' : 'outline'}
                     >
-                      Start Free Trial
+                      Get Your Free Release
                     </Button>
                   </Link>
                 </CardFooter>

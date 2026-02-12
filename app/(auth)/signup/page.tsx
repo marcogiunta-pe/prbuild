@@ -107,10 +107,10 @@ export default function SignupPage() {
   };
 
   const features = [
-    'Professional AI-assisted writing',
-    '16-persona journalist panel review',
-    'Human quality control',
-    'Journalist distribution network',
+    'Written in 24 hours — not weeks',
+    'Reviewed by our journalist panel before you see it',
+    'Sent to journalists who opted in for your category',
+    'First release free — no credit card required',
   ];
 
   return (
@@ -118,10 +118,10 @@ export default function SignupPage() {
       {/* Benefits panel */}
       <div className="hidden lg:flex flex-col justify-center flex-1 pr-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
-          Get press releases that actually get coverage
+          Press releases that journalists actually read
         </h2>
         <p className="text-gray-600 mb-6">
-          Join 500+ PR professionals who've discovered there's a better way to create and distribute press releases.
+          Join 500+ companies who stopped paying $400 per release and started getting real coverage at a fraction of the cost.
         </p>
         <ul className="space-y-3">
           {features.map((feature) => (

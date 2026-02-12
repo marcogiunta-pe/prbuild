@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const MESSAGES = [
-  { text: "Sarah from CloudApp just published a release", icon: "🟢" },
-  { text: "TechCorp's release was picked up by 3 journalists", icon: "🟢" },
-  { text: "New signup from San Francisco", icon: "🟢" },
-  { text: "Journalist opened a release 2 min ago", icon: "🟢" },
-  { text: "New release published · DataSync", icon: "🟢" },
+  { text: "TechFlow's release was picked up by 3 journalists", icon: "🟢" },
+  { text: "New release published — delivered in 22 hours", icon: "🟢" },
+  { text: "Journalist replied to a release 4 min ago", icon: "🟢" },
+  { text: "DataSync's release scored 9.2/10 from panel", icon: "🟢" },
+  { text: "New signup from Austin, TX", icon: "🟢" },
+  { text: "GreenTech's release featured in industry newsletter", icon: "🟢" },
 ];
 
 export function SocialProofTicker() {

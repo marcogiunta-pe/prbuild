@@ -33,7 +33,7 @@ const faqCategories = [
       },
       {
         q: 'How long does it take to get my press release?',
-        a: 'Typically 24 hours from when you submit your request. Rush turnaround (same-day) is available on Pro and Agency plans.',
+        a: 'Typically 24 hours from when you submit your request. Rush turnaround (same-day) is available on the Pro plan.',
       },
       {
         q: 'What information do I need to provide?',
@@ -63,7 +63,7 @@ const faqCategories = [
     questions: [
       {
         q: 'What does each plan include?',
-        a: 'Starter ($9/mo): 1 release/month, 16 journalist reviews, unlimited revisions. Pro ($29/mo): 3 releases/month, priority support, rush turnaround. Agency ($79/mo): 10 releases/month, white-label, API access.',
+        a: 'Starter ($9/mo): 1 release/month, journalist panel review, one revision round. Growth ($19/mo): 3 releases/month, everything in Starter plus priority turnaround and detailed analytics. Pro ($39/mo): 5 releases/month, everything in Growth plus rush delivery and dedicated support.',
       },
       {
         q: 'Can I upgrade or downgrade anytime?',

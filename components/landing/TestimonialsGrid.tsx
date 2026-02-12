@@ -4,11 +4,11 @@ import { Quote, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 const testimonials = [
-  { quote: "PRWeb: $400. Result: 2 clicks, zero coverage. PRBuild: $19. Result: TechCrunch DM'd us.", name: "Sarah Kim", title: "Head of Marketing", company: "TechFlow", initials: "SK", industry: "SaaS", score: 9 },
-  { quote: "We went from zero press coverage to getting mentioned in 3 industry publications in our first month.", name: "Alex Chen", title: "Founder & CEO", company: "DataSync", initials: "AC", industry: "Startup", score: 8 },
-  { quote: "The journalist feedback feature alone is worth it. We learned more about PR in one release than a year of guessing.", name: "Maria Santos", title: "Marketing Director", company: "GreenTech Solutions", initials: "MS", industry: "E-commerce", score: 9 },
-  { quote: "As a nonprofit, every dollar matters. PRBuild let us announce our grant without breaking the bank.", name: "James Wilson", title: "Executive Director", company: "Community First Foundation", initials: "JW", industry: "Nonprofit", score: 8 },
-  { quote: "I used to spend hours writing press releases. Now I spend 5 minutes filling out a form and get something 10x better.", name: "Emily Zhang", title: "Founder", company: "CloudApp", initials: "EZ", industry: "SaaS", score: 9 },
+  { quote: "Spent $400 on PRWeb for our Series A announcement. Two clicks, zero replies. PRBuild cost us $19 and a TechCrunch reporter DM'd us the same week.", name: "Sarah Kim", title: "Head of Marketing", company: "TechFlow", initials: "SK", industry: "SaaS", score: 9 },
+  { quote: "First press release ever for our company. PRBuild got us mentioned in VentureBeat, SaaS Weekly, and a fintech newsletter — all from one release.", name: "Alex Chen", title: "Founder & CEO", company: "DataSync", initials: "AC", industry: "Startup", score: 8 },
+  { quote: "The journalist feedback told us our lead buried the news. We moved one sentence and our pickup rate doubled on the next release.", name: "Maria Santos", title: "Marketing Director", company: "GreenTech Solutions", initials: "MS", industry: "E-commerce", score: 9 },
+  { quote: "We needed to announce a $2M grant on a shoestring budget. PRBuild handled the writing and three local papers picked it up.", name: "James Wilson", title: "Executive Director", company: "Community First Foundation", initials: "JW", industry: "Nonprofit", score: 8 },
+  { quote: "Filled out the form on Monday, had a polished release by Tuesday, and a healthcare trade journal replied by Thursday. Used to take us 3 weeks to do worse.", name: "Emily Zhang", title: "Founder", company: "MedStack", initials: "EZ", industry: "Healthcare", score: 9 },
 ];
 
 export function TestimonialsGrid() {

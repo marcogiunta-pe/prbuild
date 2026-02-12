@@ -215,7 +215,7 @@ export default function NonprofitsPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />
-                  <span>16 journalist reviews</span>
+                  <span>Journalist panel review</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="w-4 h-4 text-green-500" />

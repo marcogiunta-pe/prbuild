@@ -105,7 +105,7 @@ export default function AgenciesPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Start Free Trial →
+              Get Your Free Release →
             </Button>
           </Link>
         </div>
@@ -129,7 +129,7 @@ export default function AgenciesPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/signup">
               <Button size="lg" className="bg-secondary hover:bg-secondary/90">
-                Start Free Trial
+                Get Your Free Release
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -251,7 +251,7 @@ export default function AgenciesPage() {
                   <Button 
                     className={`w-full ${tier.popular ? 'bg-white text-primary hover:bg-gray-100' : 'bg-secondary hover:bg-secondary/90'}`}
                   >
-                    {tier.price === 'Custom' ? 'Contact Sales' : 'Start Free Trial'}
+                    {tier.price === 'Custom' ? 'Contact Sales' : 'Get Your Free Release'}
                   </Button>
                 </Link>
               </div>
@@ -268,11 +268,11 @@ export default function AgenciesPage() {
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Join 100+ agencies using PRBuild to deliver more without hiring more.
-            Start your free trial today.
+            Your first release is free.
           </p>
           <Link href="/signup">
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100">
-              Start Free Trial
+              Get Your Free Release
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>

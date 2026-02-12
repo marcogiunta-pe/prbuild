@@ -198,7 +198,7 @@ export function ComparisonPage({ data }: { data: CompetitorData }) {
               </ul>
               <Link href="/signup" className="block mt-6">
                 <Button className="w-full bg-secondary hover:bg-secondary/90">
-                  Start Free Trial &rarr;
+                  Get Your Free Release &rarr;
                 </Button>
               </Link>
             </div>
