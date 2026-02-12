@@ -62,8 +62,8 @@ export default function LandingPage() {
       {/* Navigation — sticky, shrinks and gets shadow after hero */}
       <header
         className={`sticky top-0 z-50 w-full border-b backdrop-blur transition-all duration-300 ${
-          navScrolled ? 'bg-white/98 dark:bg-gray-900/98 shadow-md py-2' : 'bg-white/95 dark:bg-gray-900/95 py-0'
-        } border-gray-200 dark:border-gray-800`}
+          navScrolled ? 'bg-white/98 shadow-md py-2' : 'bg-white/95 py-0'
+        } border-gray-200`}
       >
         <div className={`container mx-auto flex items-center justify-between px-4 transition-all duration-300 ${navScrolled ? 'h-14' : 'h-16'}`}>
           <Link href="/" className="flex items-center space-x-2">
@@ -76,19 +76,19 @@ export default function LandingPage() {
               <Link
                 key={id}
                 href={`#${id}`}
-                className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === id ? 'text-primary' : 'text-gray-600 dark:text-gray-400'}`}
+                className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === id ? 'text-primary' : 'text-gray-600'}`}
                 aria-current={activeSection === id ? 'true' : undefined}
               >
                 {label}
               </Link>
             ))}
-            <Link href="/showcase" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary" data-cta="nav-showcase">
+            <Link href="/showcase" className="text-sm font-medium text-gray-600 hover:text-primary" data-cta="nav-showcase">
               Showcase
             </Link>
-            <Link href="/resources/how-to-write-press-release" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary" data-cta="nav-resources">
+            <Link href="/resources/how-to-write-press-release" className="text-sm font-medium text-gray-600 hover:text-primary" data-cta="nav-resources">
               Resources
             </Link>
-            <Link href="/login" className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary" data-cta="nav-login">
+            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary" data-cta="nav-login">
               Login
             </Link>
           </nav>
@@ -101,7 +101,7 @@ export default function LandingPage() {
             </Link>
             <button
               type="button"
-              className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation rounded-lg hover:bg-gray-100"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
@@ -112,21 +112,21 @@ export default function LandingPage() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+          <div className="md:hidden border-t border-gray-200 bg-white">
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-1">
-              <Link href="#features" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-features">
+              <Link href="#features" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-features">
                 Features
               </Link>
-              <Link href="#pricing" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-pricing">
+              <Link href="#pricing" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-pricing">
                 Pricing
               </Link>
-              <Link href="/showcase" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-showcase">
+              <Link href="/showcase" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-showcase">
                 Showcase
               </Link>
-              <Link href="/resources/how-to-write-press-release" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-resources">
+              <Link href="/resources/how-to-write-press-release" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-resources">
                 Resources
               </Link>
-              <Link href="/login" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-login">
+              <Link href="/login" className="min-h-[44px] flex items-center text-sm font-medium text-gray-600 hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-login">
                 Login
               </Link>
               <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="mt-2" data-cta="mobile-signup">
@@ -141,18 +141,18 @@ export default function LandingPage() {
 
       <main id="main-content" className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 md:py-32 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900/50 dark:to-gray-900">
+        <section className="py-20 md:py-32 bg-gradient-to-b from-gray-50 to-white">
           <div className="container mx-auto px-4">
             <div className="text-center">
               <div className="animate-fade-up" style={{ animationDuration: '0.5s' }}>
                 <Badge variant="secondary" className="mb-4">
                   847 releases published • 23% journalist pickup rate
                 </Badge>
-                <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-100 mb-6 max-w-4xl mx-auto leading-tight">
+                <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 max-w-4xl mx-auto leading-tight">
                   97% of Press Releases Get Ignored.<br className="hidden md:block" /> Yours Won&apos;t.
                 </h1>
               </div>
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                 We write it. 16 journalists rip it apart. You get what survives.
               </p>
 
@@ -168,23 +168,18 @@ export default function LandingPage() {
                     See how it works
                   </Button>
                 </Link>
-                <Link href="/showcase" data-cta="hero-showcase">
-                  <Button size="lg" variant="outline" className="text-lg px-8">
-                    See Published Releases
-                  </Button>
-                </Link>
               </div>
 
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">No credit card required • Setup in 2 minutes</p>
+              <p className="text-sm text-gray-500 mb-8">No credit card required • Setup in 2 minutes</p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-12">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-600 mb-12">
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
                   Written in 24 hours
                 </div>
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
-                  Reviewed by 16 journalist personas
+                  Pre-screened by our journalist panel
                 </div>
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
@@ -205,14 +200,14 @@ export default function LandingPage() {
         <AnimatedStatsBanner />
 
         {/* Pain Points */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 You&apos;ve Tried This Before
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                $400 to PRWeb. 2 clicks. Zero coverage. Sound about right?
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <Link href="/compare/prweb" className="text-primary hover:underline">$400 to PRWeb</Link>. 2 clicks. Zero coverage. Sound about right?
               </p>
             </div>
 
@@ -223,18 +218,18 @@ export default function LandingPage() {
                 { icon: Users, title: 'PR Agencies', items: ['$3,000/month retainer', '5 rounds of "can we tweak this?"', 'Still no guarantee anyone reads it'] },
               ].map((card, i) => (
                 <AnimateOnScroll key={card.title} delay={i * 100}>
-                  <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/20">
+                  <Card className="border-amber-200 bg-amber-50/50">
                     <CardHeader>
-                      <div className="w-12 h-12 bg-amber-100 dark:bg-amber-800/50 rounded-lg flex items-center justify-center mb-4">
-                        <card.icon className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                      <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
+                        <card.icon className="h-6 w-6 text-amber-600" />
                       </div>
-                      <CardTitle className="text-xl text-gray-900 dark:text-gray-100">{card.title}</CardTitle>
+                      <CardTitle className="text-xl text-gray-900">{card.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <ul className="text-gray-600 dark:text-gray-300 space-y-2 text-sm">
+                      <ul className="text-gray-600 space-y-2 text-sm">
                         {card.items.map((item) => (
                           <li key={item} className="flex items-start gap-2">
-                            <span className="text-amber-500 dark:text-amber-400 mt-1">•</span>
+                            <span className="text-amber-500 mt-1">•</span>
                             {item}
                           </li>
                         ))}
@@ -246,10 +241,10 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-16 max-w-3xl mx-auto text-center">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 The problem isn&apos;t your news. It&apos;s the delivery.
               </h3>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
+              <p className="text-lg text-gray-600">
                 Bad tools = bad results. No amount of &quot;optimization&quot; fixes a broken system.
               </p>
             </div>
@@ -261,27 +256,27 @@ export default function LandingPage() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                Here&apos;s What Changes
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Here&apos;s What We Do Differently
               </h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
                 { icon: CheckCircle, title: "Copy That Doesn't Sound Like AI", text: 'No "excited to announce." No "innovative solutions." Just clean, punchy copy that reads like a human wrote it. Because the good parts? A human did.' },
-                { icon: Star, title: "Feedback Before You Hit Send", text: "16 journalist personas review every release. They tell you what's boring, what's missing, and what will get deleted. Fix it before journalists ever see it." },
+                { icon: Star, title: "Feedback Before You Hit Send", text: "Our journalist panel reviews every release. They tell you what's boring, what's missing, and what will get deleted. Fix it before journalists ever see it." },
                 { icon: Send, title: "Distribution to People Who Care", text: "No junk sites. No spray-and-pray. We send your release to journalists who actually opted in to receive news in your category. They want to hear from you." },
               ].map((item, i) => (
                 <AnimateOnScroll key={item.title} delay={i * 100}>
-                  <Card className="border-green-100 dark:border-green-800 bg-green-50/50 dark:bg-green-900/20">
+                  <Card className="border-green-100 bg-green-50/50">
                     <CardHeader>
-                      <div className="w-12 h-12 bg-green-100 dark:bg-green-800/50 rounded-lg flex items-center justify-center mb-4">
-                        <item.icon className="h-6 w-6 text-green-600 dark:text-green-400" />
+                      <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <item.icon className="h-6 w-6 text-green-600" />
                       </div>
-                      <CardTitle className="text-xl text-gray-900 dark:text-gray-100">{item.title}</CardTitle>
+                      <CardTitle className="text-xl text-gray-900">{item.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-600 dark:text-gray-300">{item.text}</p>
+                      <p className="text-gray-600">{item.text}</p>
                     </CardContent>
                   </Card>
                 </AnimateOnScroll>
@@ -291,13 +286,13 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works */}
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 How It Works
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 From &quot;I have news&quot; to &quot;journalists are reading it&quot; in 48 hours.
               </p>
             </div>
@@ -305,7 +300,7 @@ export default function LandingPage() {
             <div className="max-w-3xl mx-auto">
               {[
                 { step: '1', title: 'You Fill Out a Form', description: 'Company name. What happened. Why it matters. That\'s it. 5 minutes, tops.', icon: FileText, highlight: '5 minutes' },
-                { step: '2', title: 'We Write It', description: 'Our AI drafts it. Our humans fix it. 16 journalist personas tear it apart. What survives is good.', icon: Users, highlight: '16 reviewers' },
+                { step: '2', title: 'We Write It', description: 'Our AI drafts it. Our humans fix it. A panel of journalists tears it apart. What survives is good.', icon: Users, highlight: '16 reviewers' },
                 { step: '3', title: 'You Approve It', description: 'See the draft. See the feedback. Request changes or ship it. We revise until you\'re happy.', icon: CheckCircle, highlight: 'Unlimited revisions' },
                 { step: '4', title: 'Journalists Get It', description: 'Published to our showcase. Emailed to journalists who opted in for your category. Real inboxes. Real people.', icon: Send, highlight: '23% pickup rate' },
               ].map((item, index) => (
@@ -319,14 +314,14 @@ export default function LandingPage() {
                         {item.step}
                       </div>
                     </div>
-                    <div className="flex-1 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+                    <div className="flex-1 bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <item.icon className="h-5 w-5 text-primary" />
-                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{item.title}</h3>
+                            <h3 className="text-xl font-semibold text-gray-900">{item.title}</h3>
                           </div>
-                          <p className="text-gray-600 dark:text-gray-300 mb-3">{item.description}</p>
+                          <p className="text-gray-600 mb-3">{item.description}</p>
                           <span className="inline-flex items-center text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">
                             {item.highlight}
                           </span>
@@ -353,7 +348,7 @@ export default function LandingPage() {
         <section id="features" className="py-20">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 What&apos;s Included
               </h2>
             </div>
@@ -372,8 +367,8 @@ export default function LandingPage() {
                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{feature.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
                   </div>
                 </AnimateOnScroll>
               ))}
@@ -385,13 +380,13 @@ export default function LandingPage() {
 
         <PricingSection />
 
-        <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
+        <section className="py-20 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
                 Calculate Your Savings
               </h2>
-              <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 See how much you could save by switching to PRBuild.
               </p>
             </div>
@@ -401,9 +396,9 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-16 bg-white dark:bg-gray-900">
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-100">
+            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
               What Our Customers Say
             </h2>
             <SectionErrorBoundary sectionName="Testimonials">
@@ -412,7 +407,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-8 bg-gray-50 dark:bg-gray-900/50 border-y border-gray-100 dark:border-gray-800">
+        <section className="py-8 bg-gray-50 border-y border-gray-100">
           <div className="container mx-auto px-4">
             <TrustBadges />
           </div>
@@ -433,9 +428,6 @@ export default function LandingPage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <p className="mt-4 text-white/60 text-sm">
-              847 releases published • 23% journalist pickup rate
-            </p>
           </div>
         </section>
       </main>
@@ -449,7 +441,7 @@ export default function LandingPage() {
                 <span className="text-xl font-bold text-white">PRBuild</span>
               </Link>
               <p className="text-sm mb-4">
-                AI-powered press releases with human quality control. 16 journalist personas review every release.
+                AI-powered press releases with human quality control. Our journalist panel reviews every release.
               </p>
               <Link href="/referral" className="text-sm text-secondary hover:text-secondary/80">
                 Referral Program: Give $10, Get $10 →
@@ -462,6 +454,7 @@ export default function LandingPage() {
                 <li><Link href="#features" className="hover:text-white">Features</Link></li>
                 <li><Link href="#pricing" className="hover:text-white">Pricing</Link></li>
                 <li><Link href="/showcase" className="hover:text-white">Showcase</Link></li>
+                <li><Link href="/compare" className="hover:text-white">Compare</Link></li>
                 <li><Link href="/signup" className="hover:text-white">Start Free Trial</Link></li>
               </ul>
             </div>

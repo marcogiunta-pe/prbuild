@@ -125,7 +125,7 @@ export function ROICalculator() {
   }, [shareText]);
 
   return (
-    <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-8 max-w-2xl mx-auto overflow-hidden">
+    <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-2xl mx-auto overflow-hidden">
       <SimpleConfetti active={showConfetti} />
 
       <div className="flex items-center gap-3 mb-6">
@@ -134,13 +134,13 @@ export function ROICalculator() {
         </div>
         <div>
           <h3 className="text-xl font-bold">PR Savings Calculator</h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">See how much you could save with PRBuild</p>
+          <p className="text-sm text-gray-500">See how much you could save with PRBuild</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             How many press releases do you need per month?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -151,7 +151,7 @@ export function ROICalculator() {
                 className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-lg font-medium transition-colors touch-manipulation ${
                   releasesPerMonth === num
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {num}
@@ -161,7 +161,7 @@ export function ROICalculator() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             What do you currently use?
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -172,7 +172,7 @@ export function ROICalculator() {
                 className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm transition-colors touch-manipulation ${
                   currentService === key
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
                 {value.name}
@@ -183,21 +183,21 @@ export function ROICalculator() {
 
         {/* Bar chart */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex justify-between text-sm text-gray-600">
             <span>Your current cost</span>
-            <span className="font-medium text-gray-900 dark:text-gray-100">${currentMonthlyCost.toLocaleString()}/mo</span>
+            <span className="font-medium text-gray-900">${currentMonthlyCost.toLocaleString()}/mo</span>
           </div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
+          <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
             <div
-              className="h-full bg-red-400/80 dark:bg-red-500/80 transition-all duration-400 ease-out"
+              className="h-full bg-red-400/80 transition-all duration-400 ease-out"
               style={{ width: `${currentWidth}%` }}
             />
           </div>
-          <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex justify-between text-sm text-gray-600">
             <span>PRBuild cost</span>
             <span className="font-medium text-primary">${prbuildCost}/mo</span>
           </div>
-          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden flex">
+          <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
             <div
               className="h-full bg-secondary transition-all duration-400 ease-out"
               style={{ width: `${prbuildWidth}%` }}
@@ -206,14 +206,14 @@ export function ROICalculator() {
         </div>
 
         {/* Results */}
-        <div className={`rounded-xl p-6 space-y-4 ${bigWin ? 'ring-2 ring-green-400/50 dark:ring-green-500/50 bg-green-50/50 dark:bg-green-900/20' : 'bg-gray-50 dark:bg-gray-800'}`}>
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div className={`rounded-xl p-6 space-y-4 ${bigWin ? 'ring-2 ring-green-400/50 bg-green-50/50' : 'bg-gray-50'}`}>
+          <div className="border-t border-gray-200 pt-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-900 dark:text-gray-100 font-semibold">Monthly savings</span>
+              <span className="text-gray-900 font-semibold">Monthly savings</span>
               <span className="font-bold text-green-600 text-xl tabular-nums">${tweenSavings.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center mt-2">
-              <span className="text-gray-600 dark:text-gray-400">Annual savings</span>
+              <span className="text-gray-600">Annual savings</span>
               <span className="font-semibold text-green-600 tabular-nums">${tweenAnnual.toLocaleString()}/year</span>
             </div>
           </div>
@@ -246,7 +246,7 @@ export function ROICalculator() {
           </Button>
         </Link>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+        <p className="text-xs text-gray-500 text-center">
           Plus, PRBuild includes writing—others don&apos;t.
         </p>
       </div>

@@ -61,19 +61,19 @@ export function AnimatedStats() {
         <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
           <AnimatedNumber end={847} suffix="+" />
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Releases Published</div>
+        <div className="text-sm text-gray-600">Releases Published</div>
       </div>
       <div className="text-center">
         <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
           <AnimatedNumber end={23} suffix="%" />
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Journalist Pickup Rate</div>
+        <div className="text-sm text-gray-600">Journalist Pickup Rate</div>
       </div>
       <div className="text-center">
         <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
           <AnimatedNumber end={16} />
         </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">Journalist Reviewers</div>
+        <div className="text-sm text-gray-600">Journalist Reviewers</div>
       </div>
     </div>
   );
@@ -81,7 +81,7 @@ export function AnimatedStats() {
 
 export function AnimatedStatsBanner() {
   return (
-    <div className="bg-primary/5 dark:bg-primary/10 py-8 border-y border-primary/10 dark:border-primary/20">
+    <div className="bg-primary/5 py-8 border-y border-primary/10">
       <div className="container mx-auto px-4">
         <AnimatedStats />
       </div>

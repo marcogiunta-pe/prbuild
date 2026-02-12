@@ -19,20 +19,20 @@ export function PressReleasePreview() {
   const finalHeadline = 'DataSync launches AI data pipeline that cuts processing time by 90%.';
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             See a Real Press Release
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
             Hover highlights to see what our journalist panel said. Toggle Draft vs Final to see the improvement.
           </p>
           <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setVersion('draft')}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
-                version === 'draft' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 border-2 border-amber-300 dark:border-amber-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+                version === 'draft' ? 'bg-amber-100 text-amber-800 border-2 border-amber-300' : 'bg-gray-100 text-gray-600'
               }`}
             >
               Draft
@@ -40,7 +40,7 @@ export function PressReleasePreview() {
             <button
               onClick={() => setVersion('final')}
               className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
-                version === 'final' ? 'bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 border-2 border-green-300 dark:border-green-600' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300'
+                version === 'final' ? 'bg-green-100 text-green-800 border-2 border-green-300' : 'bg-gray-100 text-gray-600'
               }`}
             >
               Final
@@ -48,9 +48,9 @@ export function PressReleasePreview() {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Sample release</span>
+        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-gray-50">
+            <span className="text-sm font-medium text-gray-600">Sample release</span>
             <Badge className="bg-green-100 text-green-800 text-xs">Quality: 8.5/10</Badge>
           </div>
           <div className="p-6 space-y-4 text-sm">

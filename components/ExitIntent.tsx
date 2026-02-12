@@ -56,12 +56,12 @@ export function ExitIntentPopup() {
       onClick={() => setIsVisible(false)}
     >
       <div
-        className="bg-white dark:bg-gray-900 rounded-2xl p-8 max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-200 border border-gray-200 dark:border-gray-800"
+        className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-200 border border-gray-200"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -72,10 +72,10 @@ export function ExitIntentPopup() {
             <Gift className="w-8 h-8 text-primary" />
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Before you go — your first release is free
           </h2>
-          <ul className="text-gray-600 dark:text-gray-400 mb-6 space-y-2 text-left max-w-xs mx-auto">
+          <ul className="text-gray-600 mb-6 space-y-2 text-left max-w-xs mx-auto">
             <li className="flex items-center gap-2">✓ Written in 24 hours</li>
             <li className="flex items-center gap-2">✓ Reviewed by 16 journalists</li>
             <li className="flex items-center gap-2">✓ No credit card required</li>
@@ -89,7 +89,7 @@ export function ExitIntentPopup() {
 
           <button
             onClick={() => setIsVisible(false)}
-            className="mt-4 text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors"
           >
             No thanks, I'll pay $400 for PRWeb instead
           </button>

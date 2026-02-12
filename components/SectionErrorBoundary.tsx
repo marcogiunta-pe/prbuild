@@ -33,8 +33,8 @@ export class SectionErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
       return (
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-6 text-center text-sm text-gray-600 dark:text-gray-400">
-          {this.props.sectionName ? `This section couldn’t load. ` : ''}
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 text-center text-sm text-gray-600">
+          {this.props.sectionName ? `This section couldn't load. ` : ''}
           <a href="/" className="text-primary hover:underline">Go to homepage</a>
         </div>
       );

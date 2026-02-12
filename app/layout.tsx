@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { CTATracker } from '@/components/CTATracker';
-import { OrganizationSchema, ProductSchema, FAQSchema, WebsiteSchema } from '@/components/StructuredData';
+import { OrganizationSchema, ProductSchema, WebsiteSchema } from '@/components/StructuredData';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -110,9 +110,7 @@ export default function RootLayout({
         )}
         <OrganizationSchema />
         <ProductSchema />
-        <FAQSchema />
         <WebsiteSchema />
-        <link rel="preload" href="/og-image.png" as="image" />
       </head>
       <body className="font-sans bg-background text-foreground antialiased" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
         <ThemeProvider>

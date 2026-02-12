@@ -38,13 +38,13 @@ export function PricingSection() {
   const collapseAll = () => setFaqOpen(new Set());
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50 dark:bg-gray-900">
+    <section id="pricing" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             PRWeb: $400. Us: $9.
           </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
+          <p className="text-lg text-gray-600 mb-8">
             Same result. 97% less money. Cancel anytime.
           </p>
 
@@ -55,7 +55,7 @@ export function PricingSection() {
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 interval === 'monthly'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
               Monthly
@@ -65,7 +65,7 @@ export function PricingSection() {
               className={`px-4 py-2 rounded-lg font-medium transition-colors relative min-h-[44px] touch-manipulation ${
                 interval === 'yearly'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
               }`}
             >
               Yearly
@@ -81,12 +81,12 @@ export function PricingSection() {
             const isPopular = 'popular' in plan && plan.popular;
             const pricing = plan[interval];
             const yearlyPricing = plan.yearly;
-            
+
             return (
               <AnimateOnScroll key={key} delay={i * 80} variant="scale">
-              <Card 
-                key={key} 
-                className={`relative bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 ${isPopular ? 'border-secondary border-2 shadow-lg scale-105' : ''}`}
+              <Card
+                key={key}
+                className={`relative bg-white border-gray-200 ${isPopular ? 'border-secondary border-2 shadow-lg scale-105' : ''}`}
               >
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -98,7 +98,7 @@ export function PricingSection() {
                   <CardDescription>{plan.description}</CardDescription>
                   <div className="mt-4">
                     <span className="text-4xl font-bold">${pricing.price}</span>
-                    <span className="text-gray-600 dark:text-gray-400">/{interval === 'monthly' ? 'mo' : 'yr'}</span>
+                    <span className="text-gray-600">/{interval === 'monthly' ? 'mo' : 'yr'}</span>
                     {interval === 'yearly' && 'savings' in yearlyPricing && (
                       <div className="text-sm text-green-600 font-medium mt-1">
                         Save ${yearlyPricing.savings}/year
@@ -123,7 +123,7 @@ export function PricingSection() {
                 </CardContent>
                 <CardFooter>
                   <Link href="/signup" className="w-full" data-cta={`pricing-${key}`}>
-                    <Button 
+                    <Button
                       className={`w-full ${isPopular ? 'bg-secondary hover:bg-secondary/90' : ''}`}
                       variant={isPopular ? 'default' : 'outline'}
                     >
@@ -137,9 +137,9 @@ export function PricingSection() {
           })}
         </div>
 
-        <div className="mt-8 text-center text-gray-600 dark:text-gray-400">
+        <div className="mt-8 text-center text-gray-600">
           <p>
-            PRWeb charges $120-$480 per release. PR Newswire charges $1,070+. 
+            PRWeb charges $120-$480 per release. PR Newswire charges $1,070+.
             We charge $9. Do the math.
           </p>
           <button
@@ -152,22 +152,22 @@ export function PricingSection() {
 
         {comparisonOpen && (
           <div className="mt-12 overflow-x-auto">
-            <table className="w-full min-w-[500px] border-collapse rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <table className="w-full min-w-[500px] border-collapse rounded-lg overflow-hidden border border-gray-200">
               <thead>
-                <tr className="bg-gray-100 dark:bg-gray-800">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">Feature</th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">Starter</th>
+                <tr className="bg-gray-100">
+                  <th className="text-left px-4 py-3 font-semibold text-gray-900">Feature</th>
+                  <th className="text-center px-4 py-3 font-semibold text-gray-900">Starter</th>
                   <th className="text-center px-4 py-3 font-semibold text-secondary bg-secondary/5">Growth</th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">Pro</th>
+                  <th className="text-center px-4 py-3 font-semibold text-gray-900">Pro</th>
                 </tr>
               </thead>
               <tbody>
                 {FEATURE_COMPARISON.map((row, i) => (
-                  <tr key={row.feature} className={i % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'}>
-                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300">{row.feature}</td>
-                    <td className="px-4 py-3 text-center text-gray-600 dark:text-gray-400">{row.starter}</td>
-                    <td className="px-4 py-3 text-center bg-secondary/5 font-medium text-gray-900 dark:text-gray-100">{row.growth}</td>
-                    <td className="px-4 py-3 text-center text-gray-600 dark:text-gray-400">{row.pro}</td>
+                  <tr key={row.feature} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-4 py-3 text-gray-700">{row.feature}</td>
+                    <td className="px-4 py-3 text-center text-gray-600">{row.starter}</td>
+                    <td className="px-4 py-3 text-center bg-secondary/5 font-medium text-gray-900">{row.growth}</td>
+                    <td className="px-4 py-3 text-center text-gray-600">{row.pro}</td>
                   </tr>
                 ))}
               </tbody>
@@ -178,7 +178,7 @@ export function PricingSection() {
         {/* FAQ Section */}
         <div className="mt-20 max-w-3xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 text-center sm:text-left">
+            <h3 className="text-2xl font-bold text-gray-900 text-center sm:text-left">
               Frequently Asked Questions
             </h3>
             <div className="flex justify-center gap-2">
@@ -194,9 +194,9 @@ export function PricingSection() {
           </div>
 
           {/* FAQ CTA */}
-          <div className="mt-12 p-6 rounded-xl bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 text-center">
-            <p className="text-lg text-gray-900 dark:text-gray-100 mb-2">Still have questions?</p>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <div className="mt-12 p-6 rounded-xl bg-primary/5 border border-primary/20 text-center">
+            <p className="text-lg text-gray-900 mb-2">Still have questions?</p>
+            <p className="text-gray-600 mb-4">
               We&apos;ll answer them on your first call — plus write your first release free.
             </p>
             <Link href="/signup" data-cta="faq-cta">
@@ -211,20 +211,20 @@ export function PricingSection() {
 
 function FAQItem({ question, answer, isOpen, onToggle }: { question: string; answer: string; isOpen: boolean; onToggle: () => void }) {
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 overflow-hidden">
+    <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full px-6 py-4 text-left flex items-center justify-between gap-4"
       >
-        <span className="font-medium text-gray-900 dark:text-gray-100">{question}</span>
-        <ChevronDown className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="font-medium text-gray-900">{question}</span>
+        <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
         <div className="min-h-0 overflow-hidden">
           <div className="px-6 pb-4">
-            <p className="text-gray-600 dark:text-gray-400 transition-opacity duration-200">{answer}</p>
+            <p className="text-gray-600 transition-opacity duration-200">{answer}</p>
           </div>
         </div>
       </div>

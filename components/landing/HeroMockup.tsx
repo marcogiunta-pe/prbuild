@@ -61,26 +61,26 @@ export function HeroMockup() {
     >
       <div
         ref={cardRef}
-        className="hero-mockup-card relative bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden transition-transform duration-200 ease-out w-full max-w-full animate-pulse-glow"
+        className="hero-mockup-card relative bg-white rounded-xl border border-gray-200 overflow-hidden transition-transform duration-200 ease-out w-full max-w-full animate-pulse-glow"
         style={{
           transform: `perspective(800px) rotateY(${transform.x}deg) rotateX(${-transform.y}deg)`,
         }}
       >
         {/* Browser chrome — macOS style */}
-        <div className="bg-gradient-to-b from-gray-100 to-gray-90 dark:from-gray-700 dark:to-gray-800 px-3 sm:px-4 py-2 sm:py-2.5 border-b border-gray-200 dark:border-gray-600 flex items-center gap-2 sm:gap-3">
+        <div className="bg-gradient-to-b from-gray-100 to-gray-90 px-3 sm:px-4 py-2 sm:py-2.5 border-b border-gray-200 flex items-center gap-2 sm:gap-3">
           <div className="flex gap-1.5 sm:gap-2 flex-shrink-0">
             <div className="w-3 h-3 rounded-full bg-red-400" />
             <div className="w-3 h-3 rounded-full bg-amber-400" />
             <div className="w-3 h-3 rounded-full bg-emerald-400" />
           </div>
           <div className="flex-1 flex justify-center">
-            <div className="bg-white/80 dark:bg-gray-900/80 rounded-md px-2 sm:px-4 py-1.5 text-[10px] sm:text-xs text-gray-500 shadow-inner max-w-[140px] sm:max-w-xs w-full text-center truncate">
+            <div className="bg-white/80 rounded-md px-2 sm:px-4 py-1.5 text-[10px] sm:text-xs text-gray-500 shadow-inner max-w-[140px] sm:max-w-xs w-full text-center truncate">
               app.prbuild.ai/dashboard
             </div>
           </div>
           <div className="w-12" />
         </div>
-        <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900/50">
+        <div className="p-4 sm:p-6 bg-gray-50">
           <div className="grid md:grid-cols-3 gap-3 sm:gap-4">
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="text-sm font-semibold text-gray-900 mb-3">Your Releases</div>

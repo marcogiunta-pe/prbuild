@@ -35,7 +35,7 @@ export function TrustBadges() {
       {badges.map((badge) => (
         <div
           key={badge.text}
-          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-full"
+          className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-full"
         >
           <badge.icon className="w-4 h-4 text-primary" />
           <span>{badge.text}</span>
@@ -47,7 +47,7 @@ export function TrustBadges() {
 
 export function TrustBadgesCompact() {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+    <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
       {badges.slice(0, 4).map((badge) => (
         <div key={badge.text} className="flex items-center gap-1.5">
           <badge.icon className="w-4 h-4 text-green-500" />
