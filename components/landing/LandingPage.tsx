@@ -153,7 +153,7 @@ export default function LandingPage() {
                 </h1>
               </div>
               <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                We write it. 16 journalists rip it apart. You get what survives.
+                You get a press release that 16 journalists already tried to kill. What survived is what gets published.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
@@ -175,7 +175,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-600 mb-12">
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
-                  Written in 24 hours
+                  Written in 24–48 hours
                 </div>
                 <div className="flex items-center">
                   <Check className="h-4 w-4 text-green-500 mr-2" />
@@ -207,15 +207,15 @@ export default function LandingPage() {
                 You&apos;ve Tried This Before
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                <Link href="/compare/prweb" className="text-primary hover:underline">$400 to PRWeb</Link>. 2 clicks. Zero coverage. Sound about right?
+                <Link href="/compare/prweb" className="text-primary hover:underline">$400 to PRWeb</Link>. Zero coverage. Sound familiar?
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
-                { icon: AlertTriangle, title: 'ChatGPT Press Releases', items: ['"We are excited to announce..." (delete)', 'Journalists spot AI copy in 3 seconds', 'You rewrite 75% of it anyway'] },
-                { icon: Target, title: 'Wire Services', items: ['$400 for "distribution" to nobody', 'Published on sites with 12 monthly visitors', 'Real journalists? Never saw it.'] },
-                { icon: Users, title: 'PR Agencies', items: ['$3,000/month retainer', '5 rounds of "can we tweak this?"', 'Still no guarantee anyone reads it'] },
+                { icon: AlertTriangle, title: 'ChatGPT Press Releases', items: ['"We are excited to announce..." — delete.', 'Journalists spot AI copy instantly', 'You end up rewriting 75% anyway'] },
+                { icon: Target, title: 'Wire Services', items: ['$400 to "distribute" to nobody', 'Published on sites with 12 monthly visitors', 'Real journalists never see it'] },
+                { icon: Users, title: 'PR Agencies', items: ['$3,000/month retainer', '5 rounds of revision, still bland', 'No guarantee anyone reads it'] },
               ].map((card, i) => (
                 <AnimateOnScroll key={card.title} delay={i * 100}>
                   <Card className="border-amber-200 bg-amber-50/50">
@@ -245,7 +245,7 @@ export default function LandingPage() {
                 The problem isn&apos;t your news. It&apos;s the delivery.
               </h3>
               <p className="text-lg text-gray-600">
-                Bad tools = bad results. No amount of &quot;optimization&quot; fixes a broken system.
+                Bad tools, bad results. No amount of &quot;optimization&quot; fixes a broken system.
               </p>
             </div>
             <BeforeAfterComparison />
@@ -263,9 +263,9 @@ export default function LandingPage() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
-                { icon: CheckCircle, title: "Copy That Doesn't Sound Like AI", text: 'No "excited to announce." No "innovative solutions." Just clean, punchy copy that reads like a human wrote it. Because the good parts? A human did.' },
-                { icon: Star, title: "Feedback Before You Hit Send", text: "Our journalist panel reviews every release. They tell you what's boring, what's missing, and what will get deleted. Fix it before journalists ever see it." },
-                { icon: Send, title: "Distribution to People Who Care", text: "No junk sites. No spray-and-pray. We send your release to journalists who actually opted in to receive news in your category. They want to hear from you." },
+                { icon: CheckCircle, title: "Copy That Doesn't Sound Like AI", text: 'No "excited to announce." No "innovative solutions." Clean copy that reads like a human wrote it — because the good parts, a human did.' },
+                { icon: Star, title: "Feedback Before You Hit Send", text: "16 journalists review every release and tell you what's boring, what's missing, and what to cut. Fix it before the real audience sees it." },
+                { icon: Send, title: "Distribution to People Who Care", text: "No junk sites. No spray-and-pray. Your release goes to journalists who opted in for your category." },
               ].map((item, i) => (
                 <AnimateOnScroll key={item.title} delay={i * 100}>
                   <Card className="border-green-100 bg-green-50/50">
@@ -299,10 +299,10 @@ export default function LandingPage() {
 
             <div className="max-w-3xl mx-auto">
               {[
-                { step: '1', title: 'You Fill Out a Form', description: 'Company name. What happened. Why it matters. That\'s it. 5 minutes, tops.', icon: FileText, highlight: '5 minutes' },
-                { step: '2', title: 'We Write It', description: 'Our AI drafts it. Our humans fix it. A panel of journalists tears it apart. What survives is good.', icon: Users, highlight: '16 reviewers' },
-                { step: '3', title: 'You Approve It', description: 'See the draft. See the feedback. Request changes or ship it. We revise until you\'re happy.', icon: CheckCircle, highlight: 'Unlimited revisions' },
-                { step: '4', title: 'Journalists Get It', description: 'Published to our showcase. Emailed to journalists who opted in for your category. Real inboxes. Real people.', icon: Send, highlight: '23% pickup rate' },
+                { step: '1', title: 'You Fill Out a Form', description: 'Company name. What happened. Why it matters. 5 minutes, tops.', icon: FileText, highlight: '5 minutes' },
+                { step: '2', title: 'We Write It', description: 'AI drafts it. Humans fix it. 16 journalists tear it apart. What survives is good.', icon: Users, highlight: '16 reviewers' },
+                { step: '3', title: 'You Approve It', description: 'Review the draft and feedback. Request changes or ship it. Unlimited revisions.', icon: CheckCircle, highlight: 'Unlimited revisions' },
+                { step: '4', title: 'Journalists Get It', description: 'Published to our showcase and emailed to journalists who opted in for your category. Real inboxes, real people.', icon: Send, highlight: '23% pickup rate' },
               ].map((item, index) => (
                 <AnimateOnScroll key={item.step} delay={index * 120}>
                   <div className="relative flex gap-6 pb-12 last:pb-0">
@@ -355,12 +355,12 @@ export default function LandingPage() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
-                { icon: FileText, title: 'AI + Human Writing', description: 'AI does the heavy lifting. Humans make it not sound like AI. Best of both.' },
-                { icon: Users, title: 'Journalist Panel Review', description: '"The lead buries the news. Move the revenue figure to sentence one." — That\'s the kind of feedback you get before journalists ever see it.' },
-                { icon: CheckCircle, title: 'Quality Score', description: 'See your release rated on newsworthiness, clarity, and "would I actually publish this?"' },
+                { icon: FileText, title: 'AI + Human Writing', description: 'AI does the heavy lifting. Humans make it not sound like AI.' },
+                { icon: Users, title: 'Journalist Panel Review', description: 'Real journalists flag weak leads, missing hooks, and buried news — before your audience sees it.' },
+                { icon: CheckCircle, title: 'Quality Score', description: 'Every release rated on newsworthiness, clarity, and publishability.' },
                 { icon: Shield, title: 'Human Quality Check', description: 'A real person reviews every release before it goes out. No garbage gets through.' },
-                { icon: Send, title: 'Opt-in Distribution', description: 'Sent to journalists who raised their hand and said "yes, send me this type of news."' },
-                { icon: Target, title: 'Category Newsletters', description: 'Your release goes in our weekly digest to journalists covering your industry.' },
+                { icon: Send, title: 'Opt-in Distribution', description: 'Sent only to journalists who opted in for your type of news.' },
+                { icon: Target, title: 'Category Newsletters', description: 'Your release appears in our weekly digest to journalists covering your industry.' },
               ].map((feature, i) => (
                 <AnimateOnScroll key={feature.title} delay={i * 100}>
                   <div className="flex flex-col items-start">
@@ -384,9 +384,8 @@ export default function LandingPage() {
                 &ldquo;How can it be good at $9/month?&rdquo;
               </h2>
               <p className="text-lg text-gray-600 mb-6">
-                PRWeb charges $400 because they have a sales team, office space, and legacy infrastructure.
-                We use AI for the first draft and humans for the hard part — editing, journalist feedback,
-                and quality control. Lower overhead, same result. That&apos;s it.
+                PRWeb charges $400 to cover sales teams and legacy infrastructure.
+                We use AI for first drafts and humans for the hard part — editing, feedback, quality control. Lower overhead, same result.
               </p>
               <div className="grid sm:grid-cols-3 gap-4 text-sm">
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
@@ -450,7 +449,7 @@ export default function LandingPage() {
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
               Your first release is free. No credit card. No catch.<br />
-              If journalists don&apos;t engage, you paid nothing.
+              See real journalist feedback before you spend a dollar.
             </p>
             <Link href="/signup" data-cta="final-cta-signup">
               <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100 text-lg px-8">
