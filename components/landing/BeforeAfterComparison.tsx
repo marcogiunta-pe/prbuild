@@ -42,15 +42,15 @@ export function BeforeAfterComparison() {
       <div className="grid md:grid-cols-2 gap-6">
         <Card className={`${view === 'ai' ? 'ring-2 ring-red-200 border-red-200' : 'opacity-75'} bg-white border-gray-200`}>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg text-red-700">Generic AI — red flags</CardTitle>
+            <CardTitle className="text-lg text-red-800">Generic AI — red flags</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <p className="line-through text-gray-500">{AI_SAMPLE.headline}</p>
-            <p className="text-gray-600">
+            <p className="line-through text-gray-600">{AI_SAMPLE.headline}</p>
+            <p className="text-gray-700">
               <span className="underline decoration-red-300">{AI_SAMPLE.lede.slice(0, 50)}</span>
               {AI_SAMPLE.lede.slice(50)}
             </p>
-            <p className="italic text-gray-500">&quot;{AI_SAMPLE.quote}&quot;</p>
+            <p className="italic text-gray-600">&quot;{AI_SAMPLE.quote}&quot;</p>
           </CardContent>
         </Card>
         <Card className={`${view === 'prbuild' ? 'ring-2 ring-green-200 border-green-200' : 'opacity-75'} bg-white border-gray-200`}>

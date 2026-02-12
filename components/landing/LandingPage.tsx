@@ -211,7 +211,7 @@ export default function LandingPage() {
                 You&apos;ve Tried This Before
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                <Link href="/compare/prweb" className="text-primary hover:underline">$400 to PRWeb</Link>. Zero coverage. Sound familiar?
+                <Link href="/compare/prweb" className="text-primary underline hover:text-primary/80">$400 to PRWeb</Link>. Zero coverage. Sound familiar?
               </p>
             </div>
 
@@ -491,13 +491,13 @@ export default function LandingPage() {
               <p className="text-sm mb-4">
                 AI-powered press releases with human quality control. Our journalist panel reviews every release.
               </p>
-              <Link href="/referral" className="text-sm text-secondary hover:text-secondary/80">
+              <Link href="/referral" className="text-sm text-green-400 hover:text-green-300">
                 Referral Program: Give $10, Get $10 →
               </Link>
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <h3 className="text-white font-semibold mb-4 text-base">Product</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="#features" className="hover:text-white">Features</Link></li>
                 <li><Link href="#pricing" className="hover:text-white">Pricing</Link></li>
@@ -508,7 +508,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Use Cases</h4>
+              <h3 className="text-white font-semibold mb-4 text-base">Use Cases</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/for/startups" className="hover:text-white">For Startups</Link></li>
                 <li><Link href="/for/saas" className="hover:text-white">For SaaS</Link></li>
@@ -522,7 +522,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <h3 className="text-white font-semibold mb-4 text-base">Resources</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/resources/press-release-template" className="hover:text-white">Press Release Template</Link></li>
                 <li><Link href="/resources/how-to-write-press-release" className="hover:text-white">How to Write a PR</Link></li>
@@ -534,7 +534,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <h3 className="text-white font-semibold mb-4 text-base">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li><Link href="/about" className="hover:text-white">About</Link></li>
                 <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
