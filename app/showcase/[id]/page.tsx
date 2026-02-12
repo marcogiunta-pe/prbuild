@@ -5,20 +5,20 @@ import { getAppUrl } from '@/lib/app-url';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  FileText, 
-  ArrowLeft, 
-  Calendar, 
-  Building, 
-  Mail, 
-  Phone, 
+import {
+  FileText,
+  ArrowLeft,
+  Calendar,
+  Building,
+  Mail,
+  Phone,
   Globe,
   Share2,
   Twitter,
   Linkedin,
   Facebook,
-  Link as LinkIcon
 } from 'lucide-react';
+import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { format } from 'date-fns';
 
 export default async function ShowcaseDetailPage({ params }: { params: { id: string } }) {
@@ -136,15 +136,7 @@ export default async function ShowcaseDetailPage({ params }: { params: { id: str
                     <Facebook className="h-4 w-4" />
                   </Button>
                 </a>
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={() => {
-                    // This would need to be a client component for copy functionality
-                  }}
-                >
-                  <LinkIcon className="h-4 w-4" />
-                </Button>
+                <CopyLinkButton url={shareUrl} />
               </div>
             </CardContent>
           </Card>

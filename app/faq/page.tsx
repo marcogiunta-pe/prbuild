@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     title: 'FAQ - Frequently Asked Questions | PRBuild',
     description: 'Get answers to common questions about PRBuild.',
   },
+  alternates: { canonical: 'https://prbuild.ai/faq' },
 };
 
 const faqCategories = [
@@ -71,7 +72,7 @@ const faqCategories = [
       },
       {
         q: 'Do unused releases roll over?',
-        a: 'No, releases don\'t roll over month to month. This keeps our pricing low. If you need flexibility, the Agency plan may be a better fit.',
+        a: 'No, releases don\'t roll over month to month. This keeps our pricing low. If you consistently need more releases, the Pro plan (5/month) may be a better fit.',
       },
       {
         q: 'Is there a contract or commitment?',
@@ -148,7 +149,7 @@ export default function FAQPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Start Free →
+              Get Free Release →
             </Button>
           </Link>
         </div>

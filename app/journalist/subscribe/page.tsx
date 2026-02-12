@@ -172,7 +172,7 @@ export default function JournalistSubscribePage() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Quality Guaranteed</h3>
                   <p className="text-gray-600 text-sm">
-                    Every release is reviewed by our 16-persona journalist panel before publication.
+                    Every release is reviewed by our journalist panel before publication.
                   </p>
                 </div>
               </div>

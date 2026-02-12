@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, FileText, CheckCircle, Copy, ExternalLink } from 'lucide-react';
+import { ArrowRight, FileText, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Examples 2026 - Real Samples | PRBuild',
     description: 'See real press release examples that got media coverage.',
   },
+  alternates: { canonical: 'https://prbuild.ai/resources/press-release-examples' },
 };
 
 const examples = [
@@ -270,7 +271,7 @@ export default function PressReleaseExamplesPage() {
             Want Press Releases Like These?
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            We'll write your press release, have it reviewed by 16 journalist personas, 
+            We'll write your press release, have it reviewed by our journalist panel,
             and help you get coverage. First one's free.
           </p>
           <Link href="/signup">

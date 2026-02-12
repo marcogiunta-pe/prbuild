@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'How to Write a Press Release (2026 Guide) | PRBuild',
     description: 'Step-by-step guide to writing press releases that journalists actually want to cover.',
   },
+  alternates: { canonical: 'https://prbuild.ai/resources/how-to-write-press-release' },
 };
 
 const steps = [
@@ -198,7 +199,7 @@ export default function HowToWritePressReleasePage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Let Us Write It →
+              Get Free Release →
             </Button>
           </Link>
         </div>
@@ -320,7 +321,7 @@ export default function HowToWritePressReleasePage() {
             Don't Want to Write It Yourself?
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            We'll write your press release, have it reviewed by 16 journalist personas, 
+            We'll write your press release, have it reviewed by our journalist panel,
             and distribute it to relevant media. First one's free.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

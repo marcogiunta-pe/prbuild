@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     title: 'Free Press Release Template 2026 | PRBuild',
     description: 'Professional press release template with formatting guide and examples.',
   },
+  alternates: { canonical: 'https://prbuild.ai/resources/press-release-template' },
 };
 
 const templateSections = [
@@ -231,7 +232,7 @@ export default function PressReleaseTemplatePage() {
             Don't Want to Write It Yourself?
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-            We'll write your press release, have it reviewed by 16 journalist personas, 
+            We'll write your press release, have it reviewed by our journalist panel,
             and distribute it to relevant media. First one's free.
           </p>
           <Link href="/signup">

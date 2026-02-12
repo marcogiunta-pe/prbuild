@@ -5,7 +5,6 @@ Allow: /
 # Sitemaps
 Sitemap: https://prbuild.ai/sitemap.xml
 
-# Disallow admin and API routes
-Disallow: /admin/
+# Disallow private routes
 Disallow: /api/
 Disallow: /dashboard/

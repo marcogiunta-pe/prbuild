@@ -135,7 +135,7 @@ export default function ReferralPage() {
                 </div>
                 <div className="flex justify-between items-center pb-4 border-b">
                   <span className="text-gray-600">Your monthly plan</span>
-                  <span className="font-semibold">$29/month (Pro)</span>
+                  <span className="font-semibold">$39/month (Pro)</span>
                 </div>
                 <div className="flex justify-between items-center pb-4 border-b">
                   <span className="text-gray-600">After credits</span>

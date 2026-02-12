@@ -51,7 +51,7 @@ export function StickyCTA() {
           </div>
           <Link href="/signup" data-cta="sticky-cta">
             <Button size="sm" className="bg-secondary hover:bg-secondary/90 whitespace-nowrap">
-              Start Free →
+              Get Free Release →
             </Button>
           </Link>
           <button

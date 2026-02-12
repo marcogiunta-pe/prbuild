@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: 'Contact PRBuild - Get in Touch',
     description: 'We\'re here to help. Reach out anytime.',
   },
+  alternates: { canonical: 'https://prbuild.ai/contact' },
 };
 
 const contactOptions = [
@@ -63,7 +64,7 @@ export default function ContactPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Start Free →
+              Get Free Release →
             </Button>
           </Link>
         </div>

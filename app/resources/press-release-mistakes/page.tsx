@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: '15 Press Release Mistakes That Kill Your Coverage | PRBuild',
     description: 'Avoid these mistakes that get your press release deleted.',
   },
+  alternates: { canonical: 'https://prbuild.ai/resources/press-release-mistakes' },
 };
 
 const mistakes = [
@@ -125,7 +126,7 @@ export default function PressReleaseMistakesPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Let Us Write It →
+              Get Free Release →
             </Button>
           </Link>
         </div>
@@ -262,7 +263,7 @@ export default function PressReleaseMistakesPage() {
           </h2>
           <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             We'll write your press release and make sure it avoids all these pitfalls.
-            16 journalist personas review every release. First one's free.
+            Our journalist panel reviews every release. First one's free.
           </p>
           <Link href="/signup">
             <Button size="lg" className="bg-white text-primary hover:bg-gray-100">

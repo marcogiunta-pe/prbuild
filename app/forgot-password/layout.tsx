@@ -1,5 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FileText } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Forgot Password | PRBuild',
+  description: 'Reset your PRBuild account password. Enter your email to receive a password reset link.',
+};
 
 export default function ForgotPasswordLayout({
   children,

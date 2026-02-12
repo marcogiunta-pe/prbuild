@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: 'About PRBuild - Our Story & Mission',
     description: 'Making professional PR accessible to everyone.',
   },
+  alternates: { canonical: 'https://prbuild.ai/about' },
 };
 
 const values = [
@@ -54,7 +55,7 @@ export default function AboutPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Start Free →
+              Get Free Release →
             </Button>
           </Link>
         </div>
@@ -103,7 +104,7 @@ export default function AboutPage() {
               </ul>
               <p>
                 We built PRBuild to fix these problems. AI does the heavy lifting, but humans make 
-                it not sound like AI. 16 journalist personas review every release before you see it. 
+                it not sound like AI. Our journalist panel reviews every release before you see it.
                 And we only send to journalists who actually opted in to receive news in your category.
               </p>
               <p>

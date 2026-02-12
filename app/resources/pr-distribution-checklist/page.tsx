@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     title: 'Press Release Distribution Checklist 2026 | PRBuild',
     description: 'Free 25-point checklist for press release distribution.',
   },
+  alternates: { canonical: 'https://prbuild.ai/resources/pr-distribution-checklist' },
 };
 
 const checklistSections = [
@@ -91,7 +92,7 @@ export default function PRDistributionChecklistPage() {
           </Link>
           <Link href="/signup">
             <Button className="bg-secondary hover:bg-secondary/90">
-              Let Us Handle It →
+              Get Free Release →
             </Button>
           </Link>
         </div>
