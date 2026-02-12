@@ -353,3 +353,29 @@ export const INDUSTRIES = [
   { value: 'retail', label: 'Retail' },
   { value: 'general', label: 'General / Other' },
 ] as const;
+
+// Email leads (quiz, checklist, teardown signups)
+export interface EmailLead {
+  id: string;
+  email: string;
+  name: string | null;
+  company_name: string | null;
+  lead_source: 'quiz' | 'checklist' | 'teardown_signup';
+  quiz_score: number | null;
+  quiz_answers: Record<string, boolean> | null;
+  subscribed_teardown: boolean;
+  unsubscribe_token: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Teardown newsletter sends
+export interface TeardownSend {
+  id: string;
+  subject: string;
+  pr_company: string;
+  pr_headline: string;
+  teardown_content: string;
+  recipient_count: number | null;
+  sent_at: string;
+}

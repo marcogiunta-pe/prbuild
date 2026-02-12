@@ -22,6 +22,7 @@ const StickyCTA = dynamic(() => import('@/components/StickyCTA').then((m) => ({ 
 const ROICalculator = dynamic(() => import('@/components/ROICalculator').then((m) => ({ default: m.ROICalculator })), { ssr: false });
 const TestimonialsGrid = dynamic(() => import('@/components/landing/TestimonialsGrid').then((m) => ({ default: m.TestimonialsGrid })), { ssr: false });
 const SocialProofTicker = dynamic(() => import('@/components/landing/SocialProofTicker').then((m) => ({ default: m.SocialProofTicker })), { ssr: false });
+const QuizTeaser = dynamic(() => import('@/components/quiz/QuizTeaser').then((m) => ({ default: m.QuizTeaser })), { ssr: false });
 
 const NAV_SECTIONS = [
   { id: 'features', label: 'Features' },
@@ -421,6 +422,16 @@ export default function LandingPage() {
             </div>
             <SectionErrorBoundary sectionName="ROI Calculator">
               <ROICalculator />
+            </SectionErrorBoundary>
+          </div>
+        </section>
+
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <SectionErrorBoundary sectionName="Quiz Teaser">
+              <AnimateOnScroll>
+                <QuizTeaser />
+              </AnimateOnScroll>
             </SectionErrorBoundary>
           </div>
         </section>

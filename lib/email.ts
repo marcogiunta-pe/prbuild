@@ -324,3 +324,137 @@ export async function sendInviteEmail(
   }
   return data;
 }
+
+// ============================================
+// Lead Emails (Quiz / Checklist / Teardown)
+// ============================================
+
+export async function sendLeadWelcomeEmail(
+  email: string,
+  leadSource: string
+) {
+  const baseUrl = getAppUrl();
+
+  const isQuiz = leadSource === 'quiz';
+  const subject = isQuiz
+    ? "Here's your full PR score breakdown"
+    : "Here's your printable 23-point checklist";
+  const heading = isQuiz
+    ? 'Your PR Score Report'
+    : 'Your 23-Point PR Checklist';
+  const body = isQuiz
+    ? "Thanks for taking the Grade Your PR quiz! Your detailed item-by-item report is now unlocked on the results page. Bookmark it and come back anytime."
+    : "Thanks for downloading the 23-point press release checklist! Use it before every release to make sure you're not leaving coverage on the table.";
+  const ctaText = isQuiz ? 'View Your Full Report' : 'View the Checklist';
+  const ctaUrl = isQuiz
+    ? `${baseUrl}/resources/pr-score`
+    : `${baseUrl}/resources/press-release-checklist`;
+
+  const { data, error } = await getResend().emails.send({
+    from: FROM_EMAIL,
+    to: email,
+    subject,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+            .logo { font-size: 24px; font-weight: bold; color: #6366f1; margin-bottom: 30px; }
+            .button { display: inline-block; background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+            .footer { margin-top: 40px; font-size: 14px; color: #666; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="logo">📰 PRBuild</div>
+            <h2>${escapeHtml(heading)}</h2>
+            <p>${escapeHtml(body)}</p>
+            <p style="margin: 30px 0;">
+              <a href="${ctaUrl}" class="button">${escapeHtml(ctaText)}</a>
+            </p>
+            <p style="color: #666; font-size: 14px;">You'll also get our weekly PR Teardown — a real press release critiqued by our team so you can learn what works (and what doesn't).</p>
+            <div class="footer">
+              <p>© ${new Date().getFullYear()} PRBuild</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  });
+
+  if (error) {
+    console.error('Failed to send lead welcome email:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+export async function sendTeardownEmail(
+  email: string,
+  subject: string,
+  prCompany: string,
+  prHeadline: string,
+  teardownContent: string,
+  unsubscribeToken: string
+) {
+  const baseUrl = getAppUrl();
+  const unsubscribeUrl = `${baseUrl}/api/leads/unsubscribe?token=${encodeURIComponent(unsubscribeToken)}`;
+
+  const { data, error } = await getResend().emails.send({
+    from: FROM_EMAIL,
+    to: email,
+    subject,
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+            .logo { font-size: 24px; font-weight: bold; color: #6366f1; margin-bottom: 10px; }
+            .header { border-bottom: 2px solid #6366f1; padding-bottom: 20px; margin-bottom: 20px; }
+            .meta { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 24px; }
+            .button { display: inline-block; background: #6366f1; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; }
+            .footer { margin-top: 40px; font-size: 12px; color: #999; text-align: center; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <div class="logo">📰 PRBuild</div>
+              <p style="color: #666; margin: 0;">Weekly PR Teardown</p>
+            </div>
+
+            <div class="meta">
+              <p style="margin: 0; font-size: 14px; color: #666;"><strong>Company:</strong> ${escapeHtml(prCompany)}</p>
+              <p style="margin: 4px 0 0; font-size: 14px; color: #666;"><strong>Headline:</strong> ${escapeHtml(prHeadline)}</p>
+            </div>
+
+            ${teardownContent}
+
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center;">
+              <p style="margin: 0 0 10px; font-weight: 600;">Want us to write yours?</p>
+              <a href="${baseUrl}/signup" class="button">Get Your Free Release</a>
+            </div>
+
+            <div class="footer">
+              <p>You're receiving this because you signed up for PRBuild resources.</p>
+              <p><a href="${unsubscribeUrl}" style="color: #999;">Unsubscribe from teardowns</a></p>
+              <p>© ${new Date().getFullYear()} PRBuild</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+  });
+
+  if (error) {
+    console.error('Failed to send teardown email:', error);
+    throw error;
+  }
+
+  return data;
+}

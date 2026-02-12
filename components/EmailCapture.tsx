@@ -11,6 +11,10 @@ interface EmailCaptureProps {
   successMessage?: string;
   className?: string;
   variant?: 'default' | 'minimal' | 'card';
+  leadSource?: string;
+  quizScore?: number;
+  quizAnswers?: Record<string, boolean>;
+  onSuccess?: () => void;
 }
 
 export function EmailCapture({
@@ -20,6 +24,10 @@ export function EmailCapture({
   successMessage = 'Thanks! Check your inbox to confirm.',
   className = '',
   variant = 'default',
+  leadSource = 'checklist',
+  quizScore,
+  quizAnswers,
+  onSuccess,
 }: EmailCaptureProps) {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -27,7 +35,7 @@ export function EmailCapture({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !email.includes('@')) {
       setErrorMessage('Please enter a valid email');
       setStatus('error');
@@ -35,13 +43,31 @@ export function EmailCapture({
     }
 
     setStatus('loading');
-    
-    // Simulate API call - in production, this would call your newsletter API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, always succeed
-    setStatus('success');
-    setEmail('');
+
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          leadSource,
+          quizScore: quizScore ?? undefined,
+          quizAnswers: quizAnswers ?? undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      setStatus('success');
+      setEmail('');
+      onSuccess?.();
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setStatus('error');
+    }
   };
 
   if (variant === 'minimal') {
@@ -55,8 +81,8 @@ export function EmailCapture({
           className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           disabled={status === 'loading' || status === 'success'}
         />
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           disabled={status === 'loading' || status === 'success'}
           className="bg-secondary hover:bg-secondary/90"
         >
@@ -74,7 +100,7 @@ export function EmailCapture({
       <div className={`bg-primary/5 border border-primary/10 rounded-2xl p-8 ${className}`}>
         <h3 className="text-xl font-bold mb-2">{title}</h3>
         <p className="text-gray-600 mb-6">{description}</p>
-        
+
         {status === 'success' ? (
           <div className="flex items-center gap-2 text-green-600 font-medium">
             <Check className="w-5 h-5" />
@@ -96,8 +122,8 @@ export function EmailCapture({
             {status === 'error' && (
               <p className="text-red-500 text-sm">{errorMessage}</p>
             )}
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-secondary hover:bg-secondary/90"
               disabled={status === 'loading'}
             >
@@ -110,7 +136,7 @@ export function EmailCapture({
             </Button>
           </form>
         )}
-        
+
         <p className="text-xs text-gray-500 mt-4">
           We respect your privacy. Unsubscribe anytime.
         </p>
@@ -123,7 +149,7 @@ export function EmailCapture({
     <div className={className}>
       <h3 className="text-2xl font-bold mb-2">{title}</h3>
       <p className="text-gray-600 mb-6">{description}</p>
-      
+
       {status === 'success' ? (
         <div className="flex items-center gap-2 text-green-600 font-medium py-3">
           <Check className="w-5 h-5" />
@@ -142,8 +168,8 @@ export function EmailCapture({
             className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             disabled={status === 'loading'}
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="lg"
             className="bg-secondary hover:bg-secondary/90"
             disabled={status === 'loading'}
@@ -156,7 +182,7 @@ export function EmailCapture({
           </Button>
         </form>
       )}
-      
+
       {status === 'error' && (
         <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
       )}

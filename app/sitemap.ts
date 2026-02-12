@@ -202,6 +202,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      url: `${baseUrl}/resources/pr-score`,
+      lastModified: new Date('2026-02-12'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/resources/press-release-checklist`,
+      lastModified: new Date('2026-02-12'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/faq`,
       lastModified: new Date('2026-02-11'),
       changeFrequency: 'monthly',

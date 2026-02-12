@@ -2,17 +2,18 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  FileText, 
-  Users, 
+import {
+  FileText,
+  Users,
   UserCircle,
-  Mail, 
-  Globe, 
+  Mail,
+  Globe,
   BarChart3,
   Settings,
   Shield,
   Lightbulb,
-  Wand2
+  Wand2,
+  Scissors
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +53,12 @@ const navItems = [
     href: '/admin/feedback',
     icon: Lightbulb,
     description: 'Feature requests',
+  },
+  {
+    title: 'Teardowns',
+    href: '/admin/teardowns',
+    icon: Scissors,
+    description: 'Weekly PR teardowns',
   },
   {
     title: 'AI Prompts',
