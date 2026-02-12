@@ -365,6 +365,7 @@ export default function NewRequestPage() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="companyName">Company Name *</Label>
+              <p className="text-xs text-gray-500 mb-1">Your official company name as it should appear in the release.</p>
               <Input
                 id="companyName"
                 value={formData.companyName}
@@ -374,6 +375,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="companyWebsite">Company Website *</Label>
+              <p className="text-xs text-gray-500 mb-1">We'll link to this in the release and use it for background research.</p>
               <Input
                 id="companyWebsite"
                 value={formData.companyWebsite}
@@ -383,6 +385,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="industry">Industry *</Label>
+              <p className="text-xs text-gray-500 mb-1">Used to match your release with journalists who cover your space.</p>
               <select
                 id="industry"
                 value={formData.industry}
@@ -397,6 +400,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="boilerplate">Company Boilerplate (optional)</Label>
+              <p className="text-xs text-gray-500 mb-1">The "About" paragraph that goes at the bottom. If you have one on your website, paste it here. We'll write one if you skip this.</p>
               <Textarea
                 id="boilerplate"
                 value={formData.boilerplate}
@@ -419,6 +423,7 @@ export default function NewRequestPage() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="announcementType">Announcement Type *</Label>
+              <p className="text-xs text-gray-500 mb-1">Pick the closest match — this helps our writers choose the right tone and structure.</p>
               <select
                 id="announcementType"
                 value={formData.announcementType}
@@ -433,6 +438,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="newsHook">News Hook *</Label>
+              <p className="text-xs text-gray-500 mb-1">One sentence: what happened and why anyone should care. Think &ldquo;X launches Y to solve Z&rdquo; — not &ldquo;We are excited to announce.&rdquo;</p>
               <Textarea
                 id="newsHook"
                 value={formData.newsHook}
@@ -444,6 +450,7 @@ export default function NewRequestPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="datelineCity">Dateline City *</Label>
+                <p className="text-xs text-gray-500 mb-1">Your company&apos;s HQ city (appears at the top of the release, e.g. &ldquo;NEW YORK&rdquo;).</p>
                 <Input
                   id="datelineCity"
                   value={formData.datelineCity}
@@ -453,6 +460,7 @@ export default function NewRequestPage() {
               </div>
               <div>
                 <Label htmlFor="releaseDate">Target Release Date *</Label>
+                <p className="text-xs text-gray-500 mb-1">When you want this published. We need at least 48 hours lead time.</p>
                 <Input
                   id="releaseDate"
                   type="date"
@@ -463,7 +471,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label>Core Facts (ranked by importance) *</Label>
-              <p className="text-xs text-gray-500 mb-2">List the key facts about your announcement</p>
+              <p className="text-xs text-gray-500 mb-2">The key facts a journalist needs to write the story. Put the most important one first. Include specific numbers where possible.</p>
               {formData.coreFacts.map((fact, i) => (
                 <div key={i} className="flex gap-2 mb-2">
                   <span className="text-sm text-gray-400 pt-2">{i + 1}.</span>
@@ -510,7 +518,7 @@ export default function NewRequestPage() {
         <Card>
           <CardHeader>
             <CardTitle>Quote Sources</CardTitle>
-            <CardDescription>Add people who can be quoted in the release (optional)</CardDescription>
+            <CardDescription>Add people who can be quoted in the release (optional but recommended — releases with quotes get 30% more pickups)</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {formData.quoteSources.map((source, i) => (
@@ -558,7 +566,8 @@ export default function NewRequestPage() {
                   </div>
                 </div>
                 <div>
-                  <Label>Quote (optional - we can create one)</Label>
+                  <Label>Quote (optional — we&apos;ll draft one if you skip this)</Label>
+                  <p className="text-xs text-gray-500 mb-1">If you have a real quote, paste it. Otherwise leave blank and we&apos;ll write one for approval.</p>
                   <Textarea
                     value={source.quote || ''}
                     onChange={(e) => {
@@ -588,9 +597,10 @@ export default function NewRequestPage() {
         <Card>
           <CardHeader>
             <CardTitle>Media Contact & Call to Action</CardTitle>
-            <CardDescription>Who should journalists contact?</CardDescription>
+            <CardDescription>Who should journalists contact, and what should readers do next?</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <p className="text-xs text-gray-500">This info appears at the bottom of every press release. Use a dedicated press email if you have one.</p>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="mediaContactName">Contact Name *</Label>
@@ -634,6 +644,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="desiredCta">Desired Call to Action *</Label>
+              <p className="text-xs text-gray-500 mb-1">What should someone do after reading? Be specific — a URL, a signup page, or &ldquo;contact us for a demo.&rdquo;</p>
               <Textarea
                 id="desiredCta"
                 value={formData.desiredCta}
@@ -644,6 +655,7 @@ export default function NewRequestPage() {
             </div>
             <div>
               <Label htmlFor="visualsDescription">Available Visuals (optional)</Label>
+              <p className="text-xs text-gray-500 mb-1">Logos, product screenshots, headshots, or videos you can share. Releases with visuals get more coverage.</p>
               <Textarea
                 id="visualsDescription"
                 value={formData.visualsDescription}
