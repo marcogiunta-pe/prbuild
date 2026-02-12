@@ -337,13 +337,18 @@ export default function LandingPage() {
               ))}
             </div>
 
-            <div className="text-center mt-12">
+            <div className="text-center mt-12 space-y-3">
               <Link href="/signup" data-cta="how-it-works-signup">
                 <Button size="lg" className="bg-secondary hover:bg-secondary/90">
                   Start Your Press Release
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
+              <div>
+                <Link href="/showcase" className="text-sm text-gray-500 hover:text-primary transition-colors" data-cta="how-it-works-showcase">
+                  See a real example →
+                </Link>
+              </div>
             </div>
           </div>
         </section>
