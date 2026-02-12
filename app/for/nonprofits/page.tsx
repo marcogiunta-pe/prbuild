@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Nonprofits | PRBuild',
     description: 'Get your mission in the news. First release free.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/nonprofits' },
 };
 
 const benefits = [

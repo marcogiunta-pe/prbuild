@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: 'PRBuild vs PRWeb: Which Press Release Service Should You Choose?',
     description: 'Compare PRBuild and PRWeb on price, features, and results. See why companies are switching.',
   },
+  alternates: { canonical: 'https://prbuild.ai/compare/prweb' },
 };
 
 export default function PRWebComparisonPage() {

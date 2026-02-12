@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { getAppUrl } from '@/lib/app-url';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,6 +21,45 @@ import {
 } from 'lucide-react';
 import { CopyLinkButton } from '@/components/CopyLinkButton';
 import { format } from 'date-fns';
+import { BreadcrumbSchema, ArticleSchema } from '@/components/StructuredData';
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const supabase = await createClient();
+  const { data: release } = await supabase
+    .from('showcase_releases')
+    .select('headline, summary, company_name, published_at')
+    .eq('id', params.id)
+    .single();
+
+  if (!release) {
+    return { title: 'Release Not Found | PRBuild' };
+  }
+
+  const title = `${release.headline} | PRBuild Showcase`;
+  const description = release.summary || `Press release from ${release.company_name}`;
+  const url = `https://prbuild.ai/showcase/${params.id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'article',
+      title,
+      description,
+      url,
+      siteName: 'PRBuild',
+      publishedTime: release.published_at,
+      images: [{ url: '/og-image.png', width: 1200, height: 630, alt: release.headline }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/og-image.png'],
+    },
+    alternates: { canonical: url },
+  };
+}
 
 export default async function ShowcaseDetailPage({ params }: { params: { id: string } }) {
   const supabase = await createClient();
@@ -204,6 +244,20 @@ export default async function ShowcaseDetailPage({ params }: { params: { id: str
           <p>© 2026 PRBuild. All rights reserved.</p>
         </div>
       </footer>
+
+      <ArticleSchema
+        title={release.headline}
+        description={release.summary || `Press release from ${release.company_name}`}
+        url={shareUrl}
+        datePublished={release.published_at}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://prbuild.ai' },
+          { name: 'Showcase', url: 'https://prbuild.ai/showcase' },
+          { name: release.headline, url: shareUrl },
+        ]}
+      />
     </div>
   );
 }

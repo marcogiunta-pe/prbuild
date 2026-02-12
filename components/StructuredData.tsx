@@ -121,6 +121,68 @@ export function FAQSchema() {
   );
 }
 
+export function BreadcrumbSchema({ items }: { items: { name: string; url: string }[] }) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
+export function ArticleSchema({
+  title,
+  description,
+  url,
+  datePublished,
+}: {
+  title: string;
+  description: string;
+  url: string;
+  datePublished: string;
+}) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: title,
+    description,
+    url,
+    datePublished,
+    author: {
+      '@type': 'Organization',
+      name: 'PRBuild',
+      url: 'https://prbuild.ai',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PRBuild',
+      url: 'https://prbuild.ai',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://prbuild.ai/logo.png',
+      },
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
+}
+
 export function WebsiteSchema() {
   const schema = {
     '@context': 'https://schema.org',

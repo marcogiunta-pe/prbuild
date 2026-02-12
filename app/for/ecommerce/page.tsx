@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Releases for E-commerce & DTC Brands | PRBuild',
     description: 'Turn product launches into news stories. First release free.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/ecommerce' },
 };
 
 const benefits = [

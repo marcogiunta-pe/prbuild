@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for SaaS Companies | PRBuild',
     description: 'Turn product launches into news stories. First release free.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/saas' },
 };
 
 const benefits = [

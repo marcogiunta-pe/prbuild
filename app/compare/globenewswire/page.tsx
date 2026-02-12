@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: 'PRBuild vs GlobeNewswire: Which Press Release Service Should You Choose?',
     description: 'Compare PRBuild and GlobeNewswire on price, features, and results.',
   },
+  alternates: { canonical: 'https://prbuild.ai/compare/globenewswire' },
 };
 
 export default function GlobeNewswireComparisonPage() {

@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Healthcare Companies | PRBuild',
     description: 'Get your healthcare news in front of the right journalists.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/healthcare' },
 };
 
 const benefits = [

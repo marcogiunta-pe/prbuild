@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: 'PRBuild vs Cision: Which Press Release Service Should You Choose?',
     description: 'Compare PRBuild and Cision on price, features, and results.',
   },
+  alternates: { canonical: 'https://prbuild.ai/compare/cision' },
 };
 
 export default function CisionComparisonPage() {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { analytics } from '@/lib/analytics';
 
 interface FAQ {
   q: string;
@@ -27,13 +28,14 @@ export function FAQContent({ faqCategories }: FAQContentProps) {
     return initial;
   });
 
-  const toggle = (key: string) => {
+  const toggle = (key: string, question: string) => {
     setOpenItems((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
         next.delete(key);
       } else {
         next.add(key);
+        analytics.faqOpened(question);
       }
       return next;
     });
@@ -80,7 +82,7 @@ export function FAQContent({ faqCategories }: FAQContentProps) {
               return (
                 <div key={faqIndex} className="border border-gray-200 rounded-xl overflow-hidden">
                   <button
-                    onClick={() => toggle(key)}
+                    onClick={() => toggle(key, faq.q)}
                     className="w-full px-6 py-4 text-left flex items-center justify-between gap-4"
                   >
                     <h3 className="font-semibold text-lg text-gray-900">

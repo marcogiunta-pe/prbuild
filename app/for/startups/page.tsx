@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Startups | PRBuild',
     description: 'Get media coverage without the agency price tag. First release free.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/startups' },
 };
 
 const benefits = [

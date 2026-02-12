@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Law Firms | PRBuild',
     description: 'Get your legal news in front of the right journalists.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/legal' },
 };
 
 const benefits = [

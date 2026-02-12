@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +8,17 @@ import { Input } from '@/components/ui/input';
 import { FileText, Search, Calendar, Building, ArrowRight, Bell } from 'lucide-react';
 import { format } from 'date-fns';
 import { CATEGORIES } from '@/types';
+
+export const metadata: Metadata = {
+  title: 'Press Release Showcase | PRBuild',
+  description: 'Browse the latest press releases from innovative companies. All releases are professionally written and journalist-reviewed.',
+  openGraph: {
+    title: 'Press Release Showcase | PRBuild',
+    description: 'Browse the latest press releases from innovative companies. All releases are professionally written and journalist-reviewed.',
+    url: 'https://prbuild.ai/showcase',
+  },
+  alternates: { canonical: 'https://prbuild.ai/showcase' },
+};
 
 export default async function ShowcasePage({
   searchParams,

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FAQContent } from '@/components/FAQContent';
+import { BreadcrumbSchema } from '@/components/StructuredData';
 
 export const metadata: Metadata = {
   title: 'FAQ - Frequently Asked Questions | PRBuild',
@@ -219,6 +220,32 @@ export default function FAQPage() {
           </p>
         </div>
       </footer>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqCategories.flatMap((cat) =>
+              cat.questions.map((faq) => ({
+                '@type': 'Question',
+                name: faq.q,
+                acceptedAnswer: {
+                  '@type': 'Answer',
+                  text: faq.a,
+                },
+              }))
+            ),
+          }),
+        }}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: 'https://prbuild.ai' },
+          { name: 'FAQ', url: 'https://prbuild.ai/faq' },
+        ]}
+      />
     </div>
   );
 }

@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'White-Label Press Release Service for PR Agencies | PRBuild',
     description: 'Scale your agency without scaling headcount. White-label press releases with 24-hour turnaround.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/agencies' },
 };
 
 const benefits = [

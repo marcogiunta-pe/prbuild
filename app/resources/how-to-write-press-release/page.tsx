@@ -350,6 +350,25 @@ export default function HowToWritePressReleasePage() {
           </p>
         </div>
       </footer>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'HowTo',
+            name: 'How to Write a Press Release',
+            description:
+              'A step-by-step guide to writing press releases journalists actually want to cover.',
+            step: steps.map((s) => ({
+              '@type': 'HowToStep',
+              position: s.number,
+              name: s.title,
+              text: s.content.replace(/\*\*/g, '').replace(/[✓✗] /g, ''),
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }

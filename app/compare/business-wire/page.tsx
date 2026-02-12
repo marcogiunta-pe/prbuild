@@ -12,6 +12,7 @@ export const metadata: Metadata = {
     title: 'PRBuild vs Business Wire: Which Press Release Service Should You Choose?',
     description: 'Compare PRBuild and Business Wire on price, features, and results. Save thousands on your PR budget.',
   },
+  alternates: { canonical: 'https://prbuild.ai/compare/business-wire' },
 };
 
 export default function BusinessWireComparisonPage() {

@@ -1,8 +1,11 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { CTATracker } from '@/components/CTATracker';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import { OrganizationSchema, ProductSchema, WebsiteSchema } from '@/components/StructuredData';
 
 export const viewport: Viewport = {
@@ -86,6 +89,10 @@ export const metadata: Metadata = {
     canonical: 'https://prbuild.ai',
   },
   
+  verification: {
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION || '',
+  },
+
   category: 'technology',
 };
 
@@ -115,13 +122,16 @@ export default function RootLayout({
       <body className="font-sans bg-background text-foreground antialiased" style={{ fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
         <ThemeProvider>
           <CTATracker />
-          <a 
-            href="#main-content" 
+          <AnalyticsProvider />
+          <a
+            href="#main-content"
             className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-white px-4 py-2 rounded z-50"
           >
             Skip to main content
           </a>
           {children}
+          <Analytics />
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>

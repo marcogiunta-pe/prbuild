@@ -1,9 +1,10 @@
 import { MetadataRoute } from 'next';
+import { createAdminClient } from '@/lib/supabase/server';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://prbuild.ai';
-  
-  return [
+
+  const staticRoutes: MetadataRoute.Sitemap = [
     // Core pages
     {
       url: baseUrl,
@@ -118,6 +119,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${baseUrl}/for/healthcare`,
       lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/for/finance`,
+      lastModified: new Date('2026-02-12'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/for/legal`,
+      lastModified: new Date('2026-02-12'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/for/realestate`,
+      lastModified: new Date('2026-02-12'),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
@@ -252,4 +271,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
     },
   ];
+
+  // Fetch dynamic showcase releases
+  let showcaseRoutes: MetadataRoute.Sitemap = [];
+  try {
+    const supabase = createAdminClient();
+    const { data: releases } = await supabase
+      .from('showcase_releases')
+      .select('id, published_at')
+      .order('published_at', { ascending: false });
+
+    if (releases) {
+      showcaseRoutes = releases.map((release) => ({
+        url: `${baseUrl}/showcase/${release.id}`,
+        lastModified: new Date(release.published_at),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }));
+    }
+  } catch {
+    // Static routes still generate on failure
+  }
+
+  return [...staticRoutes, ...showcaseRoutes];
 }

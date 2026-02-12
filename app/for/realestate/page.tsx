@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Real Estate | PRBuild',
     description: 'Get your real estate news in front of property journalists.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/realestate' },
 };
 
 const benefits = [

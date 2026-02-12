@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     title: 'Press Release Service for Financial Services | PRBuild',
     description: 'Get your financial news in front of the right journalists.',
   },
+  alternates: { canonical: 'https://prbuild.ai/for/finance' },
 };
 
 const benefits = [

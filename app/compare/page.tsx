@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     description:
       'Compare PRBuild to PRWeb, PR Newswire, Business Wire, GlobeNewswire, and Cision.',
   },
+  alternates: { canonical: 'https://prbuild.ai/compare' },
 };
 
 const competitorCards = Object.values(competitors).map((c) => ({
