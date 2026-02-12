@@ -97,6 +97,9 @@ export default function SignupPage() {
           body: inviteToken ? JSON.stringify({ token: inviteToken }) : '{}',
         });
 
+        // Send welcome email (fire-and-forget)
+        fetch('/api/onboarding/welcome-email', { method: 'POST' }).catch(() => {});
+
         router.refresh();
         router.push('/dashboard/my-releases');
       }

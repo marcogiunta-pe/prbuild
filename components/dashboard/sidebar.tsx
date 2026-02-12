@@ -61,10 +61,10 @@ export function DashboardSidebar() {
           Our team is here to help you create effective press releases.
         </p>
         <Link
-          href="/contact"
+          href="/docs"
           className="text-xs text-secondary font-medium hover:underline"
         >
-          Contact Support →
+          View Help Docs →
         </Link>
       </div>
     </aside>

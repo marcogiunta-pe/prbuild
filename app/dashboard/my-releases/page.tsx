@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { PlusCircle, FileText, Clock, CheckCircle, AlertCircle, Send } from 'lucide-react';
 import { ReleaseStatus } from '@/types';
 import { formatDistanceToNow } from 'date-fns';
+import { WelcomeModal } from '@/components/dashboard/WelcomeModal';
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 
 const statusConfig: Record<ReleaseStatus, { label: string; color: string; icon: any }> = {
   submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Clock },
@@ -24,19 +26,49 @@ const statusConfig: Record<ReleaseStatus, { label: string; color: string; icon: 
   rejected: { label: 'Rejected', color: 'bg-red-100 text-red-700', icon: AlertCircle },
 };
 
+// Statuses that mean the client has seen/reviewed their draft
+const reviewedStatuses: ReleaseStatus[] = [
+  'awaiting_client',
+  'client_feedback',
+  'client_approved',
+  'final_pending',
+  'final_approved',
+  'quality_review',
+  'quality_approved',
+  'published',
+];
+
 export default async function MyReleasesPage() {
   const supabase = await createClient();
-  
+
   const { data: { user } } = await supabase.auth.getUser();
-  
-  const { data: releases, error } = await supabase
-    .from('release_requests')
-    .select('*')
-    .eq('client_id', user?.id)
-    .order('created_at', { ascending: false });
+
+  const [{ data: releases }, { data: profile }] = await Promise.all([
+    supabase
+      .from('release_requests')
+      .select('*')
+      .eq('client_id', user?.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('profiles')
+      .select('company_name, onboarding_completed_at, onboarding_dismissed_at')
+      .eq('id', user?.id)
+      .single(),
+  ]);
+
+  const releaseCount = releases?.length ?? 0;
+  const hasCompanyName = !!profile?.company_name;
+  const hasReviewedRelease = releases?.some(
+    (r: any) => reviewedStatuses.includes(r.status)
+  ) ?? false;
+
+  const showOnboarding = !profile?.onboarding_completed_at && !profile?.onboarding_dismissed_at;
+  const showWelcomeModal = showOnboarding && releaseCount === 0;
 
   return (
     <div className="max-w-5xl">
+      {showWelcomeModal && <WelcomeModal />}
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">My Press Releases</h1>
@@ -49,6 +81,14 @@ export default async function MyReleasesPage() {
           </Button>
         </Link>
       </div>
+
+      {showOnboarding && (
+        <OnboardingChecklist
+          hasCompanyName={hasCompanyName}
+          releaseCount={releaseCount}
+          hasReviewedRelease={hasReviewedRelease}
+        />
+      )}
 
       {!releases || releases.length === 0 ? (
         <Card className="border-dashed">
@@ -74,7 +114,7 @@ export default async function MyReleasesPage() {
             const status = statusConfig[release.status as ReleaseStatus] || statusConfig.submitted;
             const StatusIcon = status.icon;
             const needsAction = release.status === 'awaiting_client';
-            
+
             return (
               <Link key={release.id} href={`/dashboard/my-releases/${release.id}`}>
                 <Card className={`hover:shadow-md transition-shadow cursor-pointer ${needsAction ? 'ring-2 ring-yellow-400' : ''}`}>
@@ -90,11 +130,11 @@ export default async function MyReleasesPage() {
                             {status.label}
                           </Badge>
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 mb-3">
                           {release.company_name} • {release.announcement_type.replace('_', ' ')}
                         </p>
-                        
+
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <span>Created {formatDistanceToNow(new Date(release.created_at))} ago</span>
                           <span>•</span>
@@ -107,7 +147,7 @@ export default async function MyReleasesPage() {
                           )}
                         </div>
                       </div>
-                      
+
                       {needsAction && (
                         <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
                           Review Now

@@ -9,6 +9,9 @@ export interface Profile {
   stripe_customer_id: string | null;
   is_free_user: boolean;
   free_releases_remaining: number;
+  onboarding_completed_at: string | null;
+  onboarding_dismissed_at: string | null;
+  onboarding_email_sent_at: Record<string, string> | null;
   created_at: string;
   updated_at: string;
 }

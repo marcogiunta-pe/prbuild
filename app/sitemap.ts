@@ -121,6 +121,55 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.7,
     },
+    // Documentation pages
+    {
+      url: `${baseUrl}/docs`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/docs/how-it-works`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/submitting-request`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/review-process`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/managing-releases`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/pricing`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/distribution`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/docs/account`,
+      lastModified: new Date('2026-02-11'),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    },
     // Resource pages
     {
       url: `${baseUrl}/resources/press-release-template`,
