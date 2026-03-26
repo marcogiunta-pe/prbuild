@@ -63,7 +63,7 @@ export default function LandingPage() {
       {/* Navigation — editorial masthead style */}
       <header
         className={`sticky top-0 z-50 w-full border-b border-rule backdrop-blur transition-all duration-300 ${
-          navScrolled ? 'bg-paper-light/98 shadow-sm py-2' : 'bg-paper-light/95 py-0'
+          navScrolled ? 'bg-paper-light/98 py-2' : 'bg-paper-light/95 py-0'
         }`}
       >
         <div className={`container mx-auto flex items-center justify-between px-4 transition-all duration-300 ${navScrolled ? 'h-14' : 'h-16'}`}>
@@ -396,7 +396,7 @@ export default function LandingPage() {
                     <div className="w-10 h-10 bg-paper-dark rounded-sm flex items-center justify-center mb-4">
                       <feature.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="text-base font-semibold text-ink mb-2">{feature.title}</h3>
+                    <h3 className="text-lg font-semibold text-ink mb-2">{feature.title}</h3>
                     <p className="text-ink-muted text-sm leading-relaxed">{feature.description}</p>
                   </div>
                 </AnimateOnScroll>
