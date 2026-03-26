@@ -62,7 +62,7 @@ function SimpleConfetti({ active }: { active: boolean }) {
   if (pieces.length === 0) return null;
 
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-md">
       {pieces.map((p) => (
         <div
           key={p.id}
@@ -125,22 +125,22 @@ export function ROICalculator() {
   }, [shareText]);
 
   return (
-    <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-2xl mx-auto overflow-hidden">
+    <div className="relative bg-paper-light rounded-md border border-rule p-8 max-w-2xl mx-auto overflow-hidden">
       <SimpleConfetti active={showConfetti} />
 
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+        <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center">
           <Calculator className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h3 className="text-xl font-bold">PR Savings Calculator</h3>
-          <p className="text-sm text-gray-500">See how much you could save with PRBuild</p>
+          <h3 className="text-xl font-display">PR Savings Calculator</h3>
+          <p className="text-sm text-ink-muted">See how much you could save with PRBuild</p>
         </div>
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-ink mb-2">
             How many press releases do you need per month?
           </label>
           <div className="flex flex-wrap gap-2">
@@ -148,10 +148,10 @@ export function ROICalculator() {
               <button
                 key={num}
                 onClick={() => setReleasesPerMonth(num)}
-                className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-lg font-medium transition-colors touch-manipulation ${
+                className={`min-h-[44px] min-w-[44px] px-4 py-2 rounded-sm font-medium transition-colors touch-manipulation ${
                   releasesPerMonth === num
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
                 }`}
               >
                 {num}
@@ -161,7 +161,7 @@ export function ROICalculator() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-ink mb-2">
             What do you currently use?
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -169,10 +169,10 @@ export function ROICalculator() {
               <button
                 key={key}
                 onClick={() => setCurrentService(key as CurrentServiceKey)}
-                className={`min-h-[44px] px-4 py-2 rounded-lg font-medium text-sm transition-colors touch-manipulation ${
+                className={`min-h-[44px] px-4 py-2 rounded-sm font-medium text-sm transition-colors touch-manipulation ${
                   currentService === key
                     ? 'bg-primary text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
                 }`}
               >
                 {value.name}
@@ -183,21 +183,21 @@ export function ROICalculator() {
 
         {/* Bar chart */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-ink-muted">
             <span>Your current cost</span>
-            <span className="font-medium text-gray-900">${currentMonthlyCost.toLocaleString()}/mo</span>
+            <span className="font-medium text-ink">${currentMonthlyCost.toLocaleString()}/mo</span>
           </div>
-          <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
+          <div className="h-3 bg-paper-dark rounded-sm overflow-hidden flex">
             <div
               className="h-full bg-red-400/80 transition-all duration-400 ease-out"
               style={{ width: `${currentWidth}%` }}
             />
           </div>
-          <div className="flex justify-between text-sm text-gray-600">
+          <div className="flex justify-between text-sm text-ink-muted">
             <span>PRBuild cost</span>
             <span className="font-medium text-primary">${prbuildCost}/mo</span>
           </div>
-          <div className="h-3 bg-gray-200 rounded-full overflow-hidden flex">
+          <div className="h-3 bg-paper-dark rounded-sm overflow-hidden flex">
             <div
               className="h-full bg-secondary transition-all duration-400 ease-out"
               style={{ width: `${prbuildWidth}%` }}
@@ -206,14 +206,14 @@ export function ROICalculator() {
         </div>
 
         {/* Results */}
-        <div className={`rounded-xl p-6 space-y-4 ${bigWin ? 'ring-2 ring-green-400/50 bg-green-50/50' : 'bg-gray-50'}`}>
-          <div className="border-t border-gray-200 pt-4">
+        <div className={`rounded-md p-6 space-y-4 ${bigWin ? 'ring-2 ring-green-400/50 bg-green-50/50' : 'bg-paper'}`}>
+          <div className="border-t border-rule pt-4">
             <div className="flex justify-between items-center">
-              <span className="text-gray-900 font-semibold">Monthly savings</span>
-              <span className="font-bold text-green-600 text-xl tabular-nums">${tweenSavings.toLocaleString()}</span>
+              <span className="text-ink font-semibold">Monthly savings</span>
+              <span className="font-display text-green-600 text-xl tabular-nums">${tweenSavings.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center mt-2">
-              <span className="text-gray-600">Annual savings</span>
+              <span className="text-ink-muted">Annual savings</span>
               <span className="font-semibold text-green-600 tabular-nums">${tweenAnnual.toLocaleString()}/year</span>
             </div>
           </div>
@@ -240,13 +240,13 @@ export function ROICalculator() {
         </div>
 
         <Link href="/signup" className="block" data-cta="roi-signup">
-          <Button className="w-full bg-secondary hover:bg-secondary/90">
+          <Button className="w-full bg-primary hover:bg-primary-700 rounded-sm">
             Start Saving Today — First Release Free
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </Link>
 
-        <p className="text-xs text-gray-500 text-center">
+        <p className="text-xs text-ink-muted text-center">
           Plus, PRBuild includes writing—others don&apos;t.
         </p>
       </div>

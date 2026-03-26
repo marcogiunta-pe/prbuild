@@ -23,10 +23,10 @@ const teaserItems = TEASER_ITEMS.map(({ catIndex, itemIndex }) => ({
 export function QuizTeaser() {
   return (
     <div className="text-center">
-      <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+      <h2 className="text-3xl md:text-4xl font-display text-ink mb-4">
         How Does Your Press Release Score?
       </h2>
-      <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-10">
+      <p className="text-lg text-ink-muted max-w-2xl mx-auto mb-10">
         Journalists check 23 things before they decide whether to cover your story or hit delete.
         Take our free quiz to find out where you stand.
       </p>
@@ -35,27 +35,27 @@ export function QuizTeaser() {
         {teaserItems.map((item, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 bg-white rounded-xl border border-gray-200 p-4 text-left"
+            className="flex items-center gap-4 bg-paper-light rounded-md border border-rule p-4 text-left"
           >
             <span className="text-xl flex-shrink-0">{item.icon}</span>
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-gray-900">{item.title}</p>
-              <p className="text-xs text-gray-500">{item.category}</p>
+              <p className="font-medium text-ink">{item.title}</p>
+              <p className="text-xs text-ink-muted">{item.category}</p>
             </div>
             <div className="flex-shrink-0">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 text-gray-400 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-sm bg-paper-dark text-ink-muted flex items-center justify-center">
                 <HelpCircle className="w-4 h-4" />
               </div>
             </div>
           </div>
         ))}
-        <div className="flex items-center justify-center gap-2 text-sm text-gray-400 py-2">
+        <div className="flex items-center justify-center gap-2 text-sm text-ink-muted py-2">
           <span>+ 18 more items in the full quiz</span>
         </div>
       </div>
 
       <Link href="/resources/pr-score" data-cta="quiz-teaser">
-        <Button size="lg" className="bg-secondary hover:bg-secondary/90 text-lg px-8">
+        <Button size="lg" className="bg-primary hover:bg-primary-700 rounded-sm text-lg px-8">
           Take the Full Quiz
           <ArrowRight className="ml-2 h-5 w-5" />
         </Button>

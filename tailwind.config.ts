@@ -8,6 +8,12 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['"Instrument Serif"', 'Georgia', 'serif'],
+        body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        accent: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -15,23 +21,34 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#1E3A5F",
+          DEFAULT: "#C23B22",
           foreground: "#FFFFFF",
-          50: "#E8EDF3",
-          100: "#C5D3E3",
-          200: "#9DB5CE",
-          300: "#7597B9",
-          400: "#5780A9",
-          500: "#1E3A5F",
-          600: "#1A3354",
-          700: "#152B48",
-          800: "#11233C",
-          900: "#0C1A2E",
+          50: "#FEF2F0",
+          100: "#FDE0DB",
+          200: "#F9B8AD",
+          300: "#F08F7E",
+          400: "#D9614E",
+          500: "#C23B22",
+          600: "#A3301B",
+          700: "#8E2F1D",
+          800: "#6B2316",
+          900: "#4A180F",
         },
         secondary: {
-          DEFAULT: "#0B7A6F",
+          DEFAULT: "#B5873A",
           foreground: "#FFFFFF",
         },
+        paper: {
+          DEFAULT: "#F5F0E8",
+          light: "#FFFDF8",
+          dark: "#E8E0D2",
+        },
+        ink: {
+          DEFAULT: "#141414",
+          soft: "#2A2A2A",
+          muted: "#6B6660",
+        },
+        rule: "#CCC0AD",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -50,9 +67,9 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "10px",
+        md: "6px",
+        sm: "3px",
       },
       keyframes: {
         "fade-up": {
@@ -63,15 +80,10 @@ const config: Config = {
           "0%": { transform: "translateX(0)" },
           "100%": { transform: "translateX(-50%)" },
         },
-        "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(13, 148, 136, 0.15)" },
-          "50%": { boxShadow: "0 0 40px rgba(13, 148, 136, 0.25)" },
-        },
       },
       animation: {
         "fade-up": "fade-up 0.4s ease-out forwards",
         marquee: "marquee 25s linear infinite",
-        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
       },
     },
   },
