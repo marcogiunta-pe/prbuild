@@ -77,19 +77,19 @@ export default function LandingPage() {
               <Link
                 key={id}
                 href={`#${id}`}
-                className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === id ? 'text-primary' : 'text-ink-muted'}`}
+                className={`text-sm font-medium transition-colors hover:text-primary py-3 ${activeSection === id ? 'text-primary' : 'text-ink-muted'}`}
                 aria-current={activeSection === id ? 'true' : undefined}
               >
                 {label}
               </Link>
             ))}
-            <Link href="/showcase" className="text-sm font-medium text-ink-muted hover:text-primary" data-cta="nav-showcase">
+            <Link href="/showcase" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-showcase">
               Showcase
             </Link>
-            <Link href="/resources/how-to-write-press-release" className="text-sm font-medium text-ink-muted hover:text-primary" data-cta="nav-resources">
+            <Link href="/resources/how-to-write-press-release" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-resources">
               Resources
             </Link>
-            <Link href="/login" className="text-sm font-medium text-ink-muted hover:text-primary" data-cta="nav-login">
+            <Link href="/login" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-login">
               Login
             </Link>
           </nav>
