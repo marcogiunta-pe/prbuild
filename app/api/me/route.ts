@@ -10,14 +10,14 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let profile: { company_name?: string; company_website?: string; full_name?: string; email?: string; is_free_user?: boolean; free_releases_remaining?: number } | null = null;
+  let profile: { company_name?: string; company_website?: string; full_name?: string; email?: string; is_free_user?: boolean; free_releases_remaining?: number; role?: string } | null = null;
 
   try {
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const admin = createAdminClient();
       const { data, error } = await admin
         .from('profiles')
-        .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining')
+        .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role')
         .eq('id', user.id)
         .single();
       if (!error && data) profile = data;
@@ -29,7 +29,7 @@ export async function GET() {
   if (!profile) {
     const { data } = await supabase
       .from('profiles')
-      .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining')
+      .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role')
       .eq('id', user.id)
       .single();
     profile = data;
@@ -67,9 +67,12 @@ export async function GET() {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
   }
 
+  // Admins get unlimited free releases
+  const isAdmin = profile.role === 'admin';
+
   return NextResponse.json({
     ...profile,
-    is_free_user: !!profile.is_free_user,
-    free_releases_remaining: profile.free_releases_remaining ?? 0,
+    is_free_user: isAdmin ? true : !!profile.is_free_user,
+    free_releases_remaining: isAdmin ? -1 : (profile.free_releases_remaining ?? 0),
   });
 }
