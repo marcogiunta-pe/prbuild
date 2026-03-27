@@ -13,11 +13,18 @@ import {
   Shield,
   Lightbulb,
   Wand2,
-  Scissors
+  Scissors,
+  PlusCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
+  {
+    title: 'New Release',
+    href: '/dashboard/new-request',
+    icon: PlusCircle,
+    description: 'Create a press release',
+  },
   {
     title: 'Requests',
     href: '/admin/requests',
