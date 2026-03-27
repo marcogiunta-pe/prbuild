@@ -44,10 +44,8 @@ export default async function DashboardLayout({
 
   const displayName = profile?.full_name ?? user.user_metadata?.full_name ?? user.user_metadata?.name;
 
-  // Redirect admin users to admin dashboard
-  if (profile?.role === 'admin') {
-    redirect('/admin/requests');
-  }
+  // Redirect admin users to admin dashboard (unless they're on new-request)
+  // Admins need access to new-request to create press releases
 
   return (
     <div className="min-h-screen bg-gray-50">
