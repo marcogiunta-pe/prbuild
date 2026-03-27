@@ -40,34 +40,34 @@ export function BeforeAfterComparison() {
         </Button>
       </div>
       <div className="grid md:grid-cols-2 gap-6">
-        <Card className={`${view === 'ai' ? 'ring-2 ring-red-200 border-red-200' : 'opacity-75'} bg-white border-gray-200`}>
+        <Card className={`${view === 'ai' ? 'ring-2 ring-red-200 border-red-200' : 'opacity-75'} bg-paper-light border-rule`}>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg text-red-800">Generic AI — red flags</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <p className="line-through text-gray-600">{AI_SAMPLE.headline}</p>
-            <p className="text-gray-700">
+            <p className="line-through text-ink-muted">{AI_SAMPLE.headline}</p>
+            <p className="text-ink">
               <span className="underline decoration-red-300">{AI_SAMPLE.lede.slice(0, 50)}</span>
               {AI_SAMPLE.lede.slice(50)}
             </p>
-            <p className="italic text-gray-600">&quot;{AI_SAMPLE.quote}&quot;</p>
+            <p className="italic text-ink-muted">&quot;{AI_SAMPLE.quote}&quot;</p>
           </CardContent>
         </Card>
-        <Card className={`${view === 'prbuild' ? 'ring-2 ring-green-200 border-green-200' : 'opacity-75'} bg-white border-gray-200`}>
+        <Card className={`${view === 'prbuild' ? 'ring-2 ring-green-200 border-green-200' : 'opacity-75'} bg-paper-light border-rule`}>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg text-green-700">PRBuild — what works</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <p className="font-medium text-gray-900 bg-green-50 border-l-4 border-green-500 pl-2">{PRBUILD_SAMPLE.headline}</p>
-            <p className="text-gray-600">
+            <p className="font-medium text-ink bg-green-50 border-l-4 border-green-500 pl-2">{PRBUILD_SAMPLE.headline}</p>
+            <p className="text-ink-muted">
               <span className="bg-green-50 font-medium">{PRBUILD_SAMPLE.lede.slice(0, 40)}</span>
               {PRBUILD_SAMPLE.lede.slice(40)}
             </p>
-            <p className="italic text-gray-700 border-l-2 border-green-400 pl-2">&quot;{PRBUILD_SAMPLE.quote}&quot;</p>
+            <p className="italic text-ink border-l-2 border-green-400 pl-2">&quot;{PRBUILD_SAMPLE.quote}&quot;</p>
           </CardContent>
         </Card>
       </div>
-      <p className="text-center text-sm text-gray-500 mt-4">
+      <p className="text-center text-sm text-ink-muted mt-4">
         Toggle to compare. Left: clichés and AI-speak. Right: specific metrics, punchy headline, real quote.
       </p>
     </div>

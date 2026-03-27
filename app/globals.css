@@ -4,24 +4,36 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 213 52% 24%;
+    --background: 34 33% 93%;
+    --foreground: 0 0% 8%;
+    --card: 40 60% 99%;
+    --card-foreground: 0 0% 8%;
+    --primary: 7 70% 45%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 170 85% 26%;
+    --secondary: 37 52% 47%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
-    --destructive: 0 84% 60%;
+    --muted: 33 22% 88%;
+    --muted-foreground: 25 6% 40%;
+    --accent: 33 22% 88%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 7 70% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 213 52% 24%;
-    --radius: 0.5rem;
+    --border: 33 18% 74%;
+    --input: 33 18% 74%;
+    --ring: 7 70% 45%;
+    --radius: 0.375rem;
+
+    /* Design system tokens */
+    --bg: #F5F0E8;
+    --surface: #FFFDF8;
+    --surface-2: #E8E0D2;
+    --text-primary: #141414;
+    --text-muted: #6B6660;
+    --ink-soft: #2A2A2A;
+    --accent-color: #C23B22;
+    --accent-dark: #8E2F1D;
+    --secondary-color: #B5873A;
+    --rule: #CCC0AD;
   }
 }
 
@@ -32,12 +44,12 @@
   html {
     scroll-behavior: smooth;
     scrollbar-width: thin;
-    scrollbar-color: #c1c1c1 #f1f1f1;
+    scrollbar-color: #CCC0AD #F5F0E8;
   }
   body {
     @apply bg-background text-foreground text-base;
-    background-color: #ffffff;
-    color: #1e293b;
+    background-color: var(--bg);
+    color: var(--text-primary);
   }
   @media (max-width: 640px) {
     html { font-size: 16px; }
@@ -51,22 +63,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--rule);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: var(--text-muted);
 }
 
 /* Focus visible for a11y */
 :focus-visible {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 :focus:not(:focus-visible) {
@@ -106,14 +118,15 @@
   }
 }
 
-@keyframes confetti-fall {
-  to {
-    transform: translateY(100vh) rotate(720deg);
-    opacity: 0;
-  }
+/* Editorial design utilities */
+.font-display {
+  font-family: 'Instrument Serif', Georgia, serif;
 }
-.animate-confetti-fall {
-  animation: confetti-fall 2s ease-out forwards;
+.font-accent {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
 }
 
 /* Reduced motion */

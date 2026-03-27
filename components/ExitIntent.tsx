@@ -65,12 +65,12 @@ export function ExitIntentPopup() {
       onClick={() => setIsVisible(false)}
     >
       <div
-        className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl relative animate-in zoom-in-95 duration-300 border border-gray-200"
+        className="bg-paper-light rounded-md p-8 max-w-lg w-full relative animate-in zoom-in-95 duration-300 border border-rule"
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={() => setIsVisible(false)}
-          className="absolute top-4 right-4 p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+          className="absolute top-4 right-4 p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-ink-muted hover:text-ink rounded-sm hover:bg-paper-dark transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -81,24 +81,24 @@ export function ExitIntentPopup() {
             <Gift className="w-8 h-8 text-primary" />
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-display text-ink mb-2">
             Before you go — your first release is free
           </h2>
-          <ul className="text-gray-600 mb-6 space-y-2 text-left max-w-xs mx-auto">
+          <ul className="text-ink-muted mb-6 space-y-2 text-left max-w-xs mx-auto">
             <li className="flex items-center gap-2">✓ Written in 24 hours</li>
             <li className="flex items-center gap-2">✓ Reviewed by our journalist panel</li>
             <li className="flex items-center gap-2">✓ No credit card required</li>
           </ul>
 
           <Link href="/signup" className="block" data-cta="exit-intent-signup">
-            <Button size="lg" className="w-full bg-secondary hover:bg-secondary/90">
+            <Button size="lg" className="w-full bg-primary hover:bg-primary-700 rounded-sm">
               Get My Free Release →
             </Button>
           </Link>
 
           <button
             onClick={() => setIsVisible(false)}
-            className="mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            className="mt-4 text-sm text-ink-muted hover:text-ink transition-colors"
           >
             Maybe later
           </button>

@@ -58,22 +58,22 @@ export function AnimatedStats() {
   return (
     <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto">
       <div className="text-center">
-        <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+        <div className="text-4xl md:text-5xl font-display text-primary mb-2">
           <AnimatedNumber end={847} suffix="+" />
         </div>
-        <div className="text-sm text-gray-600">Releases Published</div>
+        <div className="text-sm text-ink-muted">Releases Published</div>
       </div>
       <div className="text-center">
-        <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+        <div className="text-4xl md:text-5xl font-display text-primary mb-2">
           <AnimatedNumber end={23} suffix="%" />
         </div>
-        <div className="text-sm text-gray-600">Journalist Pickup Rate</div>
+        <div className="text-sm text-ink-muted">Journalist Pickup Rate</div>
       </div>
       <div className="text-center">
-        <div className="text-4xl md:text-5xl font-bold text-primary mb-2">
+        <div className="text-4xl md:text-5xl font-display text-primary mb-2">
           <AnimatedNumber end={16} />
         </div>
-        <div className="text-sm text-gray-600">Journalist Reviewers</div>
+        <div className="text-sm text-ink-muted">Journalist Reviewers</div>
       </div>
     </div>
   );
@@ -81,7 +81,7 @@ export function AnimatedStats() {
 
 export function AnimatedStatsBanner() {
   return (
-    <div className="bg-primary/5 py-8 border-y border-primary/10">
+    <div className="bg-paper-dark/50 py-8 border-y border-rule">
       <div className="container mx-auto px-4">
         <AnimatedStats />
       </div>

@@ -38,13 +38,13 @@ export function PricingSection() {
   const collapseAll = () => setFaqOpen(new Set());
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50">
+    <section id="pricing" className="py-20 bg-paper">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-display text-ink mb-4">
             PRWeb: $400. Us: $9.
           </h2>
-          <p className="text-lg text-gray-600 mb-8">
+          <p className="text-lg text-ink-muted mb-8">
             Same result. 97% less money. Cancel anytime.
           </p>
 
@@ -52,24 +52,24 @@ export function PricingSection() {
           <div className="flex items-center justify-center gap-4">
             <button
               onClick={() => setInterval('monthly')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors min-h-[44px] touch-manipulation ${
+              className={`px-4 py-2 rounded-sm font-medium transition-colors min-h-[44px] touch-manipulation ${
                 interval === 'monthly'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setInterval('yearly')}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors relative min-h-[44px] touch-manipulation ${
+              className={`px-4 py-2 rounded-sm font-medium transition-colors relative min-h-[44px] touch-manipulation ${
                 interval === 'yearly'
                   ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
               }`}
             >
               Yearly
-              <span className="absolute -top-2 -right-2 bg-green-700 text-white text-xs px-1.5 py-0.5 rounded-full">
+              <span className="absolute -top-2 -right-2 bg-green-700 text-white text-xs px-1.5 py-0.5 rounded-sm">
                 Save 17%
               </span>
             </button>
@@ -86,28 +86,28 @@ export function PricingSection() {
               <AnimateOnScroll key={key} delay={i * 80} variant="scale">
               <Card
                 key={key}
-                className={`relative bg-white border-gray-200 ${isPopular ? 'border-secondary border-2 shadow-lg md:scale-105' : ''}`}
+                className={`relative bg-paper-light border-rule ${isPopular ? 'border-primary border-2 md:scale-105' : ''}`}
               >
                 {isPopular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-secondary">Most Popular</Badge>
+                    <Badge className="bg-primary">Most Popular</Badge>
                   </div>
                 )}
                 <CardHeader>
                   <CardTitle>{plan.name}</CardTitle>
                   <CardDescription>{plan.description}</CardDescription>
                   <div className="mt-4">
-                    <span className="text-4xl font-bold">${pricing.price}</span>
-                    <span className="text-gray-600">/{interval === 'monthly' ? 'mo' : 'yr'}</span>
+                    <span className="text-4xl font-display">${pricing.price}</span>
+                    <span className="text-ink-muted">/{interval === 'monthly' ? 'mo' : 'yr'}</span>
                     {interval === 'yearly' && 'savings' in yearlyPricing && (
                       <div className="text-sm text-green-600 font-medium mt-1">
                         Save ${yearlyPricing.savings}/year
                       </div>
                     )}
                     {interval === 'monthly' && (
-                      <div className="text-sm text-gray-500 mt-1">
+                      <div className="text-sm text-ink-muted mt-1">
                         or ${plan.yearly.price}/year{' '}
-                        <span className="inline-flex items-center font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full text-xs">
+                        <span className="inline-flex items-center font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-sm text-xs">
                           Save ${('savings' in yearlyPricing ? yearlyPricing.savings : 0)}
                         </span>
                       </div>
@@ -118,7 +118,7 @@ export function PricingSection() {
                   <ul className="space-y-3">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start">
-                        <Check className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                        <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -127,7 +127,7 @@ export function PricingSection() {
                 <CardFooter>
                   <Link href="/signup" className="w-full" data-cta={`pricing-${key}`}>
                     <Button
-                      className={`w-full ${isPopular ? 'bg-secondary hover:bg-secondary/90' : ''}`}
+                      className={`w-full ${isPopular ? 'bg-primary hover:bg-primary-700 rounded-sm' : ''}`}
                       variant={isPopular ? 'default' : 'outline'}
                     >
                       Get Your Free Release
@@ -140,7 +140,7 @@ export function PricingSection() {
           })}
         </div>
 
-        <div className="mt-8 text-center text-gray-600">
+        <div className="mt-8 text-center text-ink-muted">
           <p>
             PRWeb charges $120-$480 per release. PR Newswire charges $1,070+.
             We charge $9. Do the math.
@@ -155,22 +155,22 @@ export function PricingSection() {
 
         {comparisonOpen && (
           <div className="mt-12 overflow-x-auto">
-            <table className="w-full min-w-[500px] border-collapse rounded-lg overflow-hidden border border-gray-200">
+            <table className="w-full min-w-[500px] border-collapse rounded-md overflow-hidden border border-rule">
               <thead>
-                <tr className="bg-gray-100">
-                  <th className="text-left px-4 py-3 font-semibold text-gray-900">Feature</th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-900">Starter</th>
-                  <th className="text-center px-4 py-3 font-semibold text-secondary bg-secondary/5">Growth</th>
-                  <th className="text-center px-4 py-3 font-semibold text-gray-900">Pro</th>
+                <tr className="bg-paper-dark">
+                  <th className="text-left px-4 py-3 font-semibold text-ink">Feature</th>
+                  <th className="text-center px-4 py-3 font-semibold text-ink">Starter</th>
+                  <th className="text-center px-4 py-3 font-semibold text-primary bg-primary/5">Growth</th>
+                  <th className="text-center px-4 py-3 font-semibold text-ink">Pro</th>
                 </tr>
               </thead>
               <tbody>
                 {FEATURE_COMPARISON.map((row, i) => (
-                  <tr key={row.feature} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="px-4 py-3 text-gray-700">{row.feature}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{row.starter}</td>
-                    <td className="px-4 py-3 text-center bg-secondary/5 font-medium text-gray-900">{row.growth}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{row.pro}</td>
+                  <tr key={row.feature} className={i % 2 === 0 ? 'bg-paper-light' : 'bg-paper'}>
+                    <td className="px-4 py-3 text-ink">{row.feature}</td>
+                    <td className="px-4 py-3 text-center text-ink-muted">{row.starter}</td>
+                    <td className="px-4 py-3 text-center bg-primary/5 font-medium text-ink">{row.growth}</td>
+                    <td className="px-4 py-3 text-center text-ink-muted">{row.pro}</td>
                   </tr>
                 ))}
               </tbody>
@@ -181,12 +181,12 @@ export function PricingSection() {
         {/* FAQ Section */}
         <div className="mt-20 max-w-3xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-            <h3 className="text-2xl font-bold text-gray-900 text-center sm:text-left">
+            <h3 className="text-2xl font-display text-ink text-center sm:text-left">
               Frequently Asked Questions
             </h3>
             <div className="flex justify-center gap-2">
               <button onClick={expandAll} className="text-sm text-primary hover:underline min-h-[44px] px-3 py-2 touch-manipulation">Expand all</button>
-              <span className="text-gray-400">|</span>
+              <span className="text-ink-muted">|</span>
               <button onClick={collapseAll} className="text-sm text-primary hover:underline min-h-[44px] px-3 py-2 touch-manipulation">Collapse all</button>
             </div>
           </div>
@@ -197,13 +197,13 @@ export function PricingSection() {
           </div>
 
           {/* FAQ CTA */}
-          <div className="mt-12 p-6 rounded-xl bg-primary/5 border border-primary/20 text-center">
-            <p className="text-lg text-gray-900 mb-2">Still have questions?</p>
-            <p className="text-gray-600 mb-4">
+          <div className="mt-12 p-6 rounded-md bg-paper-dark border border-rule text-center">
+            <p className="text-lg text-ink mb-2">Still have questions?</p>
+            <p className="text-ink-muted mb-4">
               We&apos;ll answer them on your first call — plus write your first release free.
             </p>
             <Link href="/signup" data-cta="faq-cta">
-              <Button className="bg-secondary hover:bg-secondary/90">Get Your Free Release</Button>
+              <Button className="bg-primary hover:bg-primary-700 rounded-sm">Get Your Free Release</Button>
             </Link>
           </div>
         </div>
@@ -214,20 +214,20 @@ export function PricingSection() {
 
 function FAQItem({ question, answer, isOpen, onToggle }: { question: string; answer: string; isOpen: boolean; onToggle: () => void }) {
   return (
-    <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+    <div className="border border-rule rounded-md bg-paper-light overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full px-6 py-4 text-left flex items-center justify-between gap-4"
       >
-        <span className="font-medium text-gray-900">{question}</span>
-        <ChevronDown className={`h-5 w-5 text-gray-500 transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="font-medium text-ink">{question}</span>
+        <ChevronDown className={`h-5 w-5 text-ink-muted transition-transform duration-200 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
       >
         <div className="min-h-0 overflow-hidden">
           <div className="px-6 pb-4">
-            <p className="text-gray-600 transition-opacity duration-200">{answer}</p>
+            <p className="text-ink-muted transition-opacity duration-200">{answer}</p>
           </div>
         </div>
       </div>

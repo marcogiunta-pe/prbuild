@@ -39,24 +39,24 @@ export function StickyCTA() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden animate-in slide-in-from-bottom duration-300">
-      <div className="bg-white border-t border-gray-200 shadow-lg p-4 pb-safe">
+      <div className="bg-paper-light border-t border-rule p-4 pb-safe">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-gray-900 truncate">
+            <p className="font-semibold text-sm text-ink truncate">
               Get your first release free
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-muted">
               No credit card required
             </p>
           </div>
           <Link href="/signup" data-cta="sticky-cta">
-            <Button size="default" className="bg-secondary hover:bg-secondary/90 whitespace-nowrap min-h-[44px]">
+            <Button size="default" className="bg-primary hover:bg-primary-700 rounded-sm whitespace-nowrap min-h-[44px]">
               Get Free Release →
             </Button>
           </Link>
           <button
             onClick={handleDismiss}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="p-2 text-ink-muted hover:text-ink rounded-sm hover:bg-paper-dark transition-colors flex-shrink-0"
             aria-label="Dismiss"
           >
             <X className="w-4 h-4" />

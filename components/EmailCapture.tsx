@@ -78,13 +78,13 @@ export function EmailCapture({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="flex-1 px-4 py-2 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           disabled={status === 'loading' || status === 'success'}
         />
         <Button
           type="submit"
           disabled={status === 'loading' || status === 'success'}
-          className="bg-secondary hover:bg-secondary/90"
+          className="bg-primary hover:bg-primary-700 rounded-sm"
         >
           {status === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
           {status === 'success' && <Check className="w-4 h-4" />}
@@ -97,9 +97,9 @@ export function EmailCapture({
 
   if (variant === 'card') {
     return (
-      <div className={`bg-primary/5 border border-primary/10 rounded-2xl p-8 ${className}`}>
-        <h3 className="text-xl font-bold mb-2">{title}</h3>
-        <p className="text-gray-600 mb-6">{description}</p>
+      <div className={`bg-paper-dark border border-rule rounded-md p-8 ${className}`}>
+        <h3 className="text-xl font-display mb-2">{title}</h3>
+        <p className="text-ink-muted mb-6">{description}</p>
 
         {status === 'success' ? (
           <div className="flex items-center gap-2 text-green-600 font-medium" aria-live="polite">
@@ -116,7 +116,7 @@ export function EmailCapture({
                 if (status === 'error') setStatus('idle');
               }}
               placeholder="you@company.com"
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-4 py-3 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               disabled={status === 'loading'}
             />
             {status === 'error' && (
@@ -124,7 +124,7 @@ export function EmailCapture({
             )}
             <Button
               type="submit"
-              className="w-full bg-secondary hover:bg-secondary/90"
+              className="w-full bg-primary hover:bg-primary-700 rounded-sm"
               disabled={status === 'loading'}
             >
               {status === 'loading' ? (
@@ -137,7 +137,7 @@ export function EmailCapture({
           </form>
         )}
 
-        <p className="text-xs text-gray-500 mt-4">
+        <p className="text-xs text-ink-muted mt-4">
           We respect your privacy. Unsubscribe anytime.
         </p>
       </div>
@@ -147,8 +147,8 @@ export function EmailCapture({
   // Default variant
   return (
     <div className={className}>
-      <h3 className="text-2xl font-bold mb-2">{title}</h3>
-      <p className="text-gray-600 mb-6">{description}</p>
+      <h3 className="text-2xl font-display mb-2">{title}</h3>
+      <p className="text-ink-muted mb-6">{description}</p>
 
       {status === 'success' ? (
         <div className="flex items-center gap-2 text-green-600 font-medium py-3" aria-live="polite">
@@ -165,13 +165,13 @@ export function EmailCapture({
               if (status === 'error') setStatus('idle');
             }}
             placeholder="you@company.com"
-            className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             disabled={status === 'loading'}
           />
           <Button
             type="submit"
             size="lg"
-            className="bg-secondary hover:bg-secondary/90"
+            className="bg-primary hover:bg-primary-700 rounded-sm"
             disabled={status === 'loading'}
           >
             {status === 'loading' ? (

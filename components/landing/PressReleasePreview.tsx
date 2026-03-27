@@ -19,28 +19,28 @@ export function PressReleasePreview() {
   const finalHeadline = 'DataSync launches AI data pipeline that cuts processing time by 90%.';
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-paper">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-display text-ink mb-4">
             See a Real Press Release
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
+          <p className="text-lg text-ink-muted max-w-2xl mx-auto mb-6">
             Hover highlights to see what our journalist panel said. Toggle Draft vs Final to see the improvement.
           </p>
           <div className="flex items-center justify-center gap-2">
             <button
               onClick={() => setVersion('draft')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
-                version === 'draft' ? 'bg-amber-100 text-amber-800 border-2 border-amber-300' : 'bg-gray-100 text-gray-600'
+              className={`px-4 py-2 rounded-sm font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
+                version === 'draft' ? 'bg-amber-100 text-amber-800 border-2 border-amber-300' : 'bg-paper-dark text-ink-muted'
               }`}
             >
               Draft
             </button>
             <button
               onClick={() => setVersion('final')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
-                version === 'final' ? 'bg-green-100 text-green-800 border-2 border-green-300' : 'bg-gray-100 text-gray-600'
+              className={`px-4 py-2 rounded-sm font-medium text-sm transition-colors min-h-[44px] touch-manipulation ${
+                version === 'final' ? 'bg-green-100 text-green-800 border-2 border-green-300' : 'bg-paper-dark text-ink-muted'
               }`}
             >
               Final
@@ -48,9 +48,9 @@ export function PressReleasePreview() {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-3 border-b border-gray-200 bg-gray-50">
-            <span className="text-sm font-medium text-gray-600">Sample release</span>
+        <div className="max-w-3xl mx-auto bg-paper-light rounded-md border border-rule overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-3 border-b border-rule bg-paper">
+            <span className="text-sm font-medium text-ink-muted">Sample release</span>
             <Badge className="bg-green-100 text-green-800 text-xs">Quality: 8.5/10</Badge>
           </div>
           <div className="p-6 space-y-4 text-sm">
@@ -62,11 +62,11 @@ export function PressReleasePreview() {
                 version === 'draft' ? 'border-amber-300 bg-amber-50/50' : 'border-green-500 bg-green-50/50'
               }`}
             >
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold text-ink">
                 {version === 'draft' ? draftHeadline : finalHeadline}
               </span>
               {activeTip === 'headline' && (
-                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 shadow-lg max-w-xs">
+                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 max-w-xs">
                   {ANNOTATIONS.find((a) => a.id === 'headline')?.tip}
                 </div>
               )}
@@ -77,12 +77,12 @@ export function PressReleasePreview() {
               onMouseLeave={() => setActiveTip(null)}
               className="relative border-l-4 border-blue-300 pl-3 bg-blue-50/30"
             >
-              <span className="text-gray-700">
+              <span className="text-ink">
                 SAN FRANCISCO, Jan 15, 2025 — DataSync today announced a new AI-powered data pipeline that reduces
                 processing time from 4 hours to 24 minutes for enterprise customers.
               </span>
               {activeTip === 'lede' && (
-                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 shadow-lg max-w-xs">
+                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 max-w-xs">
                   {ANNOTATIONS.find((a) => a.id === 'lede')?.tip}
                 </div>
               )}
@@ -95,12 +95,12 @@ export function PressReleasePreview() {
             >
               &quot;We built this because our customers were losing deals waiting on reports,&quot; said Jane Doe, CEO.
               {activeTip === 'quote' && (
-                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 shadow-lg max-w-xs">
+                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 max-w-xs">
                   {ANNOTATIONS.find((a) => a.id === 'quote')?.tip}
                 </div>
               )}
             </div>
-            <p className="text-gray-600">
+            <p className="text-ink-muted">
               DataSync serves over 500 enterprise customers. The platform is available in 12 countries.
             </p>
             <div
@@ -111,7 +111,7 @@ export function PressReleasePreview() {
             >
               For more information, visit datasync.example.com or contact press@datasync.example.com.
               {activeTip === 'cta' && (
-                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 shadow-lg max-w-xs">
+                <div className="absolute left-0 top-full mt-1 z-10 bg-gray-900 text-white text-xs rounded px-2 py-1.5 max-w-xs">
                   {ANNOTATIONS.find((a) => a.id === 'cta')?.tip}
                 </div>
               )}
