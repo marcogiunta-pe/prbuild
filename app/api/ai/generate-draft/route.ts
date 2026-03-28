@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     // Call OpenAI
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
       release_request_id: releaseRequestId,
       user_id: user.id,
       action: 'ai_draft_generated',
-      details: { model: 'gpt-4-turbo-preview' },
+      details: { model: 'gpt-4o' },
     });
 
     return NextResponse.json({
