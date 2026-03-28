@@ -1,10 +1,14 @@
 // app/api/ai/generate-draft/route.ts
+import 'openai/shims/web';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { parsePRDraftResponse } from '@/lib/prompts/pr-generation';
 import { getPRGenerationPrompts } from '@/lib/prompts';
 import { requireAdmin } from '@/lib/auth';
+
+export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const RequestSchema = z.object({
   releaseRequestId: z.string().uuid('Invalid release request ID'),
@@ -13,6 +17,9 @@ const RequestSchema = z.object({
 function getOpenAIClient() {
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
+    fetch: globalThis.fetch,
+    timeout: 30_000,
+    maxRetries: 1,
   });
 }
 
