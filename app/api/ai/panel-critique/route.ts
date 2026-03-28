@@ -71,7 +71,7 @@ ${draftContent}
     // Call OpenAI
     const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -110,7 +110,7 @@ ${draftContent}
       user_id: user.id,
       action: 'panel_critique_generated',
       details: { 
-        model: 'gpt-4-turbo-preview',
+        model: 'gpt-4o',
         industry,
         feedbackCount: parsed.individualFeedback.length,
       },
