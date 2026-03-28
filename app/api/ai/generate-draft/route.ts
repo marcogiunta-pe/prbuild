@@ -124,10 +124,13 @@ export async function POST(request: NextRequest) {
       draft: parsed,
       raw: aiResponse,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('AI generation error:', error);
+    const message = error?.message || error?.error?.message || 'Unknown error';
+    const code = error?.status || error?.code || 'no_code';
+    console.error('AI generation detail:', { message, code, name: error?.name, type: error?.type });
     return NextResponse.json(
-      { error: 'Failed to generate draft' },
+      { error: `Failed to generate draft: ${message}` },
       { status: 500 }
     );
   }
