@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Public routes that don't require authentication
-  const publicRoutes = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/set-password', '/request-free-access', '/showcase', '/privacy', '/terms', '/about', '/contact', '/journalist'];
+  const publicRoutes = ['/', '/login', '/signup', '/forgot-password', '/reset-password', '/set-password', '/request-free-access', '/showcase', '/privacy', '/terms', '/about', '/contact', '/journalist', '/how-it-works'];
   const isPublicRoute = publicRoutes.some(route => 
     pathname === route || pathname.startsWith('/showcase/') || pathname.startsWith('/journalist/')
   );
@@ -158,5 +158,6 @@ export const config = {
     '/terms',
     '/about',
     '/contact',
+    '/how-it-works',
   ],
 };

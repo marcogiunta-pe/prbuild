@@ -188,6 +188,18 @@ export default function NewRequestPage() {
           .eq('id', userId);
       }
 
+      // Fire-and-forget: kick off automated draft + panel review pipeline
+      fetch('/api/process-release', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
+        },
+        body: JSON.stringify({ releaseRequestId: data.id }),
+      }).catch((err) => {
+        console.error('Failed to trigger process-release pipeline:', err);
+      });
+
       router.push(`/dashboard/my-releases/${data.id}`);
     } catch (err: any) {
       setError(err.message || 'Failed to submit request');

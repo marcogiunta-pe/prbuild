@@ -40,7 +40,7 @@ export default function ChangePasswordPage() {
         setLoading(false);
         return;
       }
-      router.push('/dashboard/my-releases');
+      router.push('/dashboard/onboarding');
       router.refresh();
     } catch {
       setError('An unexpected error occurred.');

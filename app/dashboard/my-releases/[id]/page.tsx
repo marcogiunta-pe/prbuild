@@ -67,20 +67,20 @@ function formatDraftAsHtml(content: string): string {
 }
 
 const statusConfig: Record<ReleaseStatus, { label: string; color: string; description: string; emailNote?: string }> = {
-  submitted: { 
-    label: 'Submitted', 
+  submitted: {
+    label: 'Processing',
     color: 'bg-blue-100 text-blue-700',
-    description: 'Your request has been received and is being processed.',
+    description: 'Your press release is being written and reviewed. You\'ll receive an email when it\'s ready.',
     emailNote: "We'll email you when your draft is ready for review."
   },
-  draft_generated: { 
-    label: 'Draft Generated', 
-    color: 'bg-purple-100 text-purple-700',
-    description: 'A draft has been generated. Our team is reviewing it.',
+  draft_generated: {
+    label: 'Processing',
+    color: 'bg-blue-100 text-blue-700',
+    description: 'Your press release is being written and reviewed. You\'ll receive an email when it\'s ready.',
     emailNote: "We'll email you when it's ready for your review."
   },
-  panel_reviewed: { 
-    label: 'Panel Reviewed', 
+  panel_reviewed: {
+    label: 'Panel Reviewed',
     color: 'bg-purple-100 text-purple-700',
     description: 'Our journalist panel has reviewed the draft.',
     emailNote: "We'll email you when it's ready for your review."
@@ -203,10 +203,11 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
   const handleApprove = async () => {
     if (!release) return;
-    
+
     setSubmitting(true);
     const supabase = createClient();
-    
+
+    // Set to client_approved, then immediately auto-publish
     const { error } = await supabase
       .from('release_requests')
       .update({
@@ -215,7 +216,18 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
       .eq('id', release.id);
 
     if (!error) {
-      alert("Thank you! Your release has been approved. We'll email you when it's published.");
+      // Auto-publish: move straight to published status
+      await supabase
+        .from('release_requests')
+        .update({
+          status: 'published',
+          final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
+          final_approved_at: new Date().toISOString(),
+          published_at: new Date().toISOString(),
+        })
+        .eq('id', release.id);
+
+      alert("Thank you! Your release has been approved and published.");
       await loadRelease();
     }
     setSubmitting(false);

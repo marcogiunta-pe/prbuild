@@ -12,8 +12,8 @@ import { DashboardGuide } from '@/components/dashboard/DashboardGuide';
 import { HelpTip } from '@/components/dashboard/HelpTip';
 
 const statusConfig: Record<ReleaseStatus, { label: string; color: string; icon: any }> = {
-  submitted: { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Clock },
-  draft_generated: { label: 'Draft Ready', color: 'bg-purple-100 text-purple-700', icon: FileText },
+  submitted: { label: 'Processing', color: 'bg-blue-100 text-blue-700', icon: Clock },
+  draft_generated: { label: 'Processing', color: 'bg-blue-100 text-blue-700', icon: Clock },
   panel_reviewed: { label: 'Panel Reviewed', color: 'bg-purple-100 text-purple-700', icon: FileText },
   admin_approved: { label: 'Admin Approved', color: 'bg-purple-100 text-purple-700', icon: FileText },
   awaiting_client: { label: 'Awaiting Your Review', color: 'bg-yellow-100 text-yellow-700', icon: AlertCircle },
