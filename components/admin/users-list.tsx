@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, Search, Mail, User, Shield, AlertCircle, UserPlus, Gift, Trash2, Loader2, Copy } from 'lucide-react';
+import { Users, Search, Mail, User, Shield, AlertCircle, UserPlus, Gift, Trash2, Loader2, Copy, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { addUser, grantFree, removeFree, deleteUser } from '@/app/admin/users/actions';
 
@@ -34,7 +34,7 @@ export function AdminUsersClient({
   currentUserId?: string;
 }) {
   const [search, setSearch] = useState('');
-  const [addResult, setAddResult] = useState<{ ok: boolean; message: string; tempPassword?: string; email?: string } | null>(null);
+  const [addResult, setAddResult] = useState<{ ok: boolean; message: string; tempPassword?: string; email?: string; fullName?: string } | null>(null);
   const [addPending, setAddPending] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [grantingId, setGrantingId] = useState<string | null>(null);
@@ -154,6 +154,47 @@ export function AdminUsersClient({
                   >
                     <Copy className="h-4 w-4 mr-2" />
                     Copy message to send
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-secondary hover:bg-secondary/90 text-white"
+                    onClick={() => {
+                      const name = addResult.fullName || 'there';
+                      const email = addResult.email!;
+                      const password = addResult.tempPassword!;
+                      const subject = encodeURIComponent("You're Invited to PRBuild Beta \u2014 Professional Press Releases");
+                      const body = encodeURIComponent(
+`Hi ${name},
+
+You've been invited to join PRBuild \u2014 a new way to create professional press releases that journalists actually read.
+
+PRBuild is currently in beta, and we'd love your help testing and improving the platform. Your feedback on bugs, usability, and features is incredibly valuable to us.
+
+Here are your login credentials:
+
+  Website: https://www.prbuild.ai/login
+  Email: ${email}
+  Temporary Password: ${password}
+
+IMPORTANT: You'll be asked to set a new password on your first login.
+
+Once you're in, you can:
+  - Submit a press release request in 5 minutes
+  - Get your release reviewed by 16 journalist personas
+  - Track journalist engagement in real time
+
+We're a small team building something we believe in, and your early feedback makes a real difference. If you hit any bugs or have ideas, please let us know directly.
+
+Welcome aboard!
+
+\u2014 The PRBuild Team
+https://www.prbuild.ai`
+                      );
+                      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+                    }}
+                  >
+                    <Send className="h-4 w-4 mr-2" />
+                    Send Invitation Email
                   </Button>
                 </div>
               )}

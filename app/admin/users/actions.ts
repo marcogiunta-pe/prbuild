@@ -16,7 +16,7 @@ async function ensureAdmin() {
   return admin;
 }
 
-export async function addUser(formData: FormData): Promise<{ ok: boolean; message: string; tempPassword?: string; email?: string }> {
+export async function addUser(formData: FormData): Promise<{ ok: boolean; message: string; tempPassword?: string; email?: string; fullName?: string }> {
   try {
     const admin = await ensureAdmin();
     const email = (formData.get('email') as string)?.trim().toLowerCase();
@@ -41,7 +41,7 @@ export async function addUser(formData: FormData): Promise<{ ok: boolean; messag
       { onConflict: 'id' }
     );
     revalidatePath('/admin/users');
-    return { ok: true, message: `User created. Share this temporary password: ${tempPassword} — they must reset it on first login.`, tempPassword, email };
+    return { ok: true, message: `User created. Share this temporary password: ${tempPassword} — they must reset it on first login.`, tempPassword, email, fullName: fullName || undefined };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : 'Failed' };
   }

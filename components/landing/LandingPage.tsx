@@ -24,7 +24,7 @@ const SocialProofTicker = dynamic(() => import('@/components/landing/SocialProof
 const QuizTeaser = dynamic(() => import('@/components/quiz/QuizTeaser').then((m) => ({ default: m.QuizTeaser })), { ssr: false });
 
 const NAV_SECTIONS = [
-  { id: 'how-it-works', label: 'How It Works' },
+  { id: 'how-it-works', label: 'How It Works', href: '/how-it-works' },
   { id: 'features', label: 'Features' },
   { id: 'pricing', label: 'Pricing' },
 ];
@@ -73,10 +73,10 @@ export default function LandingPage() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-6">
-            {NAV_SECTIONS.map(({ id, label }) => (
+            {NAV_SECTIONS.map(({ id, label, href }) => (
               <Link
                 key={id}
-                href={`#${id}`}
+                href={href || `#${id}`}
                 className={`text-sm font-medium transition-colors hover:text-primary py-3 ${activeSection === id ? 'text-primary' : 'text-ink-muted'}`}
                 aria-current={activeSection === id ? 'true' : undefined}
               >
@@ -115,6 +115,9 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-rule bg-paper-light">
             <nav className="container mx-auto px-4 py-4 flex flex-col space-y-1">
+              <Link href="/how-it-works" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-how-it-works">
+                How It Works
+              </Link>
               <Link href="#features" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-features">
                 Features
               </Link>
