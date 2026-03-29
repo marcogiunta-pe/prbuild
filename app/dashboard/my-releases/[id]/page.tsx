@@ -552,20 +552,23 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
   const handleSaveEdits = async () => {
     if (!release) return;
-    
-    setSubmitting(true);
-    const supabase = createClient();
-    
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        client_edited_content: editedContent,
-      })
-      .eq('id', release.id);
 
-    if (!error) {
-      await loadRelease();
-      setIsEditing(false);
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/releases/update-draft', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseId: release.id, content: editedContent }),
+      });
+      if (res.ok) {
+        await loadRelease();
+        setIsEditing(false);
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to save changes');
+      }
+    } catch {
+      alert('Failed to save changes');
     }
     setSubmitting(false);
   };
