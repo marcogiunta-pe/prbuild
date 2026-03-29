@@ -60,9 +60,7 @@ export async function POST(request: NextRequest) {
     const { error: showErr } = await admin.from('showcase_releases').delete().eq('release_request_id', parsed.data.releaseId);
     if (showErr) console.error('showcase delete error:', showErr);
 
-    // Also clean up any newsletter references
-    const { error: nlErr } = await admin.from('newsletter_sends').delete().eq('release_request_id', parsed.data.releaseId);
-    if (nlErr) console.error('newsletter delete error (may not exist):', nlErr);
+    // newsletter_sends uses release_ids UUID[] array — skip FK cleanup (no direct FK constraint)
 
     // Delete the release
     const { error: deleteErr } = await admin
