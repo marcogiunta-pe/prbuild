@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,8 @@ import {
   AlertCircle,
   PlusCircle,
   Trash2,
-  Sparkles
+  Sparkles,
+  Mail
 } from 'lucide-react';
 import { PRICING, ANNOUNCEMENT_TYPES, INDUSTRIES, Plan, AnnouncementType, Industry, QuoteSource, BillingInterval } from '@/types';
 import { HelpTip } from '@/components/dashboard/HelpTip';
@@ -35,6 +37,9 @@ export default function NewRequestPage() {
   const [isFreeUser, setIsFreeUser] = useState(false);
   const [freeReleasesRemaining, setFreeReleasesRemaining] = useState(0);
   const [isFreeRelease, setIsFreeRelease] = useState(false);
+  const [noCredits, setNoCredits] = useState(false);
+  const [userRole, setUserRole] = useState<string>('client');
+  const [releasesUsed, setReleasesUsed] = useState(0);
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
   const [showCustomIndustry, setShowCustomIndustry] = useState(false);
   const [customIndustry, setCustomIndustry] = useState('');
@@ -93,14 +98,37 @@ export default function NewRequestPage() {
           boilerplate: profile.company_boilerplate || '',
           industry: (profile.industry || '') as typeof prev.industry,
         }));
-        setIsFreeUser(true);
-        setFreeReleasesRemaining(-1);
-        // Always skip the plan step — go straight to the form
+        const isAdmin = profile.role === 'admin';
+        const isFree = !!profile.is_free_user;
+        const remaining = profile.free_releases_remaining ?? 0;
+        const hasActiveSubscription = profile.subscription_status === 'active';
+
+        setUserRole(profile.role || 'client');
+        setIsFreeUser(isFree);
+        setFreeReleasesRemaining(remaining);
+
+        // Determine if user has credits
+        const hasCredits = isAdmin || hasActiveSubscription || (isFree && (remaining > 0 || remaining === -1));
+
+        if (!hasCredits) {
+          // Count how many releases they've used
+          const countRes = await supabase
+            .from('release_requests')
+            .select('id', { count: 'exact', head: true })
+            .eq('client_id', user.id);
+          setReleasesUsed(countRes.count || 0);
+          setNoCredits(true);
+          return;
+        }
+
+        // Has credits — go to form
         if (!searchParams.get('session_id')) {
           setFormData(prev => ({ ...prev, plan: 'starter' }));
-          setIsFreeRelease(true);
+          setIsFreeRelease(isFree || isAdmin);
           setStep('company');
         }
+
+        // Decrement credits on submission (handled later)
       }
     };
     getUser();
@@ -189,11 +217,9 @@ export default function NewRequestPage() {
 
       if (insertError) throw insertError;
 
-      if (isFreeRelease && freeReleasesRemaining !== -1) {
-        await supabase
-          .from('profiles')
-          .update({ free_releases_remaining: Math.max(0, freeReleasesRemaining - 1) })
-          .eq('id', userId);
+      // Decrement credits (skip for unlimited = -1, skip for admins)
+      if (freeReleasesRemaining > 0 && userRole !== 'admin') {
+        await fetch('/api/releases/decrement-credits', { method: 'POST' });
       }
 
       // Fire-and-forget: kick off automated draft + panel review pipeline
@@ -235,6 +261,67 @@ export default function NewRequestPage() {
         return true;
     }
   };
+
+  // No credits gate
+  if (noCredits) {
+    return (
+      <div className="max-w-2xl mx-auto py-12">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-paper-dark rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-secondary" />
+          </div>
+          <h1 className="font-display text-3xl text-ink mb-2">You&apos;ve Used All Your Releases</h1>
+          <p className="text-ink-muted text-lg">
+            You&apos;ve submitted {releasesUsed} press release{releasesUsed !== 1 ? 's' : ''}. To create more, you&apos;ll need additional credits.
+          </p>
+        </div>
+
+        <div className="grid gap-4">
+          <Card className="border-rule bg-paper-light">
+            <CardContent className="p-6">
+              <h3 className="font-semibold text-ink mb-2">Request Free Access</h3>
+              <p className="text-sm text-ink-muted mb-4">
+                We&apos;re still in beta and happy to grant additional releases to active users. Click below to request more credits from our team.
+              </p>
+              <Button
+                onClick={() => {
+                  const subject = encodeURIComponent('Request for additional PRBuild credits');
+                  const body = encodeURIComponent(`Hi PRBuild team,\n\nI've used my available press release credits and would like to request more.\n\nAccount email: ${formData.mediaContactEmail || ''}\nReleases used: ${releasesUsed}\n\nThank you!`);
+                  window.location.href = `mailto:support@prbuild.ai?subject=${subject}&body=${body}`;
+                }}
+                className="bg-primary hover:bg-primary-700 rounded-sm"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Request More Credits
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-rule bg-paper-light">
+            <CardContent className="p-6">
+              <h3 className="font-semibold text-ink mb-2">Upgrade Your Plan</h3>
+              <p className="text-sm text-ink-muted mb-4">
+                Get a monthly subscription for unlimited press releases, priority journalist targeting, and detailed analytics.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => setNoCredits(false)}
+                className="rounded-sm border-rule"
+              >
+                View Plans
+              </Button>
+            </CardContent>
+          </Card>
+
+          <div className="text-center mt-4">
+            <Link href="/dashboard/my-releases" className="text-sm text-ink-muted hover:text-primary">
+              ← Back to My Releases
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
