@@ -33,21 +33,31 @@ import { format } from 'date-fns';
 // Convert markdown-style text to HTML
 function formatDraftAsHtml(content: string): string {
   if (!content) return '';
-  
+
+  // If content is already HTML (contains HTML tags), render it directly
+  // Strip script tags for safety but allow formatting tags
+  if (/<[a-z][\s\S]*>/i.test(content)) {
+    return content
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/on\w+="[^"]*"/gi, '');
+  }
+
+  // Otherwise treat as markdown-style text
   let html = content
-    // Escape HTML first
+    // Escape HTML entities in plain text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     // Remove ### markers
     .replace(/###/g, '')
     // Numbered list items with bold headers (1. **Title:**)
-    .replace(/(\d+)\.\s*\*\*([^*]+):\*\*/g, '<div class="mt-3"><span class="font-semibold text-indigo-700">$1. $2:</span></div>')
+    .replace(/(\d+)\.\s*\*\*([^*]+):\*\*/g, '<div class="mt-3"><span class="font-semibold text-primary">$1. $2:</span></div>')
     // Bullet points with bold headers (- **Title:**)
-    .replace(/-\s*\*\*([^*]+):\*\*/g, '<div class="mt-2 ml-4"><span class="font-semibold">• $1:</span></div>')
+    .replace(/-\s*\*\*([^*]+):\*\*/g, '<div class="mt-2 ml-4"><span class="font-semibold">$1:</span></div>')
     // Headers (** at start of line)
-    .replace(/^\*\*([^*]+):\*\*$/gm, '<h3 class="text-base font-bold text-gray-900 mt-4 mb-2">$1</h3>')
-    .replace(/^\*\*([^*]+)\*\*$/gm, '<h3 class="text-base font-bold text-gray-900 mt-4 mb-2">$1</h3>')
+    .replace(/^\*\*([^*]+):\*\*$/gm, '<h3 class="text-base font-bold text-ink mt-4 mb-2">$1</h3>')
+    .replace(/^\*\*([^*]+)\*\*$/gm, '<h3 class="text-base font-bold text-ink mt-4 mb-2">$1</h3>')
     // Bold text inline
     .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold">$1</strong>')
     // Italic text
@@ -62,7 +72,7 @@ function formatDraftAsHtml(content: string): string {
     // Clean up empty paragraphs
     .replace(/<p class="mb-3"><\/p>/g, '')
     .replace(/<p class="mb-3">\s*<\/p>/g, '');
-  
+
   return html;
 }
 
