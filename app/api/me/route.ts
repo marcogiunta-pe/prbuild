@@ -10,14 +10,16 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let profile: { company_name?: string; company_website?: string; full_name?: string; email?: string; is_free_user?: boolean; free_releases_remaining?: number; role?: string } | null = null;
+  const PROFILE_COLUMNS = 'company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role, media_contact_name, media_contact_title, media_contact_email, media_contact_phone, company_boilerplate, industry';
+
+  let profile: Record<string, unknown> | null = null;
 
   try {
     if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       const admin = createAdminClient();
       const { data, error } = await admin
         .from('profiles')
-        .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role')
+        .select(PROFILE_COLUMNS)
         .eq('id', user.id)
         .single();
       if (!error && data) profile = data;
@@ -29,7 +31,7 @@ export async function GET() {
   if (!profile) {
     const { data } = await supabase
       .from('profiles')
-      .select('company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role')
+      .select(PROFILE_COLUMNS)
       .eq('id', user.id)
       .single();
     profile = data;

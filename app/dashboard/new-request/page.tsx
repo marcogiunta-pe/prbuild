@@ -86,8 +86,12 @@ export default function NewRequestPage() {
           ...prev,
           companyName: profile.company_name || '',
           companyWebsite: profile.company_website || '',
-          mediaContactName: profile.full_name || '',
-          mediaContactEmail: profile.email || '',
+          mediaContactName: profile.media_contact_name || profile.full_name || '',
+          mediaContactTitle: profile.media_contact_title || '',
+          mediaContactEmail: profile.media_contact_email || profile.email || '',
+          mediaContactPhone: profile.media_contact_phone || '',
+          boilerplate: profile.company_boilerplate || '',
+          industry: (profile.industry || '') as typeof prev.industry,
         }));
         const free = !!profile.is_free_user;
         const remaining = profile.free_releases_remaining ?? 0;
