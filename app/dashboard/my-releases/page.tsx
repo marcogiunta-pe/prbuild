@@ -10,6 +10,7 @@ import { WelcomeModal } from '@/components/dashboard/WelcomeModal';
 import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist';
 import { DashboardGuide } from '@/components/dashboard/DashboardGuide';
 import { HelpTip } from '@/components/dashboard/HelpTip';
+import { DeleteReleaseButton } from '@/components/dashboard/DeleteReleaseButton';
 
 const statusConfig: Record<ReleaseStatus, { label: string; color: string; icon: any }> = {
   submitted: { label: 'Processing', color: 'bg-blue-100 text-blue-700', icon: Clock },
@@ -53,7 +54,7 @@ export default async function MyReleasesPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('profiles')
-      .select('company_name, onboarding_completed_at, onboarding_dismissed_at')
+      .select('company_name, onboarding_completed_at, onboarding_dismissed_at, role')
       .eq('id', user?.id)
       .single(),
   ]);
@@ -64,6 +65,7 @@ export default async function MyReleasesPage() {
     (r: any) => reviewedStatuses.includes(r.status)
   ) ?? false;
 
+  const isAdmin = profile?.role === 'admin';
   const showOnboarding = !profile?.onboarding_completed_at && !profile?.onboarding_dismissed_at;
   const showWelcomeModal = showOnboarding && releaseCount === 0;
 
@@ -154,11 +156,16 @@ export default async function MyReleasesPage() {
                         </div>
                       </div>
 
-                      {needsAction && (
-                        <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
-                          Review Now
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {needsAction && (
+                          <Button size="sm" className="bg-yellow-500 hover:bg-yellow-600 text-white">
+                            Review Now
+                          </Button>
+                        )}
+                        {(release.status !== 'published' || isAdmin) && (
+                          <DeleteReleaseButton releaseId={release.id} />
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

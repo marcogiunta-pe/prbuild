@@ -26,7 +26,8 @@ import {
   Edit3,
   Save,
   X,
-  Mail
+  Mail,
+  Trash2
 } from 'lucide-react';
 import { ReleaseRequest, ReleaseStatus, PanelFeedback } from '@/types';
 import { format } from 'date-fns';
@@ -35,44 +36,146 @@ import { format } from 'date-fns';
 function formatDraftAsHtml(content: string): string {
   if (!content) return '';
 
-  // If content is already HTML (contains HTML tags), render it directly
-  // Strip script tags for safety but allow formatting tags
-  if (/<[a-z][\s\S]*>/i.test(content)) {
+  // If content contains HTML block-level tags, treat as HTML
+  // Strip scripts/styles/event handlers but keep formatting tags
+  if (/<(?:p|div|h[1-6]|ul|ol|li|br|table|blockquote)[\s>]/i.test(content)) {
     return content
       .replace(/<script[\s\S]*?<\/script>/gi, '')
       .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/on\w+="[^"]*"/gi, '');
+      .replace(/on\w+="[^"]*"/gi, '')
+      // Still clean up stray markdown artifacts inside HTML
+      .replace(/\(\d+\)\s*\*{0,2}\s*/g, '')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
 
-  // Otherwise treat as markdown-style text
+  // Otherwise treat as markdown/plain text
   let html = content
     // Escape HTML entities in plain text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    // Remove ### markers
-    .replace(/###/g, '')
-    // Numbered list items with bold headers (1. **Title:**)
-    .replace(/(\d+)\.\s*\*\*([^*]+):\*\*/g, '<div class="mt-3"><span class="font-semibold text-primary">$1. $2:</span></div>')
-    // Bullet points with bold headers (- **Title:**)
-    .replace(/-\s*\*\*([^*]+):\*\*/g, '<div class="mt-2 ml-4"><span class="font-semibold">$1:</span></div>')
-    // Headers (** at start of line)
-    .replace(/^\*\*([^*]+):\*\*$/gm, '<h3 class="text-base font-bold text-ink mt-4 mb-2">$1</h3>')
-    .replace(/^\*\*([^*]+)\*\*$/gm, '<h3 class="text-base font-bold text-ink mt-4 mb-2">$1</h3>')
-    // Bold text inline
-    .replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold">$1</strong>')
-    // Italic text
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    // Paragraphs (double newlines)
-    .replace(/\n\n/g, '</p><p class="mb-3">')
-    // Single newlines
-    .replace(/\n/g, ' ')
-    // Wrap in paragraph
-    .replace(/^/, '<p class="mb-3">')
-    .replace(/$/, '</p>')
-    // Clean up empty paragraphs
-    .replace(/<p class="mb-3"><\/p>/g, '')
-    .replace(/<p class="mb-3">\s*<\/p>/g, '');
+    .replace(/>/g, '&gt;');
+
+  // Process line by line for better control
+  const lines = html.split('\n');
+  const processed: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Strip (1), (2), (3) etc. prefixes (AI numbering artifacts)
+    line = line.replace(/^\s*\(\d+\)\s*/, '');
+
+    // Horizontal rules
+    if (/^\s*(?:---+|\*\*\*+)\s*$/.test(line)) {
+      processed.push('<hr class="my-4 border-rule" />');
+      continue;
+    }
+
+    // ### headings
+    if (/^###\s+(.+)$/.test(line)) {
+      const match = line.match(/^###\s+(.+)$/);
+      if (match) {
+        let text = match[1].replace(/\*\*/g, '');
+        processed.push(`<h4 class="text-sm font-bold text-ink mt-3 mb-1">${text}</h4>`);
+        continue;
+      }
+    }
+
+    // ## headings
+    if (/^##\s+(.+)$/.test(line)) {
+      const match = line.match(/^##\s+(.+)$/);
+      if (match) {
+        let text = match[1].replace(/\*\*/g, '');
+        processed.push(`<h3 class="text-base font-bold text-ink mt-4 mb-2">${text}</h3>`);
+        continue;
+      }
+    }
+
+    // # headings
+    if (/^#\s+(.+)$/.test(line)) {
+      const match = line.match(/^#\s+(.+)$/);
+      if (match) {
+        let text = match[1].replace(/\*\*/g, '');
+        processed.push(`<h2 class="text-lg font-bold text-ink mt-4 mb-2">${text}</h2>`);
+        continue;
+      }
+    }
+
+    // Numbered list items with bold headers: "1. **Title:**" or "1. **Title**"
+    const numberedBold = line.match(/^(\d+)\.\s*\*\*([^*]+?)(?::)?\*\*\s*(.*)/);
+    if (numberedBold) {
+      const rest = numberedBold[3] || '';
+      processed.push(`<h3 class="text-base font-bold text-ink mt-4 mb-1">${numberedBold[2].trim()}</h3>`);
+      if (rest.trim()) {
+        processed.push(`<p class="mb-3">${rest.trim()}</p>`);
+      }
+      continue;
+    }
+
+    // Standalone bold lines as section headers (** at start and end of line)
+    if (/^\*\*([^*]+)\*\*\s*$/.test(line)) {
+      const match = line.match(/^\*\*([^*]+)\*\*\s*$/);
+      if (match) {
+        processed.push(`<h3 class="text-base font-bold text-ink mt-4 mb-2">${match[1].replace(/:$/, '').trim()}</h3>`);
+        continue;
+      }
+    }
+
+    // Bullet points with bold headers: "- **Title:** text"
+    const bulletBold = line.match(/^[-•]\s*\*\*([^*]+?)(?::)?\*\*\s*(.*)/);
+    if (bulletBold) {
+      const rest = bulletBold[2] || '';
+      processed.push(`<div class="mt-2 ml-4"><span class="font-semibold">${bulletBold[1].trim()}:</span> ${rest.trim()}</div>`);
+      continue;
+    }
+
+    // Plain bullet points
+    if (/^[-•]\s+(.+)/.test(line)) {
+      const match = line.match(/^[-•]\s+(.+)/);
+      if (match) {
+        processed.push(`<div class="mt-1 ml-4 flex gap-2"><span class="text-ink-muted">•</span><span>${match[1]}</span></div>`);
+        continue;
+      }
+    }
+
+    // Empty lines become paragraph breaks
+    if (line.trim() === '') {
+      processed.push('</p><p class="mb-3">');
+      continue;
+    }
+
+    // Regular text line
+    processed.push(line);
+  }
+
+  // Join and apply inline formatting
+  html = processed.join('\n');
+
+  // Bold text **text**
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong class="font-semibold">$1</strong>');
+  // Italic text *text*
+  html = html.replace(/\*([^*\n]+)\*/g, '<em>$1</em>');
+
+  // Clean up any stray ** or * markers that didn't match pairs
+  html = html.replace(/\*{2,}/g, '');
+  html = html.replace(/(?<![<\w\/])\*(?![<\w])/g, '');
+
+  // Wrap in paragraph tags
+  html = '<p class="mb-3">' + html + '</p>';
+
+  // Clean up: remove empty paragraphs and fix doubled tags
+  html = html.replace(/<p class="mb-3">\s*<\/p>/g, '');
+  html = html.replace(/<\/p>\s*<p class="mb-3">\s*<\/p>/g, '</p>');
+  html = html.replace(/<p class="mb-3">\s*<(h[2-4])/g, '<$1');
+  html = html.replace(/<\/(h[2-4])>\s*<\/p>/g, '</$1>');
+  html = html.replace(/<p class="mb-3">\s*<hr/g, '<hr');
+  html = html.replace(/\/>\s*<\/p>/g, '/>');
+  html = html.replace(/<p class="mb-3">\s*<div/g, '<div');
+  html = html.replace(/<\/div>\s*<\/p>/g, '</div>');
+
+  // Convert remaining single newlines within paragraphs to spaces
+  html = html.replace(/([^>])\n([^<])/g, '$1 $2');
 
   return html;
 }
@@ -254,10 +357,45 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [panelComments, setPanelComments] = useState<string[]>([]);
   const [processing, setProcessing] = useState(false);
   const [rewriteProgress, setRewriteProgress] = useState(0);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     loadRelease();
+    loadUserProfile();
   }, [params.id]);
+
+  const loadUserProfile = async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (profile) setUserRole(profile.role);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!release) return;
+    if (!confirm('Are you sure you want to delete this release? This cannot be undone.')) return;
+
+    setDeleting(true);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('release_requests')
+      .delete()
+      .eq('id', release.id);
+
+    if (!error) {
+      router.push('/dashboard/my-releases');
+    } else {
+      alert('Failed to delete release.');
+      setDeleting(false);
+    }
+  };
 
   const loadRelease = async () => {
     const supabase = createClient();
@@ -584,9 +722,26 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               {release.company_name} • {release.announcement_type.replace('_', ' ')}
             </p>
           </div>
-          <Badge className={`${status.color} text-sm px-3 py-1`}>
-            {status.label}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={`${status.color} text-sm px-3 py-1`}>
+              {status.label}
+            </Badge>
+            {(release.status !== 'published' || userRole === 'admin') && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+              >
+                {deleting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+          </div>
         </div>
         <p className="mt-2 text-sm text-gray-500">{status.description}</p>
         {status.emailNote && (
@@ -863,6 +1018,29 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
           </Card>
         )}
 
+        {/* Request New Review button — above the panel results */}
+        {release.panel_individual_feedback && (release.panel_individual_feedback as PanelFeedback[]).length > 0 && canReview && !requestingPanel && (
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={handleRequestPanelReview}
+              className="bg-secondary hover:bg-secondary/90 rounded-sm"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              Request New Review
+            </Button>
+            <p className="text-xs text-ink-muted">
+              Run the 16-journalist panel again after making changes.
+            </p>
+          </div>
+        )}
+        {release.panel_individual_feedback && (release.panel_individual_feedback as PanelFeedback[]).length > 0 && requestingPanel && (
+          <PanelReviewAnimation
+            reviewers={REVIEWERS}
+            progress={panelProgress}
+            comments={panelComments}
+          />
+        )}
+
         {/* Panel Critique — Full Detail View */}
         {release.panel_individual_feedback && (release.panel_individual_feedback as PanelFeedback[]).length > 0 && (
           (() => {
@@ -982,13 +1160,13 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                             {fb.feedback && (
                               <div>
                                 <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted mb-1">Feedback</div>
-                                <p className="text-sm text-ink leading-relaxed">{fb.feedback}</p>
+                                <p className="text-sm text-ink leading-relaxed">{(fb.feedback || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim()}</p>
                               </div>
                             )}
                             {fb.missing && (
                               <div>
                                 <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">What&apos;s Missing</div>
-                                <p className="text-sm text-ink-muted">{fb.missing}</p>
+                                <p className="text-sm text-ink-muted">{(fb.missing || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim()}</p>
                               </div>
                             )}
                           </div>
@@ -1049,32 +1227,6 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     </div>
                   )}
 
-                  {/* Re-review button + animation */}
-                  {canReview && !requestingPanel && (
-                    <div className="pt-3 border-t border-rule">
-                      <Button
-                        onClick={handleRequestPanelReview}
-                        variant="outline"
-                        className="rounded-sm border-rule"
-                      >
-                        <Users className="h-4 w-4 mr-2" />
-                        Request New Review
-                      </Button>
-                      <p className="text-xs text-ink-muted mt-1">
-                        Run the 16-journalist panel again after making changes.
-                      </p>
-                    </div>
-                  )}
-                  {requestingPanel && (
-                    <div className="pt-3 border-t border-rule">
-                      <PanelReviewAnimation
-                        reviewers={REVIEWERS}
-                        progress={panelProgress}
-                        comments={panelComments}
-                      />
-                    </div>
-                  )}
-
                   {release.panel_reviewed_at && !requestingPanel && (
                     <p className="text-xs text-ink-muted font-mono">
                       Last reviewed {format(new Date(release.panel_reviewed_at), 'PPp')}
@@ -1095,18 +1247,28 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                 Your Review Needed
               </CardTitle>
               <CardDescription>
-                Please review the draft above and either approve it or provide feedback for revisions.
+                This is your chance to review the press release before it goes to publication. Take a moment to read through the draft and the journalist panel feedback above.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="bg-paper p-4 rounded-md border border-rule text-sm text-ink-muted space-y-2">
+                <p><strong className="text-ink">What to look for:</strong></p>
+                <ul className="list-disc ml-5 space-y-1">
+                  <li>Are all company names, dates, and facts accurate?</li>
+                  <li>Does the headline capture your announcement?</li>
+                  <li>Are the quotes attributed correctly?</li>
+                  <li>Is there anything missing that journalists should know?</li>
+                </ul>
+                <p className="pt-2"><strong className="text-ink">Your options:</strong> Approve to send it to our publication queue, or send feedback and we&apos;ll revise it. You can also edit the draft directly using the &quot;Edit Draft&quot; button above.</p>
+              </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Feedback (optional if approving)
+                <label className="block text-sm font-medium text-ink mb-2">
+                  Feedback or revision notes
                 </label>
                 <Textarea
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Share any changes you'd like us to make..."
+                  placeholder="e.g., 'Change the headline to focus on the partnership angle' or 'The quote attribution should be CEO, not CTO'..."
                   rows={4}
                 />
               </div>
@@ -1165,7 +1327,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
         {/* Request Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Request Details</CardTitle>
+            <CardTitle>Your Original Request</CardTitle>
+            <CardDescription>
+              This is the information you submitted. Our writing team used these details to craft your press release.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <dl className="grid grid-cols-2 gap-4 text-sm">
@@ -1196,7 +1361,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
         {/* Timeline */}
         <Card>
           <CardHeader>
-            <CardTitle>Timeline</CardTitle>
+            <CardTitle>Progress Timeline</CardTitle>
+            <CardDescription>
+              Track every step of your press release from submission to publication.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3 text-sm">
