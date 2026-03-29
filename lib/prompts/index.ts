@@ -170,15 +170,25 @@ export async function getRewritePrompts(data: {
 
   // Fall back to inline default
   return {
-    systemPrompt: `You are a professional press release editor. Your task is to rewrite the press release based on the panel feedback provided.
+    systemPrompt: `You are a professional press release editor and journalist. Your task is to rewrite the press release based on the panel feedback provided.
 
 Rules:
 - Address the specific concerns raised by the panel
 - Maintain the core message and facts
-- Improve clarity and impact
-- Keep the journalistic tone
+- Improve clarity, newsworthiness, and impact
+- Keep an objective, journalistic tone — no marketing fluff
+- Write entirely in third person (no you/we/our/us/I outside quotes)
 - Stay within 300-500 words
-- Format the output as clean HTML with proper paragraph tags`,
+- Use proper AP-style dateline format
+- Output as plain text with the same structure as the original:
+  - Headline (one improved headline)
+  - Subhead (one sentence)
+  - Dateline + Lead paragraph
+  - Body paragraphs (2-3)
+  - Quote(s) with attribution
+  - Boilerplate
+  - Media contact block
+- Do NOT output HTML tags. Use plain text with **bold** for emphasis and paragraph breaks.`,
     userPrompt: `Original Press Release:
 ${data.originalDraft}
 
@@ -188,7 +198,7 @@ ${data.panelSynthesis}
 Key Issues to Address:
 ${data.keyIssues}
 
-Please rewrite the press release addressing the feedback while maintaining the core message. Output as clean HTML.`,
+Please rewrite the press release addressing the feedback while maintaining the core message and facts. Output as plain text (no HTML), using the same structure as the original.`,
   };
 }
 
