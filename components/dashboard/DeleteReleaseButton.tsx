@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Trash2, Loader2 } from 'lucide-react';
 
-export function DeleteReleaseButton({ releaseId }: { releaseId: string }) {
+export function DeleteReleaseButton({ releaseId, redirectTo }: { releaseId: string; redirectTo?: string }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState(false);
 
@@ -17,15 +16,26 @@ export function DeleteReleaseButton({ releaseId }: { releaseId: string }) {
     if (!confirm('Are you sure you want to delete this release? This cannot be undone.')) return;
 
     setDeleting(true);
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('release_requests')
-      .delete()
-      .eq('id', releaseId);
+    try {
+      const res = await fetch('/api/releases/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseId }),
+      });
 
-    if (!error) {
-      router.refresh();
-    } else {
+      if (res.ok) {
+        if (redirectTo) {
+          router.push(redirectTo);
+        } else {
+          router.refresh();
+          window.location.reload();
+        }
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to delete release.');
+        setDeleting(false);
+      }
+    } catch {
       alert('Failed to delete release.');
       setDeleting(false);
     }
