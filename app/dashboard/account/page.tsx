@@ -148,6 +148,15 @@ export default function AccountPage() {
 
   const handleAutoFill = async () => {
     if (!formData.companyWebsite) return;
+
+    // Warn user that existing data will be overwritten
+    const hasData = formData.companyName || formData.companyAddress || formData.companyCity ||
+      formData.companyPhone || formData.companyBoilerplate || formData.companyVoiceStyle || formData.industry;
+
+    if (hasData && !confirm('This will replace all company information with data from the website. You can edit any field after. Continue?')) {
+      return;
+    }
+
     setAutoFilling(true);
     setError(null);
 
@@ -169,45 +178,26 @@ export default function AccountPage() {
 
       const data = await res.json();
 
-      // Check if all fillable fields are currently empty
-      const companyFieldsEmpty =
-        !formData.companyName &&
-        !formData.companyAddress &&
-        !formData.companyCity &&
-        !formData.companyState &&
-        !formData.companyZip &&
-        !formData.companyCountry &&
-        !formData.companyPhone &&
-        !formData.companyLogoUrl &&
-        !formData.industry &&
-        !formData.companyBoilerplate &&
-        !formData.companyVoiceStyle;
-
       setFormData(prev => {
         const next = { ...prev };
 
-        const fillIfEmpty = (field: keyof ProfileData, value: string | null | undefined) => {
-          if (value && (companyFieldsEmpty || !prev[field])) {
-            next[field] = value;
-          }
-        };
-
-        fillIfEmpty('companyName', data.companyName);
-        fillIfEmpty('companyPhone', data.phone);
-        fillIfEmpty('companyAddress', data.address);
-        fillIfEmpty('companyCity', data.city);
-        fillIfEmpty('companyState', data.state);
-        fillIfEmpty('companyZip', data.zip);
-        fillIfEmpty('companyCountry', data.country);
-        fillIfEmpty('companyLogoUrl', data.logoUrl);
-        fillIfEmpty('companyBoilerplate', data.boilerplate);
-        fillIfEmpty('companyVoiceStyle', data.voiceStyle);
+        // Override all fields with data from the website
+        if (data.companyName) next.companyName = data.companyName;
+        if (data.phone) next.companyPhone = data.phone;
+        if (data.address) next.companyAddress = data.address;
+        if (data.city) next.companyCity = data.city;
+        if (data.state) next.companyState = data.state;
+        if (data.zip) next.companyZip = data.zip;
+        if (data.country) next.companyCountry = data.country;
+        if (data.logoUrl) next.companyLogoUrl = data.logoUrl;
+        if (data.boilerplate) next.companyBoilerplate = data.boilerplate;
+        if (data.voiceStyle) next.companyVoiceStyle = data.voiceStyle;
 
         // Handle industry mapping
-        if (data.industry && (companyFieldsEmpty || !prev.industry)) {
-          const isStandard = INDUSTRIES.some(i => i.value === data.industry);
+        if (data.industry) {
+          const isStandard = INDUSTRIES.some(i => i.value === data.industry?.toLowerCase());
           if (isStandard) {
-            next.industry = data.industry;
+            next.industry = data.industry.toLowerCase();
             next.customIndustry = '';
           } else {
             next.industry = 'other';
