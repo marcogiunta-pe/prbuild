@@ -93,13 +93,10 @@ export default function NewRequestPage() {
           boilerplate: profile.company_boilerplate || '',
           industry: (profile.industry || '') as typeof prev.industry,
         }));
-        const isAdmin = profile.role === 'admin';
-        const free = isAdmin || !!profile.is_free_user;
-        const remaining = isAdmin ? -1 : (profile.free_releases_remaining ?? 0);
-        setIsFreeUser(free);
-        setFreeReleasesRemaining(remaining);
-        // Free users and admins skip the plan step entirely — go straight to the form
-        if (free && (remaining > 0 || remaining === -1) && !searchParams.get('session_id')) {
+        setIsFreeUser(true);
+        setFreeReleasesRemaining(-1);
+        // Always skip the plan step — go straight to the form
+        if (!searchParams.get('session_id')) {
           setFormData(prev => ({ ...prev, plan: 'starter' }));
           setIsFreeRelease(true);
           setStep('company');
@@ -218,7 +215,7 @@ export default function NewRequestPage() {
     }
   };
 
-  const steps: Step[] = ['plan', 'company', 'announcement', 'quotes', 'contact', 'review'];
+  const steps: Step[] = ['company', 'announcement', 'quotes', 'contact', 'review'];
   const currentStepIndex = steps.indexOf(step);
 
   const canProceed = () => {
@@ -252,7 +249,6 @@ export default function NewRequestPage() {
       {/* Progress Steps */}
       {(() => {
         const stepLabels: Record<Step, string> = {
-          plan: 'Plan',
           company: 'Company',
           announcement: 'Details',
           quotes: 'Quotes',
