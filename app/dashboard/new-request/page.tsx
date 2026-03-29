@@ -407,15 +407,33 @@ export default function NewRequestPage() {
               <p className="text-xs text-gray-500 mb-1">Used to match your release with journalists who cover your space.</p>
               <select
                 id="industry"
-                value={formData.industry}
-                onChange={(e) => updateField('industry', e.target.value)}
+                value={['healthcare', 'technology', 'finance', 'retail'].includes(formData.industry) ? formData.industry : formData.industry ? '_other' : ''}
+                onChange={(e) => {
+                  if (e.target.value === '_other') {
+                    updateField('industry', '');
+                  } else {
+                    updateField('industry', e.target.value);
+                  }
+                }}
                 className="w-full px-3 py-2 border rounded-md"
               >
                 <option value="">Select industry...</option>
-                {INDUSTRIES.map(ind => (
-                  <option key={ind.value} value={ind.value}>{ind.label}</option>
-                ))}
+                <option value="healthcare">Healthcare</option>
+                <option value="technology">Technology</option>
+                <option value="finance">Finance</option>
+                <option value="retail">Retail</option>
+                <option value="_other">Other (type your industry)</option>
               </select>
+              {!['healthcare', 'technology', 'finance', 'retail', ''].includes(formData.industry) && (
+                <input
+                  type="text"
+                  value={formData.industry}
+                  onChange={(e) => updateField('industry', e.target.value)}
+                  placeholder="Enter your industry (e.g., Education, Energy, Real Estate, Legal...)"
+                  className="w-full px-3 py-2 border rounded-md mt-2"
+                  autoFocus
+                />
+              )}
             </div>
             <div>
               <Label htmlFor="boilerplate">Company Boilerplate (optional)</Label>
