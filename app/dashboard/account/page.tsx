@@ -27,6 +27,10 @@ interface ProfileData {
   mediaContactPhone: string;
   companyName: string;
   companyAddress: string;
+  companyCity: string;
+  companyState: string;
+  companyZip: string;
+  companyCountry: string;
   companyPhone: string;
   companyWebsite: string;
   companyLogoUrl: string;
@@ -48,6 +52,10 @@ const INITIAL_DATA: ProfileData = {
   mediaContactPhone: '',
   companyName: '',
   companyAddress: '',
+  companyCity: '',
+  companyState: '',
+  companyZip: '',
+  companyCountry: '',
   companyPhone: '',
   companyWebsite: '',
   companyLogoUrl: '',
@@ -64,6 +72,7 @@ export default function AccountPage() {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ProfileData>(INITIAL_DATA);
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
+  const [autoFilling, setAutoFilling] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -111,6 +120,10 @@ export default function AccountPage() {
           mediaContactPhone: profile.media_contact_phone || '',
           companyName: profile.company_name || '',
           companyAddress: profile.company_address || '',
+          companyCity: profile.company_city || '',
+          companyState: profile.company_state || '',
+          companyZip: profile.company_zip || '',
+          companyCountry: profile.company_country || '',
           companyPhone: profile.company_phone || '',
           companyWebsite: profile.company_website || '',
           companyLogoUrl: profile.company_logo_url || '',
@@ -131,6 +144,85 @@ export default function AccountPage() {
 
   const updateField = (field: keyof ProfileData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAutoFill = async () => {
+    if (!formData.companyWebsite) return;
+    setAutoFilling(true);
+    setError(null);
+
+    try {
+      const websiteUrl = formData.companyWebsite.startsWith('http')
+        ? formData.companyWebsite
+        : `https://${formData.companyWebsite}`;
+
+      const res = await fetch('/api/ai/company-info', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ websiteUrl }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to analyze website');
+      }
+
+      const data = await res.json();
+
+      // Check if all fillable fields are currently empty
+      const companyFieldsEmpty =
+        !formData.companyName &&
+        !formData.companyAddress &&
+        !formData.companyCity &&
+        !formData.companyState &&
+        !formData.companyZip &&
+        !formData.companyCountry &&
+        !formData.companyPhone &&
+        !formData.companyLogoUrl &&
+        !formData.industry &&
+        !formData.companyBoilerplate &&
+        !formData.companyVoiceStyle;
+
+      setFormData(prev => {
+        const next = { ...prev };
+
+        const fillIfEmpty = (field: keyof ProfileData, value: string | null | undefined) => {
+          if (value && (companyFieldsEmpty || !prev[field])) {
+            next[field] = value;
+          }
+        };
+
+        fillIfEmpty('companyName', data.companyName);
+        fillIfEmpty('companyPhone', data.phone);
+        fillIfEmpty('companyAddress', data.address);
+        fillIfEmpty('companyCity', data.city);
+        fillIfEmpty('companyState', data.state);
+        fillIfEmpty('companyZip', data.zip);
+        fillIfEmpty('companyCountry', data.country);
+        fillIfEmpty('companyLogoUrl', data.logoUrl);
+        fillIfEmpty('companyBoilerplate', data.boilerplate);
+        fillIfEmpty('companyVoiceStyle', data.voiceStyle);
+
+        // Handle industry mapping
+        if (data.industry && (companyFieldsEmpty || !prev.industry)) {
+          const isStandard = INDUSTRIES.some(i => i.value === data.industry);
+          if (isStandard) {
+            next.industry = data.industry;
+            next.customIndustry = '';
+          } else {
+            next.industry = 'other';
+            next.customIndustry = data.industry;
+          }
+        }
+
+        return next;
+      });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to analyze website';
+      setError(message);
+    } finally {
+      setAutoFilling(false);
+    }
   };
 
   const handleSave = async () => {
@@ -160,6 +252,10 @@ export default function AccountPage() {
           media_contact_phone: formData.mediaContactPhone,
           company_name: formData.companyName,
           company_address: formData.companyAddress,
+          company_city: formData.companyCity,
+          company_state: formData.companyState,
+          company_zip: formData.companyZip,
+          company_country: formData.companyCountry,
           company_phone: formData.companyPhone,
           company_website: formData.companyWebsite,
           company_logo_url: formData.companyLogoUrl,
@@ -398,8 +494,46 @@ export default function AccountPage() {
             <CardTitle className="font-display text-xl text-ink">Company Information</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
+            {/* Company Website — first field */}
             <div className="space-y-1.5">
-              <Label htmlFor="companyName" className="text-sm font-medium text-ink">
+              <Label htmlFor="companyWebsite" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                Company Website
+              </Label>
+              <Input
+                id="companyWebsite"
+                value={formData.companyWebsite}
+                onChange={(e) => updateField('companyWebsite', e.target.value)}
+                placeholder="https://example.com"
+                className="border-rule"
+              />
+            </div>
+
+            {/* Auto-fill button */}
+            <div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAutoFill}
+                disabled={autoFilling || !formData.companyWebsite}
+                className="rounded-sm border-rule text-ink hover:bg-paper-dark/30 text-sm"
+              >
+                {autoFilling ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing website...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Auto-fill from website
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Company Name */}
+            <div className="space-y-1.5">
+              <Label htmlFor="companyName" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                 Company Name <span className="text-primary">*</span>
               </Label>
               <Input
@@ -411,48 +545,91 @@ export default function AccountPage() {
               />
             </div>
 
+            {/* Company Address (street) */}
             <div className="space-y-1.5">
-              <Label htmlFor="companyAddress" className="text-sm font-medium text-ink">
+              <Label htmlFor="companyAddress" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                 Company Address
               </Label>
               <Input
                 id="companyAddress"
                 value={formData.companyAddress}
                 onChange={(e) => updateField('companyAddress', e.target.value)}
-                placeholder="123 Main St, City, State, ZIP"
+                placeholder="123 Main St"
                 className="border-rule"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* City, State, ZIP — 3 columns */}
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="companyPhone" className="text-sm font-medium text-ink">
-                  Company Phone
+                <Label htmlFor="companyCity" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                  City
                 </Label>
                 <Input
-                  id="companyPhone"
-                  value={formData.companyPhone}
-                  onChange={(e) => updateField('companyPhone', e.target.value)}
-                  placeholder="+1 (555) 000-0000"
+                  id="companyCity"
+                  value={formData.companyCity}
+                  onChange={(e) => updateField('companyCity', e.target.value)}
+                  placeholder="City"
                   className="border-rule"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="companyWebsite" className="text-sm font-medium text-ink">
-                  Company Website
+                <Label htmlFor="companyState" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                  State
                 </Label>
                 <Input
-                  id="companyWebsite"
-                  value={formData.companyWebsite}
-                  onChange={(e) => updateField('companyWebsite', e.target.value)}
-                  placeholder="https://example.com"
+                  id="companyState"
+                  value={formData.companyState}
+                  onChange={(e) => updateField('companyState', e.target.value)}
+                  placeholder="CA"
+                  className="border-rule"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="companyZip" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                  ZIP
+                </Label>
+                <Input
+                  id="companyZip"
+                  value={formData.companyZip}
+                  onChange={(e) => updateField('companyZip', e.target.value)}
+                  placeholder="90210"
                   className="border-rule"
                 />
               </div>
             </div>
 
+            {/* Country */}
             <div className="space-y-1.5">
-              <Label htmlFor="companyLogoUrl" className="text-sm font-medium text-ink">
+              <Label htmlFor="companyCountry" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                Country
+              </Label>
+              <Input
+                id="companyCountry"
+                value={formData.companyCountry}
+                onChange={(e) => updateField('companyCountry', e.target.value)}
+                placeholder="United States"
+                className="border-rule"
+              />
+            </div>
+
+            {/* Company Phone */}
+            <div className="space-y-1.5">
+              <Label htmlFor="companyPhone" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
+                Company Phone
+              </Label>
+              <Input
+                id="companyPhone"
+                value={formData.companyPhone}
+                onChange={(e) => updateField('companyPhone', e.target.value)}
+                placeholder="+1 (555) 000-0000"
+                className="border-rule"
+              />
+            </div>
+
+            {/* Company Logo URL */}
+            <div className="space-y-1.5">
+              <Label htmlFor="companyLogoUrl" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                 Company Logo URL
               </Label>
               <Input
@@ -467,8 +644,9 @@ export default function AccountPage() {
               </p>
             </div>
 
+            {/* Industry */}
             <div className="space-y-1.5">
-              <Label htmlFor="industry" className="text-sm font-medium text-ink">
+              <Label htmlFor="industry" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                 Industry
               </Label>
               <select
@@ -480,7 +658,7 @@ export default function AccountPage() {
                     updateField('customIndustry', '');
                   }
                 }}
-                className="w-full px-3 py-2 border border-rule rounded-md bg-paper-light text-ink text-sm"
+                className="w-full px-3 py-2 border border-rule rounded-sm bg-paper-light text-ink text-sm"
               >
                 <option value="">Select industry...</option>
                 {INDUSTRIES.map(ind => (
@@ -498,17 +676,18 @@ export default function AccountPage() {
               )}
             </div>
 
+            {/* Company Boilerplate */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="companyBoilerplate" className="text-sm font-medium text-ink">
+                <Label htmlFor="companyBoilerplate" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                   Company Boilerplate
                 </Label>
-                {formData.companyWebsite && !formData.companyBoilerplate && (
+                {formData.companyWebsite && (
                   <button
                     type="button"
                     onClick={handleGenerateBoilerplate}
                     disabled={generatingBoilerplate}
-                    className="text-xs text-primary hover:text-primary-700 font-medium flex items-center gap-1"
+                    className="text-xs text-primary hover:text-primary-700 font-medium flex items-center gap-1 rounded-sm"
                   >
                     {generatingBoilerplate ? (
                       <><Loader2 className="h-3 w-3 animate-spin" /> Generating from website...</>
@@ -531,8 +710,9 @@ export default function AccountPage() {
               />
             </div>
 
+            {/* Voice Style */}
             <div className="space-y-1.5">
-              <Label htmlFor="companyVoiceStyle" className="text-sm font-medium text-ink">
+              <Label htmlFor="companyVoiceStyle" className="font-mono text-xs font-medium text-ink uppercase tracking-wide">
                 Voice Style
               </Label>
               <p className="text-xs text-ink-muted mb-1">
@@ -564,7 +744,7 @@ export default function AccountPage() {
             <Button
               variant="outline"
               onClick={handlePasswordReset}
-              className="border-rule text-ink hover:bg-paper-dark/30"
+              className="border-rule text-ink hover:bg-paper-dark/30 rounded-sm"
             >
               Request Password Reset
             </Button>
@@ -576,7 +756,7 @@ export default function AccountPage() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-primary hover:bg-primary-700 text-white px-8 py-2.5"
+            className="bg-primary hover:bg-primary-700 text-white px-8 py-2.5 rounded-sm"
           >
             {saving ? (
               <>
