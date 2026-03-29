@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, PlusCircle, User, LayoutDashboard, Lightbulb } from 'lucide-react';
+import { FileText, PlusCircle, User, LayoutDashboard, Lightbulb, PlayCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -57,8 +57,20 @@ export function DashboardSidebar() {
         })}
       </nav>
 
+      {/* Walkthrough button */}
+      <div className="mt-8">
+        <Link
+          href="/walkthrough.html"
+          target="_blank"
+          className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary/90 transition-colors"
+        >
+          <PlayCircle className="h-5 w-5" />
+          See How It Works
+        </Link>
+      </div>
+
       {/* Help section */}
-      <div className="mt-8 p-4 bg-gray-50 rounded-lg" data-guide="help">
+      <div className="mt-4 p-4 bg-gray-50 rounded-lg" data-guide="help">
         <h4 className="font-medium text-sm text-gray-900 mb-2">Need help?</h4>
         <p className="text-xs text-gray-600 mb-3">
           Our team is here to help you create effective press releases.

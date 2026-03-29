@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your PRBuild Experience</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper: #F5F0E8;
+  --red: #C23B22;
+  --brass: #B5873A;
+  --ink: #141414;
+  --muted: #6B6660;
+  --slide-transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--ink);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Slides ── */
+.deck { position: relative; width: 100%; height: 100%; }
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 80px;
+  opacity: 0; pointer-events: none;
+  transform: translateX(40px);
+  transition: opacity var(--slide-transition), transform var(--slide-transition);
+  overflow-y: auto;
+}
+.slide.active {
+  opacity: 1; pointer-events: auto; transform: translateX(0);
+}
+.slide.exiting-left {
+  opacity: 0; transform: translateX(-40px);
+}
+
+.slide--dark { background: var(--ink); color: var(--paper); }
+.slide--light { background: var(--paper); color: var(--ink); }
+
+/* ── Typography ── */
+h1, h2, h3 { font-family: 'Instrument Serif', serif; font-weight: 400; }
+.display-xl { font-size: clamp(2.4rem, 5vw, 4.2rem); line-height: 1.1; }
+.display-lg { font-size: clamp(1.8rem, 3.5vw, 2.8rem); line-height: 1.15; }
+.display-md { font-size: clamp(1.4rem, 2.5vw, 2rem); line-height: 1.2; }
+.body-lg { font-size: 1.1rem; line-height: 1.6; color: var(--muted); max-width: 560px; }
+.body-md { font-size: 0.95rem; line-height: 1.6; color: var(--muted); }
+.mono { font-family: 'JetBrains Mono', monospace; }
+.quote-font { font-family: 'Cormorant Garamond', serif; font-style: italic; }
+.text-red { color: var(--red); }
+.text-brass { color: var(--brass); }
+.text-paper { color: var(--paper); }
+.text-muted { color: var(--muted); }
+.text-center { text-align: center; }
+
+.tag {
+  display: inline-block; font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 3px;
+  background: rgba(194,59,34,0.1); color: var(--red);
+  margin-bottom: 16px;
+}
+.tag--dark { background: rgba(245,240,232,0.08); color: var(--brass); }
+
+/* ── Layout helpers ── */
+.content { max-width: 900px; width: 100%; }
+.gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; } .gap-24 { gap: 24px; } .gap-32 { gap: 32px; }
+.flex { display: flex; } .flex-col { flex-direction: column; } .flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; } .justify-center { justify-content: center; }
+.mt-8 { margin-top: 8px; } .mt-16 { margin-top: 16px; } .mt-24 { margin-top: 24px; } .mt-32 { margin-top: 32px; }
+.mb-8 { margin-bottom: 8px; } .mb-16 { margin-bottom: 16px; }
+
+/* ── Mockup UI Components ── */
+.mockup-window {
+  background: #fff; border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+  overflow: hidden; width: 100%; max-width: 680px;
+}
+.mockup-titlebar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 10px 14px; background: #f4f4f4; border-bottom: 1px solid #e8e8e8;
+}
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mockup-dot--r { background: #ff5f57; } .mockup-dot--y { background: #ffbd2e; } .mockup-dot--g { background: #28c840; }
+.mockup-body { padding: 24px 28px; }
+
+.mockup-input {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #e0dcd6;
+  border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+  background: var(--paper); color: var(--ink);
+}
+.mockup-input--filled { border-color: var(--brass); background: #faf8f4; }
+.mockup-label { font-size: 0.75rem; font-weight: 600; color: var(--ink); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.mockup-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border-radius: 6px; font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; font-weight: 600; border: none; cursor: default;
+}
+.mockup-btn--red { background: var(--red); color: #fff; }
+.mockup-btn--outline { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); }
+.mockup-btn--brass { background: var(--brass); color: #fff; }
+.mockup-btn--dark { background: var(--ink); color: var(--paper); }
+
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+
+/* ── Step indicators ── */
+.steps { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+.step-item { display: flex; align-items: center; gap: 0; }
+.step-circle {
+  width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 500;
+  border: 2px solid #e0dcd6; color: var(--muted); background: #fff;
+  flex-shrink: 0;
+}
+.step-circle.done { background: var(--red); color: #fff; border-color: var(--red); }
+.step-circle.current { border-color: var(--red); color: var(--red); background: rgba(194,59,34,0.08); }
+.step-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-left: 4px; margin-right: 12px; white-space: nowrap; }
+.step-label.current { color: var(--red); font-weight: 600; }
+.step-line { width: 20px; height: 2px; background: #e0dcd6; flex-shrink: 0; }
+.step-line.done { background: var(--red); }
+
+/* ── Radio / option cards ── */
+.option-card {
+  border: 1.5px solid #e0dcd6; border-radius: 8px; padding: 14px 16px;
+  display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color 0.2s;
+}
+.option-card.selected { border-color: var(--red); background: rgba(194,59,34,0.03); }
+.radio-dot {
+  width: 18px; height: 18px; border-radius: 50%; border: 2px solid #ccc;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+}
+.radio-dot.on { border-color: var(--red); }
+.radio-dot.on::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+
+/* ── Journalist grid ── */
+.reviewer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 580px; }
+.reviewer-card {
+  background: #fff; border-radius: 6px; padding: 8px 10px;
+  border: 1px solid #e8e4de; font-size: 0.72rem;
+  display: flex; flex-direction: column; gap: 3px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.35s, transform 0.35s;
+}
+.reviewer-card.visible { opacity: 1; transform: translateY(0); }
+.reviewer-name { font-weight: 600; color: var(--ink); }
+.reviewer-beat { color: var(--muted); font-size: 0.65rem; }
+.reviewer-verdict { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 500; letter-spacing: 0.06em; }
+.verdict-pass { color: #2e7d32; }
+.verdict-revise { color: var(--brass); }
+
+/* ── Status / Timeline ── */
+.timeline { display: flex; flex-direction: column; gap: 0; margin-top: 16px; }
+.timeline-item { display: flex; gap: 14px; }
+.timeline-track { display: flex; flex-direction: column; align-items: center; }
+.timeline-dot {
+  width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--brass);
+  background: #fff; flex-shrink: 0;
+}
+.timeline-dot.filled { background: var(--brass); }
+.timeline-line { width: 2px; flex: 1; background: #e0dcd6; min-height: 24px; }
+.timeline-content { padding-bottom: 18px; }
+.timeline-time { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+.timeline-text { font-size: 0.85rem; color: var(--ink); }
+
+/* ── Processing animation ── */
+.processing-ring {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid #e0dcd6; border-top-color: var(--red);
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.pulse-dot {
+  width: 10px; height: 10px; border-radius: 50%; background: var(--red);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 0.4; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.15); } }
+
+/* ── Preview release ── */
+.release-preview {
+  background: #fff; border-radius: 10px; padding: 32px 36px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  max-width: 560px; width: 100%;
+}
+.release-dateline { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.release-hl { font-family: 'Instrument Serif', serif; font-size: 1.4rem; line-height: 1.2; margin: 8px 0 12px; }
+.release-body-text { font-size: 0.82rem; line-height: 1.7; color: #444; }
+
+/* ── Distribution stats ── */
+.stat-row { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+.stat-block { text-align: center; }
+.stat-number { font-family: 'Instrument Serif', serif; font-size: 2.2rem; color: var(--red); line-height: 1; }
+.stat-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 4px; }
+
+/* ── Version diff ── */
+.version-tabs { display: flex; gap: 0; border-bottom: 2px solid #e0dcd6; margin-bottom: 12px; }
+.version-tab {
+  padding: 8px 16px; font-size: 0.8rem; font-weight: 500;
+  border-bottom: 2px solid transparent; margin-bottom: -2px; color: var(--muted);
+}
+.version-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+/* ── Progress bar ── */
+.progress-bar {
+  position: fixed; bottom: 0; left: 0; width: 100%; height: 4px;
+  background: rgba(0,0,0,0.08); z-index: 100;
+}
+.progress-fill {
+  height: 100%; background: var(--red);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Navigation ── */
+.nav-arrows {
+  position: fixed; bottom: 20px; right: 28px; z-index: 100;
+  display: flex; gap: 8px;
+}
+.nav-btn {
+  width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(20,20,20,0.7); color: var(--paper);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 1.1rem;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s, border-color 0.2s;
+}
+.nav-btn:hover { background: rgba(20,20,20,0.9); border-color: rgba(255,255,255,0.4); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.slide-counter {
+  position: fixed; bottom: 26px; left: 28px; z-index: 100;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
+  color: rgba(255,255,255,0.5); mix-blend-mode: difference;
+}
+
+/* ── CTA button (final slide) ── */
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 36px; border-radius: 8px;
+  background: var(--red); color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(194,59,34,0.3); }
+
+/* ── Misc ── */
+.divider { width: 48px; height: 2px; background: var(--red); margin: 16px 0; }
+.divider--brass { background: var(--brass); }
+.divider--center { margin-left: auto; margin-right: auto; }
+
+.icon-circle {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.icon-circle--red { background: rgba(194,59,34,0.1); }
+.icon-circle--brass { background: rgba(181,135,58,0.12); }
+.icon-circle--green { background: rgba(46,125,50,0.1); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+@media (max-width: 768px) {
+  .two-col { grid-template-columns: 1fr; }
+  .slide { padding: 40px 28px; }
+  .reviewer-grid { grid-template-columns: repeat(2, 1fr); }
+  .steps { flex-wrap: wrap; }
+}
+
+.action-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+.action-card {
+  flex: 1; min-width: 160px; border: 1.5px solid #e0dcd6; border-radius: 8px;
+  padding: 16px; text-align: center;
+}
+.action-card h4 { font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+.action-card p { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+
+.copy-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.copy-btn {
+  padding: 6px 14px; border: 1px solid #e0dcd6; border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+  background: #faf8f4; color: var(--muted); cursor: default;
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- ============ SLIDE 1: TITLE ============ -->
+  <div class="slide slide--dark active" data-index="0">
+    <div class="content text-center flex flex-col items-center gap-16">
+      <div class="tag tag--dark">Welcome to PRBuild</div>
+      <h1 class="display-xl text-paper">Your PRBuild<br>Experience</h1>
+      <div class="divider divider--brass divider--center"></div>
+      <p class="body-lg" style="color:rgba(245,240,232,0.6);">A guided look at what happens from the moment you log in to the moment your press release reaches journalists.</p>
+      <p class="mono" style="font-size:0.75rem; color:rgba(245,240,232,0.3); margin-top:24px;">Press <span style="border:1px solid rgba(245,240,232,0.2); padding:2px 8px; border-radius:3px;">&#8594;</span> or <span style="border:1px solid rgba(245,240,232,0.2); padding:2px 8px; border-radius:3px;">Space</span> to begin</p>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 2: GETTING STARTED ============ -->
+  <div class="slide slide--light" data-index="1">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Getting Started</div>
+        <h2 class="display-lg">Set up once,<br>auto-fill forever</h2>
+        <p class="body-md mt-8" style="max-width:480px; margin-left:auto; margin-right:auto;">Complete your company profile and every future release pre-fills your details automatically.</p>
+      </div>
+      <div class="mockup-window">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot mockup-dot--r"></div>
+          <div class="mockup-dot mockup-dot--y"></div>
+          <div class="mockup-dot mockup-dot--g"></div>
+          <span style="font-size:0.72rem; color:#999; margin-left:8px;">app.prbuild.com/profile</span>
+        </div>
+        <div class="mockup-body">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 class="display-md" style="font-size:1.15rem;">Company Profile</h3>
+            <div class="mockup-btn mockup-btn--brass" style="font-size:0.75rem; padding:8px 14px;">&#9889; Auto-fill from website</div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div class="field-group">
+              <div class="mockup-label">Company Name</div>
+              <div class="mockup-input mockup-input--filled">Acme Technologies Inc.</div>
+            </div>
+            <div class="field-group">
+              <div class="mockup-label">Website</div>
+              <div class="mockup-input mockup-input--filled">acmetech.com</div>
+            </div>
+            <div class="field-group">
+              <div class="mockup-label">Media Contact</div>
+              <div class="mockup-input mockup-input--filled">Sarah Chen, VP Communications</div>
+            </div>
+            <div class="field-group">
+              <div class="mockup-label">Contact Email</div>
+              <div class="mockup-input mockup-input--filled">press@acmetech.com</div>
+            </div>
+            <div class="field-group" style="grid-column:1/-1;">
+              <div class="mockup-label">Company Boilerplate</div>
+              <div class="mockup-input mockup-input--filled" style="min-height:56px; font-size:0.8rem; line-height:1.5;">Acme Technologies is a leading provider of enterprise workflow solutions, serving over 2,000 companies worldwide since 2018...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 3: CREATE A RELEASE ============ -->
+  <div class="slide slide--light" data-index="2">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Create a Release</div>
+        <h2 class="display-lg">Six simple steps</h2>
+        <p class="body-md mt-8">A guided form walks you through everything we need.</p>
+      </div>
+      <div class="mockup-window">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot mockup-dot--r"></div>
+          <div class="mockup-dot mockup-dot--y"></div>
+          <div class="mockup-dot mockup-dot--g"></div>
+          <span style="font-size:0.72rem; color:#999; margin-left:8px;">app.prbuild.com/new</span>
+        </div>
+        <div class="mockup-body">
+          <div class="steps">
+            <div class="step-item"><div class="step-circle done">&#10003;</div><span class="step-label">Company</span></div>
+            <div class="step-line done"></div>
+            <div class="step-item"><div class="step-circle current">2</div><span class="step-label current">Details</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">3</div><span class="step-label">Quotes</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">4</div><span class="step-label">Contact</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">5</div><span class="step-label">Review</span></div>
+            <div class="step-line"></div>
+            <div class="step-item"><div class="step-circle">6</div><span class="step-label">Submit</span></div>
+          </div>
+          <div style="border-top:1px solid #e8e4de; padding-top:16px;">
+            <div class="field-group mb-16">
+              <div class="mockup-label">What is your announcement about?</div>
+              <div class="mockup-input" style="border-color:#ccc;">New partnership with GlobalCorp to expand into European markets</div>
+            </div>
+            <div class="field-group mb-16">
+              <div class="mockup-label">Type of Release</div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <span style="padding:6px 14px; border:1.5px solid var(--red); border-radius:20px; font-size:0.78rem; color:var(--red); background:rgba(194,59,34,0.05);">Partnership</span>
+                <span style="padding:6px 14px; border:1.5px solid #e0dcd6; border-radius:20px; font-size:0.78rem; color:var(--muted);">Product Launch</span>
+                <span style="padding:6px 14px; border:1.5px solid #e0dcd6; border-radius:20px; font-size:0.78rem; color:var(--muted);">Funding</span>
+                <span style="padding:6px 14px; border:1.5px solid #e0dcd6; border-radius:20px; font-size:0.78rem; color:var(--muted);">Hire</span>
+                <span style="padding:6px 14px; border:1.5px solid #e0dcd6; border-radius:20px; font-size:0.78rem; color:var(--muted);">Event</span>
+              </div>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <div class="mockup-btn mockup-btn--outline" style="font-size:0.8rem;">Back</div>
+              <div class="mockup-btn mockup-btn--red" style="font-size:0.8rem;">Continue &rarr;</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 4: SMART SUGGESTIONS ============ -->
+  <div class="slide slide--light" data-index="3">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Smart Suggestions</div>
+        <h2 class="display-lg">We help you find<br>the right angle</h2>
+        <p class="body-md mt-8">Choose a news hook and we handle the boilerplate.</p>
+      </div>
+      <div class="mockup-window">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot mockup-dot--r"></div>
+          <div class="mockup-dot mockup-dot--y"></div>
+          <div class="mockup-dot mockup-dot--g"></div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-label mb-8">Suggested News Hooks</div>
+          <div class="flex flex-col gap-8">
+            <div class="option-card selected">
+              <div class="radio-dot on"></div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600; color:var(--ink);">European Expansion Play</div>
+                <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;">Acme partners with GlobalCorp to enter 12 EU markets, doubling its addressable audience by Q3.</div>
+              </div>
+            </div>
+            <div class="option-card">
+              <div class="radio-dot"></div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600; color:var(--ink);">Strategic Alliance Angle</div>
+                <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;">Two workflow leaders join forces, combining Acme's platform with GlobalCorp's distribution network.</div>
+              </div>
+            </div>
+            <div class="option-card">
+              <div class="radio-dot"></div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600; color:var(--ink);">Customer Impact Story</div>
+                <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;">Existing customers gain seamless access to European compliance tools through the new integration.</div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px; padding:12px 16px; background:rgba(181,135,58,0.06); border-radius:6px; border-left:3px solid var(--brass);">
+            <div style="font-size:0.72rem; font-weight:600; color:var(--brass); text-transform:uppercase; letter-spacing:0.06em;">Auto-generated boilerplate</div>
+            <div style="font-size:0.78rem; color:var(--muted); margin-top:4px; line-height:1.5;">Pulled from your website and profile. Edit anytime.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 5: SUBMIT & RELAX ============ -->
+  <div class="slide slide--dark" data-index="4">
+    <div class="content text-center flex flex-col items-center gap-24">
+      <div class="tag tag--dark">Submit &amp; Relax</div>
+      <h2 class="display-lg text-paper">Your release is<br>in good hands</h2>
+      <div style="position:relative; display:flex; align-items:center; justify-content:center; margin:8px 0;">
+        <div class="processing-ring"></div>
+        <div style="position:absolute; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--brass); letter-spacing:0.06em;">WRITING</div>
+      </div>
+      <div style="background:rgba(245,240,232,0.06); border:1px solid rgba(245,240,232,0.1); border-radius:10px; padding:24px 32px; max-width:420px; width:100%;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <div class="pulse-dot"></div>
+          <span class="mono" style="font-size:0.75rem; color:var(--brass);">PROCESSING</span>
+        </div>
+        <p style="font-size:0.9rem; color:rgba(245,240,232,0.7); line-height:1.6;">Your release is being written and reviewed by our editorial team. We will notify you when your draft is ready.</p>
+        <div style="margin-top:14px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:rgba(245,240,232,0.35);">Estimated: 15-30 minutes</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 6: THE WRITING PROCESS ============ -->
+  <div class="slide slide--light" data-index="5">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">The Writing Process</div>
+        <h2 class="display-lg">Professional writers,<br>editorial standards</h2>
+        <p class="body-md mt-8">Your release is crafted in AP style with multiple headline options.</p>
+      </div>
+      <div class="two-col" style="max-width:700px; width:100%;">
+        <div>
+          <div class="mockup-label mb-8">3 Headline Options</div>
+          <div class="flex flex-col gap-8">
+            <div style="padding:12px 16px; background:#fff; border-radius:6px; border-left:3px solid var(--red);">
+              <div style="font-family:'Instrument Serif',serif; font-size:1.05rem;">Acme Technologies Partners with GlobalCorp to Enter European Market</div>
+            </div>
+            <div style="padding:12px 16px; background:#fff; border-radius:6px; border-left:3px solid #e0dcd6;">
+              <div style="font-family:'Instrument Serif',serif; font-size:1.05rem;">Acme, GlobalCorp Forge Alliance to Serve EU Enterprise Customers</div>
+            </div>
+            <div style="padding:12px 16px; background:#fff; border-radius:6px; border-left:3px solid #e0dcd6;">
+              <div style="font-family:'Instrument Serif',serif; font-size:1.05rem;">Enterprise Workflow Leader Acme Expands to 12 New Markets via GlobalCorp Deal</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="mockup-label mb-8">What You Get</div>
+          <div class="flex flex-col gap-12">
+            <div class="flex items-center gap-12">
+              <div class="icon-circle icon-circle--red">&#9998;</div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600;">AP-Style Formatting</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Proper dateline, structure, and attribution</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <div class="icon-circle icon-circle--brass">&#8220;</div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600;">Polished Quotes</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Your words, refined for maximum impact</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-12">
+              <div class="icon-circle icon-circle--green">&#10003;</div>
+              <div>
+                <div style="font-size:0.88rem; font-weight:600;">Fact-Checked Details</div>
+                <div style="font-size:0.78rem; color:var(--muted);">Numbers, names, and claims verified</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 7: JOURNALIST PANEL ============ -->
+  <div class="slide slide--light" data-index="6">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">The Journalist Panel</div>
+        <h2 class="display-lg">16 reviewers score<br>your draft</h2>
+        <p class="body-md mt-8">Each reviewer evaluates from their unique beat perspective.</p>
+      </div>
+      <div class="reviewer-grid" id="reviewerGrid">
+        <div class="reviewer-card"><div class="reviewer-name">M. Torres</div><div class="reviewer-beat">Tech / Enterprise</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">J. Nakamura</div><div class="reviewer-beat">Business / M&A</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">R. Okonkwo</div><div class="reviewer-beat">Startups / VC</div><div class="reviewer-verdict verdict-revise">&#9998; REVISE</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">S. Lindqvist</div><div class="reviewer-beat">EU Markets</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">A. Petrov</div><div class="reviewer-beat">SaaS / Cloud</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">K. Chandra</div><div class="reviewer-beat">Product</div><div class="reviewer-verdict verdict-revise">&#9998; REVISE</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">D. Walsh</div><div class="reviewer-beat">Finance</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">L. Moreau</div><div class="reviewer-beat">International</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">T. Abrams</div><div class="reviewer-beat">Trade Press</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">H. Kim</div><div class="reviewer-beat">Digital Media</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">F. Russo</div><div class="reviewer-beat">Wire Services</div><div class="reviewer-verdict verdict-revise">&#9998; REVISE</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">B. Osei</div><div class="reviewer-beat">Emerging Markets</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">C. Nguyen</div><div class="reviewer-beat">Industry Analysis</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">P. Brennan</div><div class="reviewer-beat">Broadcast / TV</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">W. Johansson</div><div class="reviewer-beat">Compliance / Legal</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+        <div class="reviewer-card"><div class="reviewer-name">E. Castillo</div><div class="reviewer-beat">Consumer Tech</div><div class="reviewer-verdict verdict-pass">&#10003; PASS</div></div>
+      </div>
+      <div class="mono" style="font-size:0.75rem; color:var(--brass);">13 of 16 PASS &mdash; 3 REVISE notes incorporated</div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 8: REVIEW YOUR DRAFT ============ -->
+  <div class="slide slide--light" data-index="7">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Review Your Draft</div>
+        <h2 class="display-lg">Your polished release,<br>ready for review</h2>
+      </div>
+      <div class="mockup-window">
+        <div class="mockup-titlebar">
+          <div class="mockup-dot mockup-dot--r"></div>
+          <div class="mockup-dot mockup-dot--y"></div>
+          <div class="mockup-dot mockup-dot--g"></div>
+          <span style="font-size:0.72rem; color:#999; margin-left:8px;">app.prbuild.com/releases/pr-2847/review</span>
+        </div>
+        <div class="mockup-body">
+          <div class="version-tabs">
+            <div class="version-tab active">Rewritten</div>
+            <div class="version-tab">Original</div>
+            <div class="version-tab">Panel Notes</div>
+          </div>
+          <div style="font-family:'Instrument Serif',serif; font-size:1.2rem; margin-bottom:8px;">Acme Technologies Partners with GlobalCorp to Enter European Market</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-bottom:12px;">SAN FRANCISCO, March 26, 2026</div>
+          <div style="font-size:0.82rem; color:#444; line-height:1.7; margin-bottom:16px;">
+            Acme Technologies, a leading enterprise workflow platform, today announced a strategic partnership with GlobalCorp to expand operations across 12 European markets...
+          </div>
+          <div style="border-left:3px solid var(--brass); padding-left:14px; margin-bottom:16px;">
+            <div class="quote-font" style="font-size:1rem; color:var(--ink); line-height:1.5;">"This partnership marks a defining moment for our company. European enterprises deserve the same caliber of workflow tools their US counterparts rely on."</div>
+            <div style="font-size:0.75rem; color:var(--muted); margin-top:4px;">&mdash; Jane Doe, CEO, Acme Technologies</div>
+          </div>
+          <div style="display:flex; gap:8px; border-top:1px solid #e8e4de; padding-top:14px;">
+            <div class="mockup-btn mockup-btn--red" style="font-size:0.8rem;">&#10003; Approve Draft</div>
+            <div class="mockup-btn mockup-btn--outline" style="font-size:0.8rem;">Edit Directly</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 9: YOUR OPTIONS ============ -->
+  <div class="slide slide--light" data-index="8">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Your Options</div>
+        <h2 class="display-lg">You are always<br>in control</h2>
+        <p class="body-md mt-8">Unlimited revision rounds until you are completely satisfied.</p>
+      </div>
+      <div class="action-cards" style="max-width:620px; width:100%;">
+        <div class="action-card" style="border-color:var(--red);">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#10003;</div>
+          <h4>Approve</h4>
+          <p>Ready to go. Move to preview and distribution.</p>
+        </div>
+        <div class="action-card">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#9998;</div>
+          <h4>Send Feedback</h4>
+          <p>Add notes and request specific changes to tone, facts, or structure.</p>
+        </div>
+        <div class="action-card">
+          <div style="font-size:1.4rem; margin-bottom:8px;">&#8634;</div>
+          <h4>Request Rewrite</h4>
+          <p>Start a fresh draft incorporating panel feedback automatically.</p>
+        </div>
+      </div>
+      <div style="background:rgba(181,135,58,0.06); border-radius:8px; padding:16px 24px; max-width:480px; text-align:center;">
+        <span class="quote-font" style="font-size:1.05rem; color:var(--ink);">"We went back and forth three times and the team never blinked. Final version was exactly right."</span>
+        <div style="font-size:0.75rem; color:var(--muted); margin-top:6px;">&mdash; PRBuild customer</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 10: THE PREVIEW PAGE ============ -->
+  <div class="slide slide--light" data-index="9">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Preview Page</div>
+        <h2 class="display-lg">Beautifully formatted,<br>ready to share</h2>
+      </div>
+      <div class="release-preview">
+        <div class="release-dateline">For Immediate Release &mdash; March 26, 2026</div>
+        <div class="release-hl">Acme Technologies Partners with GlobalCorp to Enter European Market</div>
+        <div class="divider"></div>
+        <div class="release-body-text">
+          <strong>SAN FRANCISCO</strong> &mdash; Acme Technologies, a leading enterprise workflow platform serving over 2,000 companies, today announced a strategic partnership with GlobalCorp to expand operations across 12 European markets, effective immediately...
+        </div>
+        <div class="copy-btns">
+          <div class="copy-btn">&#128203; Copy Text</div>
+          <div class="copy-btn">&#128221; Markdown</div>
+          <div class="copy-btn">&lt;/&gt; HTML</div>
+          <div class="copy-btn">&#128424; Print</div>
+          <div class="copy-btn">&#9993; Email</div>
+        </div>
+      </div>
+      <p class="body-md text-center">Copy in any format for your website, newsletter, or newsroom.</p>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 11: PUBLISH TO MEDIA ============ -->
+  <div class="slide slide--dark" data-index="10">
+    <div class="content text-center flex flex-col items-center gap-24">
+      <div class="tag tag--dark">Publish to Media</div>
+      <h2 class="display-lg text-paper">Reach the journalists<br>who matter</h2>
+      <div class="stat-row">
+        <div class="stat-block">
+          <div class="stat-number">1,000+</div>
+          <div class="stat-label" style="color:rgba(245,240,232,0.5);">Journalists</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number">50+</div>
+          <div class="stat-label" style="color:rgba(245,240,232,0.5);">Partner Sites</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-number">24hr</div>
+          <div class="stat-label" style="color:rgba(245,240,232,0.5);">Social &amp; Digest</div>
+        </div>
+      </div>
+      <div style="background:rgba(245,240,232,0.06); border:1px solid rgba(245,240,232,0.1); border-radius:10px; padding:24px 32px; max-width:440px; width:100%;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+          <div style="width:18px; height:18px; border:2px solid var(--brass); border-radius:3px; display:flex; align-items:center; justify-content:center; color:var(--brass); font-size:0.7rem;">&#10003;</div>
+          <span style="font-size:0.88rem; color:var(--paper);">I authorize distribution of this release</span>
+        </div>
+        <div style="font-size:0.78rem; color:rgba(245,240,232,0.45); line-height:1.5; margin-bottom:14px;">By signing, you confirm the contents are accurate and approved for public distribution.</div>
+        <div style="display:flex; gap:8px;">
+          <div class="mockup-btn mockup-btn--red" style="flex:1; justify-content:center;">Sign &amp; Distribute</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 12: TRACK EVERYTHING ============ -->
+  <div class="slide slide--light" data-index="11">
+    <div class="content flex flex-col items-center gap-24">
+      <div class="text-center">
+        <div class="tag">Track Everything</div>
+        <h2 class="display-lg">Full visibility,<br>every step</h2>
+      </div>
+      <div class="two-col" style="max-width:700px; width:100%;">
+        <div>
+          <div class="mockup-label mb-8">Release Timeline</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-track"><div class="timeline-dot filled"></div><div class="timeline-line"></div></div>
+              <div class="timeline-content"><div class="timeline-time">Mar 26, 9:04 AM</div><div class="timeline-text">Release submitted</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-track"><div class="timeline-dot filled"></div><div class="timeline-line"></div></div>
+              <div class="timeline-content"><div class="timeline-time">Mar 26, 9:22 AM</div><div class="timeline-text">Draft completed</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-track"><div class="timeline-dot filled"></div><div class="timeline-line"></div></div>
+              <div class="timeline-content"><div class="timeline-time">Mar 26, 9:31 AM</div><div class="timeline-text">Panel review complete (13/16 pass)</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-track"><div class="timeline-dot filled"></div><div class="timeline-line"></div></div>
+              <div class="timeline-content"><div class="timeline-time">Mar 26, 10:15 AM</div><div class="timeline-text">Customer approved</div></div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-track"><div class="timeline-dot filled"></div><div class="timeline-line" style="background:transparent;"></div></div>
+              <div class="timeline-content"><div class="timeline-time">Mar 26, 10:16 AM</div><div class="timeline-text">Distribution started</div></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="mockup-label mb-8">Analytics <span style="font-size:0.6rem; color:var(--brass); background:rgba(181,135,58,0.1); padding:2px 8px; border-radius:3px; margin-left:6px;">Coming Soon</span></div>
+          <div style="background:#fff; border-radius:8px; padding:20px; border:1px solid #e8e4de;">
+            <div class="flex flex-col gap-16">
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span style="font-size:0.8rem;">Journalist Opens</span>
+                  <span class="mono" style="font-size:0.75rem; color:var(--muted);">--</span>
+                </div>
+                <div style="height:6px; background:#f0ece4; border-radius:3px;"><div style="width:0%; height:100%; background:var(--red); border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span style="font-size:0.8rem;">Media Pickups</span>
+                  <span class="mono" style="font-size:0.75rem; color:var(--muted);">--</span>
+                </div>
+                <div style="height:6px; background:#f0ece4; border-radius:3px;"><div style="width:0%; height:100%; background:var(--brass); border-radius:3px;"></div></div>
+              </div>
+              <div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                  <span style="font-size:0.8rem;">Social Shares</span>
+                  <span class="mono" style="font-size:0.75rem; color:var(--muted);">--</span>
+                </div>
+                <div style="height:6px; background:#f0ece4; border-radius:3px;"><div style="width:0%; height:100%; background:#6B6660; border-radius:3px;"></div></div>
+              </div>
+            </div>
+            <div style="text-align:center; margin-top:16px; font-size:0.75rem; color:var(--muted);">Engagement tracking launches Q2 2026</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SLIDE 13: FINAL CTA ============ -->
+  <div class="slide slide--dark" data-index="12">
+    <div class="content text-center flex flex-col items-center gap-24">
+      <div class="divider divider--brass divider--center"></div>
+      <h1 class="display-xl text-paper" style="max-width:600px;">Your press release,<br>done right.</h1>
+      <p class="body-lg" style="color:rgba(245,240,232,0.55); max-width:420px;">From first draft to journalist inboxes, PRBuild handles every step so you can focus on your story.</p>
+      <button class="cta-btn" onclick="window.open('https://prbuild.com','_blank')">Get Started &rarr;</button>
+      <div class="mono" style="font-size:0.7rem; color:rgba(245,240,232,0.25); margin-top:16px;">prbuild.com</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- Navigation -->
+<div class="slide-counter"><span id="slideNum">1</span> / <span id="slideTotal">13</span></div>
+<div class="nav-arrows">
+  <button class="nav-btn" id="prevBtn" aria-label="Previous slide">&#8592;</button>
+  <button class="nav-btn" id="nextBtn" aria-label="Next slide">&#8594;</button>
+</div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let transitioning = false;
+
+  const progressFill = document.getElementById('progressFill');
+  const slideNum = document.getElementById('slideNum');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function updateUI() {
+    progressFill.style.width = ((current + 1) / total * 100) + '%';
+    slideNum.textContent = current + 1;
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+  }
+
+  function goTo(index) {
+    if (index < 0 || index >= total || index === current || transitioning) return;
+    transitioning = true;
+    const dir = index > current ? 'left' : 'right';
+
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exiting-left');
+    if (dir === 'right') {
+      slides[current].style.transform = 'translateX(40px)';
+    }
+
+    slides[index].style.transform = dir === 'left' ? 'translateX(40px)' : 'translateX(-40px)';
+    slides[index].offsetHeight; // reflow
+    slides[index].classList.add('active');
+
+    // Animate reviewer cards on slide 7 (index 6)
+    if (index === 6) animateReviewers();
+
+    setTimeout(() => {
+      slides[current].classList.remove('exiting-left');
+      slides[current].style.transform = '';
+      current = index;
+      updateUI();
+      transitioning = false;
+    }, 600);
+  }
+
+  function animateReviewers() {
+    const cards = document.querySelectorAll('.reviewer-card');
+    cards.forEach((c, i) => {
+      c.classList.remove('visible');
+      setTimeout(() => c.classList.add('visible'), 80 * i);
+    });
+  }
+
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(current - 1); }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goTo(current + 1);
+      else goTo(current - 1);
+    }
+  });
+
+  updateUI();
+})();
+</script>
+</body>
+</html>
