@@ -12,17 +12,123 @@ import {
   Printer,
   Mail,
   Send,
-  Download,
+  Code,
+  FileText,
   CheckCircle,
 } from 'lucide-react';
 import { ReleaseRequest } from '@/types';
-import { format } from 'date-fns';
+
+function cleanContent(raw: string): string {
+  if (!raw) return '';
+  return raw
+    // Remove standalone (1), (2), (3) lines
+    .replace(/^\s*\(\d+\)\s*$/gm, '')
+    // Remove (1) prefixes at start of lines
+    .replace(/^\s*\(\d+\)\s*/gm, '')
+    // Clean stray ** markers
+    .replace(/\*\*\s*$/gm, '')
+    .replace(/^\s*\*\*\s*/gm, '')
+    .trim();
+}
+
+function extractHeadlineFromContent(content: string): string {
+  if (!content) return '';
+  // Try to find bold text at the top (likely the headline)
+  const boldMatch = content.match(/^\s*\*\*(.+?)\*\*/m);
+  if (boldMatch) return boldMatch[1].trim();
+  // Try HTML heading
+  const h1Match = content.match(/<h1[^>]*>(.+?)<\/h1>/i);
+  if (h1Match) return h1Match[1].replace(/<[^>]+>/g, '').trim();
+  // Try first strong tag
+  const strongMatch = content.match(/<strong>(.+?)<\/strong>/i);
+  if (strongMatch) return strongMatch[1].trim();
+  // First non-empty line
+  const firstLine = content.split('\n').find(l => l.trim().length > 10);
+  return firstLine?.trim() || '';
+}
+
+function contentToHtml(content: string): string {
+  if (!content) return '';
+  // Already HTML
+  if (/<(?:p|div|h[1-6]|ul|ol|li|br|table|blockquote)[\s>]/i.test(content)) {
+    return content
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/^\s*\(\d+\)\s*$/gm, '')
+      .replace(/\(\d+\)\s*/g, '');
+  }
+  // Markdown to HTML
+  let html = content
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^\s*\(\d+\)\s*$/gm, '')
+    .replace(/^\s*\(\d+\)\s*/gm, '')
+    .replace(/^\s*---+\s*$/gm, '<hr class="my-6 border-rule">')
+    .replace(/^\s*\*\*\*+\s*$/gm, '<hr class="my-6 border-rule">')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/\n\n+/g, '</p><p class="mb-4">')
+    .replace(/\n/g, '<br>')
+    .replace(/^\s*/, '<p class="mb-4">')
+    .replace(/\s*$/, '</p>')
+    .replace(/<p class="mb-4"><\/p>/g, '')
+    .replace(/<p class="mb-4">\s*<\/p>/g, '')
+    .replace(/<p class="mb-4">\s*<br>\s*<\/p>/g, '');
+  return html;
+}
+
+function contentToMarkdown(content: string, headline: string, release: ReleaseRequest): string {
+  let text = content
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/^\s*\(\d+\)\s*$/gm, '')
+    .replace(/^\s*\(\d+\)\s*/gm, '')
+    .trim();
+
+  return `# ${headline}\n\n${release.ai_subhead ? `*${release.ai_subhead}*\n\n` : ''}${text}\n\n---\n\n**Media Contact:**\n${release.media_contact_name || ''}${release.media_contact_title ? ', ' + release.media_contact_title : ''}\nEmail: ${release.media_contact_email || ''}\n${release.media_contact_phone ? 'Phone: ' + release.media_contact_phone + '\n' : ''}${release.company_website ? 'Website: ' + release.company_website : ''}`;
+}
+
+function contentToWebHtml(content: string, headline: string, release: ReleaseRequest): string {
+  const body = contentToHtml(cleanContent(content));
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${headline}</title>
+<style>
+  body { font-family: Georgia, 'Times New Roman', serif; max-width: 700px; margin: 40px auto; padding: 0 20px; color: #141414; line-height: 1.7; }
+  h1 { font-size: 32px; line-height: 1.2; margin-bottom: 8px; }
+  .subhead { font-style: italic; color: #6B6660; font-size: 18px; margin-bottom: 24px; }
+  .dateline { font-weight: bold; }
+  hr { border: none; border-top: 1px solid #CCC0AD; margin: 32px 0; }
+  .contact { font-size: 14px; color: #6B6660; }
+  .contact strong { color: #141414; }
+  .end-mark { text-align: center; color: #6B6660; margin-top: 32px; }
+</style>
+</head>
+<body>
+<h1>${headline}</h1>
+${release.ai_subhead ? `<p class="subhead">${release.ai_subhead}</p>` : ''}
+${body}
+<hr>
+<div class="contact">
+<strong>Media Contact:</strong><br>
+${release.media_contact_name || ''}${release.media_contact_title ? ', ' + release.media_contact_title : ''}<br>
+Email: <a href="mailto:${release.media_contact_email}">${release.media_contact_email || ''}</a><br>
+${release.media_contact_phone ? 'Phone: ' + release.media_contact_phone + '<br>' : ''}
+${release.company_website ? 'Website: <a href="' + release.company_website + '">' + release.company_website + '</a>' : ''}
+</div>
+<p class="end-mark">###</p>
+</body>
+</html>`;
+}
 
 export default function ReleasePreviewPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [release, setRelease] = useState<ReleaseRequest | null>(null);
   const [loading, setLoading] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
 
   useEffect(() => {
@@ -39,59 +145,6 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     load();
   }, [params.id]);
 
-  const finalContent = release?.client_edited_content || release?.admin_refined_content || release?.ai_draft_content || '';
-  const headline = release?.ai_selected_headline || release?.news_hook || 'Press Release';
-  const subhead = release?.ai_subhead || '';
-
-  const getPlainText = () => {
-    // Strip HTML tags for plain text copy
-    let text = finalContent
-      .replace(/<[^>]+>/g, '')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/\*\*/g, '')
-      .replace(/\*/g, '')
-      .trim();
-
-    return `${headline}\n${subhead ? subhead + '\n' : ''}\n${text}\n\nMedia Contact:\n${release?.media_contact_name || ''}${release?.media_contact_title ? ', ' + release.media_contact_title : ''}\nEmail: ${release?.media_contact_email || ''}\n${release?.media_contact_phone ? 'Phone: ' + release.media_contact_phone : ''}\n${release?.company_website ? 'Website: ' + release.company_website : ''}`;
-  };
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(getPlainText());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handlePrint = () => window.print();
-
-  const handleEmail = () => {
-    const subject = encodeURIComponent(headline);
-    const body = encodeURIComponent(getPlainText());
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  };
-
-  const handlePublishToMedia = async () => {
-    if (!release) return;
-    setPublishing(true);
-    const supabase = createClient();
-
-    // Update status to client_approved (admin publishes to showcase)
-    await supabase
-      .from('release_requests')
-      .update({
-        status: 'client_approved',
-        final_content: finalContent,
-        final_approved_at: new Date().toISOString(),
-      })
-      .eq('id', release.id);
-
-    setPublishing(false);
-    router.push(`/dashboard/my-releases/${release.id}`);
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-paper">
@@ -102,30 +155,66 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
   if (!release) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-20 bg-paper min-h-screen">
         <p className="text-ink-muted">Release not found.</p>
         <Link href="/dashboard/my-releases" className="text-primary hover:underline mt-2 inline-block">Back to releases</Link>
       </div>
     );
   }
 
-  // Render content — handle both HTML and markdown
-  const isHtml = /<(?:p|div|h[1-6]|ul|ol|li|br|table|blockquote)[\s>]/i.test(finalContent);
-  const renderedContent = isHtml
-    ? finalContent.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<style[\s\S]*?<\/style>/gi, '')
-    : finalContent
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/^\s*\(\d+\)\s*/gm, '')
-        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-        .replace(/\n\n/g, '</p><p style="margin-bottom:1em;">')
-        .replace(/\n/g, '<br>')
-        .replace(/^/, '<p style="margin-bottom:1em;">')
-        .replace(/$/, '</p>');
+  const rawContent = release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '';
+  const cleaned = cleanContent(rawContent);
+
+  // Extract headline: prefer ai_selected_headline, then try to extract from content, then fall back to news_hook
+  const headline = release.ai_selected_headline
+    || extractHeadlineFromContent(rawContent)
+    || release.news_hook
+    || 'Press Release';
+  const subhead = release.ai_subhead || '';
+
+  const renderedContent = contentToHtml(cleaned);
+
+  const copyAs = async (format: 'text' | 'markdown' | 'html') => {
+    let text = '';
+    if (format === 'text') {
+      text = cleaned.replace(/<[^>]+>/g, '').replace(/\*\*/g, '').replace(/\*/g, '').trim();
+      text = `${headline}\n${subhead ? subhead + '\n' : ''}\n${text}\n\n---\nMedia Contact:\n${release.media_contact_name || ''}${release.media_contact_title ? ', ' + release.media_contact_title : ''}\nEmail: ${release.media_contact_email || ''}\n${release.media_contact_phone ? 'Phone: ' + release.media_contact_phone : ''}\n${release.company_website ? 'Website: ' + release.company_website : ''}`;
+    } else if (format === 'markdown') {
+      text = contentToMarkdown(rawContent, headline, release);
+    } else {
+      text = contentToWebHtml(rawContent, headline, release);
+    }
+    await navigator.clipboard.writeText(text);
+    setCopiedFormat(format);
+    setTimeout(() => setCopiedFormat(null), 2000);
+  };
+
+  const handlePrint = () => window.print();
+
+  const handleEmail = () => {
+    const plainText = cleaned.replace(/<[^>]+>/g, '').replace(/\*\*/g, '').replace(/\*/g, '').trim();
+    const subject = encodeURIComponent(headline);
+    const body = encodeURIComponent(`${headline}\n\n${plainText}\n\n---\nMedia Contact: ${release.media_contact_name || ''}\nEmail: ${release.media_contact_email || ''}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  const handlePublishToMedia = async () => {
+    setPublishing(true);
+    const supabase = createClient();
+    await supabase
+      .from('release_requests')
+      .update({
+        status: 'client_approved',
+        final_content: cleaned,
+        final_approved_at: new Date().toISOString(),
+      })
+      .eq('id', release.id);
+    setPublishing(false);
+    router.push(`/dashboard/my-releases/${release.id}`);
+  };
 
   return (
     <>
-      {/* Print styles */}
       <style jsx global>{`
         @media print {
           .no-print { display: none !important; }
@@ -136,7 +225,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
       <div className="min-h-screen bg-paper">
         {/* Action bar */}
-        <div className="no-print sticky top-0 z-50 bg-ink text-paper-light border-b border-paper-light/10">
+        <div className="no-print sticky top-0 z-50 bg-ink text-paper-light">
           <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between">
             <Link
               href={`/dashboard/my-releases/${params.id}`}
@@ -145,14 +234,29 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               <ArrowLeft className="h-4 w-4" />
               Back to release
             </Link>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
-                onClick={handleCopy}
+                onClick={() => copyAs('text')}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
               >
-                {copied ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
-                {copied ? 'Copied' : 'Copy Text'}
+                {copiedFormat === 'text' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
+                {copiedFormat === 'text' ? 'Copied' : 'Plain Text'}
               </button>
+              <button
+                onClick={() => copyAs('markdown')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+              >
+                {copiedFormat === 'markdown' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <FileText className="h-3.5 w-3.5" />}
+                {copiedFormat === 'markdown' ? 'Copied' : 'Markdown'}
+              </button>
+              <button
+                onClick={() => copyAs('html')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+              >
+                {copiedFormat === 'html' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Code className="h-3.5 w-3.5" />}
+                {copiedFormat === 'html' ? 'Copied' : 'HTML'}
+              </button>
+              <div className="w-px h-5 bg-paper-light/20 mx-1" />
               <button
                 onClick={handlePrint}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
@@ -200,7 +304,8 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               prose-headings:font-display prose-headings:text-ink prose-headings:font-normal
               prose-p:text-ink-soft prose-p:leading-relaxed prose-p:text-base
               prose-strong:text-ink prose-em:text-ink-muted
-              prose-a:text-primary prose-a:underline"
+              prose-a:text-primary prose-a:underline
+              prose-hr:border-rule"
             dangerouslySetInnerHTML={{ __html: renderedContent }}
           />
 
@@ -217,7 +322,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
             </div>
           </div>
 
-          {/* Footer */}
+          {/* End mark */}
           <div className="border-t border-rule pt-6 text-center">
             <p className="font-mono text-xs text-ink-muted">###</p>
           </div>
@@ -237,12 +342,12 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               {publishing ? (
                 <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Publishing...</>
               ) : release.status === 'client_approved' || release.status === 'published' ? (
-                <><CheckCircle className="h-5 w-5 mr-2" /> Published</>
+                <><CheckCircle className="h-5 w-5 mr-2" /> In Publication Queue</>
               ) : (
                 <><Send className="h-5 w-5 mr-2" /> Publish to Media</>
               )}
             </Button>
-            {(release.status === 'client_approved') && (
+            {release.status === 'client_approved' && (
               <p className="text-sm text-green-600 mt-3 flex items-center justify-center gap-1">
                 <CheckCircle className="h-4 w-4" />
                 Your release is in the publication queue. Our team will publish it shortly.
