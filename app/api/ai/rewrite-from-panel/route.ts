@@ -73,11 +73,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No panel feedback available' }, { status: 400 });
     }
 
-    // Check if rewrite was already used
-    if (release.rewrite_used) {
-      return NextResponse.json({ error: 'Rewrite has already been used for this release' }, { status: 400 });
-    }
-
     // Format feedback for the prompt
     const feedbackSummary = panelFeedback.map(f => 
       `- ${f.persona} (${f.role}): ${f.compelling ? 'Found compelling' : 'Not compelling'}. ${f.feedback}${f.missing ? ` Missing: ${f.missing}` : ''}`
@@ -113,7 +108,6 @@ export async function POST(request: NextRequest) {
       .from('release_requests')
       .update({
         admin_refined_content: rewrittenContent,
-        rewrite_used: true,
         admin_notes: (release.admin_notes || '') + `\n[${new Date().toISOString()}] Rewrite based on panel feedback requested by ${profile?.role === 'admin' ? 'admin' : 'client'}.`,
         updated_at: new Date().toISOString(),
       })
