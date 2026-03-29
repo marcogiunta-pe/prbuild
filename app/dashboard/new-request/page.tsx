@@ -27,7 +27,7 @@ type Step = 'plan' | 'company' | 'announcement' | 'quotes' | 'contact' | 'review
 export default function NewRequestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState<Step>('plan');
+  const [step, setStep] = useState<Step>('company');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
