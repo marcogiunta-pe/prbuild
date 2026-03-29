@@ -171,7 +171,7 @@ export default function NewRequestPage() {
           media_contact_phone: formData.mediaContactPhone || null,
           visuals_description: formData.visualsDescription || null,
           desired_cta: formData.desiredCta,
-          industry: formData.industry || null,
+          industry: formData.industry === '_other' ? 'general' : (formData.industry || null),
           supporting_context: formData.supportingContext || null,
           plan: formData.plan,
           amount_paid: amountPaid,
@@ -409,10 +409,10 @@ export default function NewRequestPage() {
               <p className="text-xs text-gray-500 mb-1">Used to match your release with journalists who cover your space.</p>
               <select
                 id="industry"
-                value={['healthcare', 'technology', 'finance', 'retail'].includes(formData.industry) ? formData.industry : formData.industry ? '_other' : ''}
+                value={['healthcare', 'technology', 'finance', 'retail'].includes(formData.industry) ? formData.industry : formData.industry === '' ? '' : '_other'}
                 onChange={(e) => {
                   if (e.target.value === '_other') {
-                    updateField('industry', '');
+                    updateField('industry', '_other');
                   } else {
                     updateField('industry', e.target.value);
                   }
@@ -426,11 +426,11 @@ export default function NewRequestPage() {
                 <option value="retail">Retail</option>
                 <option value="_other">Other (type your industry)</option>
               </select>
-              {!['healthcare', 'technology', 'finance', 'retail', ''].includes(formData.industry) && (
+              {(formData.industry === '_other' || (!['healthcare', 'technology', 'finance', 'retail', ''].includes(formData.industry) && formData.industry)) && (
                 <input
                   type="text"
-                  value={formData.industry}
-                  onChange={(e) => updateField('industry', e.target.value)}
+                  value={formData.industry === '_other' ? '' : formData.industry}
+                  onChange={(e) => updateField('industry', e.target.value || '_other')}
                   placeholder="Enter your industry (e.g., Education, Energy, Real Estate, Legal...)"
                   className="w-full px-3 py-2 border rounded-md mt-2"
                   autoFocus
