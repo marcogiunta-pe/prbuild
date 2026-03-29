@@ -349,7 +349,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   }
 
   const status = statusConfig[release.status as ReleaseStatus] || statusConfig.submitted;
-  const canReview = release.status === 'awaiting_client';
+  const canReview = ['awaiting_client', 'panel_reviewed', 'sent_to_client'].includes(release.status);
 
   return (
     <div className="max-w-4xl">
@@ -386,6 +386,44 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
       </div>
 
       <div className="grid gap-6">
+        {/* Headline Selection — shown when headlines exist and none selected yet */}
+        {release.ai_headline_options && (release.ai_headline_options as string[]).length > 0 && !release.ai_selected_headline && canReview && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Sparkles className="h-5 w-5" />
+                Choose Your Headline
+              </CardTitle>
+              <CardDescription>
+                Select the headline that best represents your announcement. You can always edit it later.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {(release.ai_headline_options as string[]).map((headline: string, i: number) => (
+                <button
+                  key={i}
+                  onClick={async () => {
+                    const supabase = createClient();
+                    await supabase
+                      .from('release_requests')
+                      .update({ ai_selected_headline: headline })
+                      .eq('id', release.id);
+                    await loadRelease();
+                  }}
+                  className="w-full text-left p-4 rounded-md border border-rule bg-paper-light hover:border-primary hover:bg-primary/5 transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="font-mono text-xs text-ink-muted bg-paper-dark px-2 py-1 rounded-sm flex-shrink-0">
+                      {i + 1}
+                    </span>
+                    <span className="font-display text-lg text-ink">{headline}</span>
+                  </div>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
         {/* Current Draft */}
         {(release.client_edited_content || release.admin_refined_content || release.ai_draft_content) && (
           <Card>
