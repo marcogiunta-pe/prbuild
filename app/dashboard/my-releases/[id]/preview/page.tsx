@@ -19,7 +19,17 @@ import {
 import { ReleaseRequest } from '@/types';
 
 // Section labels the AI includes that should be stripped from display
-const SECTION_LABELS = /^\s*(?:Headline(?:\s*Options?)?|Subhead|Dateline\s*\+?\s*Lead\s*(?:paragraph)?|Body(?:\s*paragraph\s*\d*)?|Quote(?:s)?|Boilerplate|Media\s*[Cc]ontact|Call\s*to\s*[Aa]ction|Visuals?\s*[Ss]uggestions?|Distribution\s*[Cc]hecklist)\s*$/i;
+const LABEL_WORDS = ['headline', 'headline options', 'subhead', 'dateline', 'dateline + lead paragraph',
+  'dateline + lead', 'lead paragraph', 'body paragraph', 'body paragraphs', 'body paragraph 1',
+  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'boilerplate',
+  'media contact', 'call to action', 'visuals suggestions', 'visuals', 'distribution checklist',
+  'distribution', 'call-to-action', 'cta'];
+
+function isSectionLabel(line: string): boolean {
+  // Strip ** markers, #, -, numbers, and whitespace to get the raw text
+  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').trim().toLowerCase();
+  return LABEL_WORDS.includes(cleaned);
+}
 
 function cleanContent(raw: string): string {
   if (!raw) return '';
@@ -27,8 +37,8 @@ function cleanContent(raw: string): string {
     .split('\n')
     .filter(line => {
       const trimmed = line.trim();
-      // Remove section label lines
-      if (SECTION_LABELS.test(trimmed)) return false;
+      // Remove section label lines (with or without ** bold markers)
+      if (isSectionLabel(trimmed)) return false;
       // Remove standalone (1), (2), (3) with optional **
       if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(trimmed)) return false;
       // Remove lines that are just ** or - **
@@ -51,7 +61,7 @@ function extractHeadlineFromContent(content: string): string {
 
   for (const line of lines) {
     // Skip section labels
-    if (SECTION_LABELS.test(line)) continue;
+    if (isSectionLabel(line)) continue;
     // Skip artifacts like (1)** or standalone markers
     if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line)) continue;
     if (/^\s*[-–]?\s*\*{2,}\s*$/.test(line)) continue;
@@ -89,7 +99,7 @@ function contentToHtml(content: string): string {
   // Clean section labels and artifacts first, then convert to HTML
   const cleaned = content
     .split('\n')
-    .filter(line => !SECTION_LABELS.test(line.trim()))
+    .filter(line => !isSectionLabel(line.trim()))
     .filter(line => !/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line.trim()))
     .filter(line => !/^\s*[-–]?\s*\*{2,}\s*$/.test(line.trim()))
     .join('\n');
