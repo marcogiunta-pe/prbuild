@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { 
-  ArrowLeft, 
+  ArrowLeft,
+  ArrowRight,
   Clock, 
   CheckCircle, 
   AlertCircle, 
@@ -112,11 +113,11 @@ const statusConfig: Record<ReleaseStatus, { label: string; color: string; descri
     description: 'We received your feedback and are making revisions.',
     emailNote: "We'll email you when the revised draft is ready."
   },
-  client_approved: { 
-    label: 'Approved', 
+  client_approved: {
+    label: 'Approved — Awaiting Publication',
     color: 'bg-green-100 text-green-700',
-    description: 'You have approved the release. Final review in progress.',
-    emailNote: "We'll email you when your release is published."
+    description: 'You have approved the release. Our team is reviewing it for publication.',
+    emailNote: "We'll email you when your release is published on the PRBuild Showcase."
   },
   final_pending: { 
     label: 'Final Review', 
@@ -299,52 +300,20 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
     setSubmitting(true);
     const supabase = createClient();
-    const finalContent = release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '';
-    const headline = release.ai_selected_headline || release.news_hook || 'Press Release';
-    const now = new Date().toISOString();
 
-    // Set to client_approved, then immediately auto-publish
+    // Client approves — goes to client_approved (admin must publish)
     const { error } = await supabase
       .from('release_requests')
       .update({
-        status: 'published',
-        final_content: finalContent,
-        final_approved_at: now,
-        published_at: now,
+        status: 'client_approved',
+        final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
+        final_approved_at: new Date().toISOString(),
       })
       .eq('id', release.id);
 
     if (!error) {
-      // Create showcase entry so the release is publicly visible
-      const { data: showcaseEntry } = await supabase
-        .from('showcase_releases')
-        .insert({
-          release_request_id: release.id,
-          headline,
-          subhead: release.ai_subhead || '',
-          company_name: release.company_name,
-          summary: release.news_hook,
-          full_content: finalContent,
-          category: release.announcement_type,
-          industry: release.industry || 'general',
-          contact_name: release.media_contact_name,
-          contact_email: release.media_contact_email,
-          contact_phone: release.media_contact_phone || '',
-          published_at: now,
-        })
-        .select('id')
-        .single();
-
-      const showcaseUrl = showcaseEntry?.id
-        ? `/showcase/${showcaseEntry.id}`
-        : '/showcase';
-
+      alert("Thank you! Your release has been approved and is now in the publication queue. Our team will review and publish it shortly.");
       await loadRelease();
-
-      // Show success with link to published release
-      if (confirm(`Your release has been approved and published!\n\nView it on the PRBuild Showcase?\n${window.location.origin}${showcaseUrl}`)) {
-        router.push(showcaseUrl);
-      }
     }
     setSubmitting(false);
   };
