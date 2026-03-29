@@ -47,7 +47,7 @@ export default function NewRequestPage() {
   const [generatingHooks, setGeneratingHooks] = useState(false);
 
   const [formData, setFormData] = useState({
-    plan: '' as Plan | '',
+    plan: 'starter' as Plan | '',
     companyName: '',
     companyWebsite: '',
     announcementType: '' as AnnouncementType | '',
@@ -182,7 +182,7 @@ export default function NewRequestPage() {
 
     try {
       const supabase = createClient();
-      const amountPaid = isFreeRelease ? 0 : PRICING[formData.plan as Plan][billingInterval].priceInCents;
+      const amountPaid = 0; // All releases are free during beta
       const stripePaymentId = isFreeRelease ? null : undefined;
 
       const { data, error: insertError } = await supabase
