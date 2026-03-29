@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { PanelFeedback } from '@/types';
 import { getRewritePrompts } from '@/lib/prompts';
 import { requireAuth } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -105,11 +106,13 @@ export async function POST(request: NextRequest) {
 
     const rewrittenContent = completion.choices[0].message.content || '';
 
-    // Save as pending rewrite and mark rewrite as used
-    const { error: updateError } = await supabase
+    // Save rewrite as the refined content and mark rewrite as used
+    // Use admin client to bypass RLS for server-side updates
+    const adminClient = createAdminClient();
+    const { error: updateError } = await adminClient
       .from('release_requests')
       .update({
-        pending_rewrite_content: rewrittenContent,
+        admin_refined_content: rewrittenContent,
         rewrite_used: true,
         admin_notes: (release.admin_notes || '') + `\n[${new Date().toISOString()}] Rewrite based on panel feedback requested by ${profile?.role === 'admin' ? 'admin' : 'client'}.`,
         updated_at: new Date().toISOString(),
@@ -118,11 +121,11 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Update error:', updateError);
-      return NextResponse.json({ error: 'Failed to save rewritten draft' }, { status: 500 });
+      return NextResponse.json({ error: `Failed to save rewritten draft: ${updateError.message}` }, { status: 500 });
     }
 
     // Log activity
-    await supabase.from('activity_log').insert({
+    await adminClient.from('activity_log').insert({
       release_request_id: releaseRequestId,
       user_id: user.id,
       action: 'ai_rewrite_from_panel',
