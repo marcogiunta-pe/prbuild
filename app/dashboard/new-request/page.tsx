@@ -243,23 +243,42 @@ export default function NewRequestPage() {
       </div>
 
       {/* Progress Steps */}
-      <div className="flex items-center justify-between mb-8">
-        {steps.map((s, i) => (
-          <div key={s} className="flex items-center">
-            <div className={`
-              w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-              ${i < currentStepIndex ? 'bg-secondary text-white' : 
-                i === currentStepIndex ? 'bg-secondary text-white' : 
-                'bg-gray-200 text-gray-600'}
-            `}>
-              {i < currentStepIndex ? <Check className="h-4 w-4" /> : i + 1}
-            </div>
-            {i < steps.length - 1 && (
-              <div className={`w-12 h-0.5 mx-2 ${i < currentStepIndex ? 'bg-secondary' : 'bg-gray-200'}`} />
-            )}
+      {(() => {
+        const stepLabels: Record<Step, string> = {
+          plan: 'Plan',
+          company: 'Company',
+          announcement: 'Details',
+          quotes: 'Quotes',
+          contact: 'Contact',
+          review: 'Review',
+        };
+        return (
+          <div className="flex items-center justify-between mb-8">
+            {steps.map((s, i) => (
+              <div key={s} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div className={`
+                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
+                    ${i < currentStepIndex ? 'bg-secondary text-white' :
+                      i === currentStepIndex ? 'bg-secondary text-white' :
+                      'bg-gray-200 text-gray-600'}
+                  `}>
+                    {i < currentStepIndex ? <Check className="h-4 w-4" /> : i + 1}
+                  </div>
+                  <span className={`text-[10px] mt-1 font-medium ${
+                    i <= currentStepIndex ? 'text-secondary' : 'text-gray-400'
+                  }`}>
+                    {stepLabels[s]}
+                  </span>
+                </div>
+                {i < steps.length - 1 && (
+                  <div className={`w-12 h-0.5 mx-2 mb-4 ${i < currentStepIndex ? 'bg-secondary' : 'bg-gray-200'}`} />
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        );
+      })()}
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
