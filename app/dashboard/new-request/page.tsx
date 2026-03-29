@@ -93,11 +93,12 @@ export default function NewRequestPage() {
           boilerplate: profile.company_boilerplate || '',
           industry: (profile.industry || '') as typeof prev.industry,
         }));
-        const free = !!profile.is_free_user;
-        const remaining = profile.free_releases_remaining ?? 0;
+        const isAdmin = profile.role === 'admin';
+        const free = isAdmin || !!profile.is_free_user;
+        const remaining = isAdmin ? -1 : (profile.free_releases_remaining ?? 0);
         setIsFreeUser(free);
         setFreeReleasesRemaining(remaining);
-        // Free users skip the plan step entirely — go straight to the form
+        // Free users and admins skip the plan step entirely — go straight to the form
         if (free && (remaining > 0 || remaining === -1) && !searchParams.get('session_id')) {
           setFormData(prev => ({ ...prev, plan: 'starter' }));
           setIsFreeRelease(true);
