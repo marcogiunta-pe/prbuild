@@ -38,18 +38,18 @@ export async function GET() {
   }
 
   // Profile missing — create it (handle_new_user may not have run yet)
+  // IMPORTANT: use INSERT not UPSERT to avoid overwriting role on existing profiles
   if (!profile && process.env.SUPABASE_SERVICE_ROLE_KEY) {
     try {
       const admin = createAdminClient();
-      const { error: upsertErr } = await admin.from('profiles').upsert(
+      const { error: upsertErr } = await admin.from('profiles').insert(
         {
           id: user.id,
           email: user.email || '',
           full_name: user.user_metadata?.full_name || user.user_metadata?.name,
           role: 'client',
-        },
-        { onConflict: 'id' }
-      );
+        }
+      ).select().maybeSingle();
       if (!upsertErr) {
         profile = {
           company_name: undefined,
