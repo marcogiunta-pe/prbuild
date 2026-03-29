@@ -53,9 +53,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Published releases can only be deleted by an admin' }, { status: 403 });
     }
 
-    // Delete related records first (activity_log has FK)
-    await admin.from('activity_log').delete().eq('release_request_id', parsed.data.releaseId);
-    await admin.from('showcase_releases').delete().eq('release_request_id', parsed.data.releaseId);
+    // Delete related records first (FK constraints)
+    const { error: actErr } = await admin.from('activity_log').delete().eq('release_request_id', parsed.data.releaseId);
+    if (actErr) console.error('activity_log delete error:', actErr);
+
+    const { error: showErr } = await admin.from('showcase_releases').delete().eq('release_request_id', parsed.data.releaseId);
+    if (showErr) console.error('showcase delete error:', showErr);
+
+    // Also clean up any newsletter references
+    const { error: nlErr } = await admin.from('newsletter_sends').delete().eq('release_request_id', parsed.data.releaseId);
+    if (nlErr) console.error('newsletter delete error (may not exist):', nlErr);
 
     // Delete the release
     const { error: deleteErr } = await admin

@@ -225,31 +225,26 @@ const statusConfig: Record<ReleaseStatus, { label: string; color: string; descri
     label: 'Approved — Awaiting Publication',
     color: 'bg-green-100 text-green-700',
     description: 'You have approved the release. Our team is reviewing it for publication.',
-    emailNote: "We'll email you when your release is published on the PRBuild Showcase."
   },
-  final_pending: { 
-    label: 'Final Review', 
+  final_pending: {
+    label: 'Final Review',
     color: 'bg-blue-100 text-blue-700',
     description: 'Final formatting and review in progress.',
-    emailNote: "We'll email you when your release is published."
   },
-  final_approved: { 
-    label: 'Final Approved', 
+  final_approved: {
+    label: 'Final Approved',
     color: 'bg-green-100 text-green-700',
     description: 'Final version approved. Preparing for publication.',
-    emailNote: "We'll email you when your release is published."
   },
-  quality_review: { 
-    label: 'Quality Review', 
+  quality_review: {
+    label: 'Quality Review',
     color: 'bg-blue-100 text-blue-700',
     description: 'Undergoing final quality review.',
-    emailNote: "We'll email you when your release is published."
   },
-  quality_approved: { 
-    label: 'Quality Approved', 
+  quality_approved: {
+    label: 'Quality Approved',
     color: 'bg-green-100 text-green-700',
     description: 'Quality review passed. Ready for publication.',
-    emailNote: "We'll email you when your release is published."
   },
   published: { 
     label: 'Published', 
