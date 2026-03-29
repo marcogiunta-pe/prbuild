@@ -18,33 +18,63 @@ import {
 } from 'lucide-react';
 import { ReleaseRequest } from '@/types';
 
+// Section labels the AI includes that should be stripped from display
+const SECTION_LABELS = /^\s*(?:Headline(?:\s*Options?)?|Subhead|Dateline\s*\+?\s*Lead\s*(?:paragraph)?|Body(?:\s*paragraph\s*\d*)?|Quote(?:s)?|Boilerplate|Media\s*[Cc]ontact|Call\s*to\s*[Aa]ction|Visuals?\s*[Ss]uggestions?|Distribution\s*[Cc]hecklist)\s*$/i;
+
 function cleanContent(raw: string): string {
   if (!raw) return '';
   return raw
-    // Remove standalone (1), (2), (3) lines
-    .replace(/^\s*\(\d+\)\s*$/gm, '')
-    // Remove (1) prefixes at start of lines
-    .replace(/^\s*\(\d+\)\s*/gm, '')
-    // Clean stray ** markers
-    .replace(/\*\*\s*$/gm, '')
-    .replace(/^\s*\*\*\s*/gm, '')
+    .split('\n')
+    .filter(line => {
+      const trimmed = line.trim();
+      // Remove section label lines
+      if (SECTION_LABELS.test(trimmed)) return false;
+      // Remove standalone (1), (2), (3) with optional **
+      if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(trimmed)) return false;
+      // Remove lines that are just ** or - **
+      if (/^\s*[-–]?\s*\*{2,}\s*$/.test(trimmed)) return false;
+      // Remove numbered labels like "1." "2." "3." alone on a line
+      if (/^\s*\d+\.\s*$/.test(trimmed)) return false;
+      return true;
+    })
+    .join('\n')
+    // Clean remaining inline artifacts
+    .replace(/\(\d+\)\s*\*{0,2}\s*/g, '')
+    .replace(/^\s*\*\*\s*$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
 
 function extractHeadlineFromContent(content: string): string {
   if (!content) return '';
-  // Try to find bold text at the top (likely the headline)
-  const boldMatch = content.match(/^\s*\*\*(.+?)\*\*/m);
-  if (boldMatch) return boldMatch[1].trim();
-  // Try HTML heading
+  const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+
+  for (const line of lines) {
+    // Skip section labels
+    if (SECTION_LABELS.test(line)) continue;
+    // Skip artifacts like (1)** or standalone markers
+    if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line)) continue;
+    if (/^\s*[-–]?\s*\*{2,}\s*$/.test(line)) continue;
+    // Skip very short lines
+    if (line.length < 15) continue;
+
+    // Found a real content line — extract text
+    let headline = line
+      .replace(/^\*\*(.+?)\*\*$/, '$1')  // **Headline**
+      .replace(/^\*\*/, '').replace(/\*\*$/, '')
+      .replace(/<[^>]+>/g, '')
+      .trim();
+
+    if (headline.length > 15) return headline;
+  }
+
+  // HTML fallback
   const h1Match = content.match(/<h1[^>]*>(.+?)<\/h1>/i);
   if (h1Match) return h1Match[1].replace(/<[^>]+>/g, '').trim();
-  // Try first strong tag
   const strongMatch = content.match(/<strong>(.+?)<\/strong>/i);
-  if (strongMatch) return strongMatch[1].trim();
-  // First non-empty line
-  const firstLine = content.split('\n').find(l => l.trim().length > 10);
-  return firstLine?.trim() || '';
+  if (strongMatch && strongMatch[1].length > 15) return strongMatch[1].trim();
+
+  return '';
 }
 
 function contentToHtml(content: string): string {
@@ -54,14 +84,18 @@ function contentToHtml(content: string): string {
     return content
       .replace(/<script[\s\S]*?<\/script>/gi, '')
       .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/^\s*\(\d+\)\s*$/gm, '')
-      .replace(/\(\d+\)\s*/g, '');
+      .replace(/\(\d+\)\s*\*{0,2}/g, '');
   }
-  // Markdown to HTML
-  let html = content
+  // Clean section labels and artifacts first, then convert to HTML
+  const cleaned = content
+    .split('\n')
+    .filter(line => !SECTION_LABELS.test(line.trim()))
+    .filter(line => !/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line.trim()))
+    .filter(line => !/^\s*[-–]?\s*\*{2,}\s*$/.test(line.trim()))
+    .join('\n');
+
+  let html = cleaned
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^\s*\(\d+\)\s*$/gm, '')
-    .replace(/^\s*\(\d+\)\s*/gm, '')
     .replace(/^\s*---+\s*$/gm, '<hr class="my-6 border-rule">')
     .replace(/^\s*\*\*\*+\s*$/gm, '<hr class="my-6 border-rule">')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
