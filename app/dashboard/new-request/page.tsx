@@ -38,6 +38,8 @@ export default function NewRequestPage() {
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
   const [showCustomIndustry, setShowCustomIndustry] = useState(false);
   const [customIndustry, setCustomIndustry] = useState('');
+  const [suggestedHooks, setSuggestedHooks] = useState<string[]>([]);
+  const [generatingHooks, setGeneratingHooks] = useState(false);
 
   const [formData, setFormData] = useState({
     plan: '' as Plan | '',
@@ -256,11 +258,16 @@ export default function NewRequestPage() {
           <div className="flex items-center justify-between mb-8">
             {steps.map((s, i) => (
               <div key={s} className="flex items-center">
-                <div className="flex flex-col items-center">
+                <button
+                  type="button"
+                  onClick={() => { if (i <= currentStepIndex) setStep(s); }}
+                  className={`flex flex-col items-center ${i <= currentStepIndex ? 'cursor-pointer' : 'cursor-default'}`}
+                  disabled={i > currentStepIndex}
+                >
                   <div className={`
-                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-                    ${i < currentStepIndex ? 'bg-secondary text-white' :
-                      i === currentStepIndex ? 'bg-secondary text-white' :
+                    w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors
+                    ${i < currentStepIndex ? 'bg-secondary text-white hover:bg-secondary/80' :
+                      i === currentStepIndex ? 'bg-secondary text-white ring-2 ring-secondary/30' :
                       'bg-gray-200 text-gray-600'}
                   `}>
                     {i < currentStepIndex ? <Check className="h-4 w-4" /> : i + 1}
@@ -270,7 +277,7 @@ export default function NewRequestPage() {
                   }`}>
                     {stepLabels[s]}
                   </span>
-                </div>
+                </button>
                 {i < steps.length - 1 && (
                   <div className={`w-12 h-0.5 mx-2 mb-4 ${i < currentStepIndex ? 'bg-secondary' : 'bg-gray-200'}`} />
                 )}
@@ -539,15 +546,73 @@ export default function NewRequestPage() {
               </select>
             </div>
             <div>
-              <Label htmlFor="newsHook">News Hook *</Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="newsHook">News Hook *</Label>
+                {formData.companyName && formData.announcementType && !generatingHooks && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setGeneratingHooks(true);
+                      setSuggestedHooks([]);
+                      try {
+                        const res = await fetch('/api/ai/suggest-hooks', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            companyName: formData.companyName,
+                            announcementType: formData.announcementType,
+                            industry: formData.industry || customIndustry || 'general',
+                            currentHook: formData.newsHook || '',
+                          }),
+                        });
+                        if (res.ok) {
+                          const data = await res.json();
+                          if (data.hooks) setSuggestedHooks(data.hooks);
+                        }
+                      } catch { /* ignore */ }
+                      setGeneratingHooks(false);
+                    }}
+                    className="text-xs text-primary hover:text-primary-700 font-medium flex items-center gap-1"
+                  >
+                    <Sparkles className="h-3 w-3" /> Suggest 3 hooks
+                  </button>
+                )}
+                {generatingHooks && (
+                  <span className="text-xs text-primary flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" /> Generating...
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-gray-500 mb-1">One sentence: what happened and why anyone should care. Think &ldquo;X launches Y to solve Z&rdquo; — not &ldquo;We are excited to announce.&rdquo;</p>
               <Textarea
                 id="newsHook"
                 value={formData.newsHook}
-                onChange={(e) => updateField('newsHook', e.target.value)}
+                onChange={(e) => { updateField('newsHook', e.target.value); setSuggestedHooks([]); }}
                 placeholder="One sentence explaining why this is newsworthy..."
                 rows={2}
               />
+              {suggestedHooks.length > 0 && (
+                <div className="mt-2 space-y-2">
+                  <p className="text-xs font-medium text-ink-muted">Choose a suggested hook or edit your own above:</p>
+                  {suggestedHooks.map((hook, i) => (
+                    <label
+                      key={i}
+                      className={`flex items-start gap-3 p-3 border rounded-md cursor-pointer transition-colors ${
+                        formData.newsHook === hook ? 'border-primary bg-primary/5' : 'border-rule hover:border-primary/30 hover:bg-paper-dark/30'
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="hookSuggestion"
+                        checked={formData.newsHook === hook}
+                        onChange={() => updateField('newsHook', hook)}
+                        className="mt-1 accent-primary"
+                      />
+                      <span className="text-sm text-ink">{hook}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
