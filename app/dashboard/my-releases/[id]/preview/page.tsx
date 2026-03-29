@@ -164,6 +164,11 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const [loading, setLoading] = useState(true);
   const [copiedFormat, setCopiedFormat] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [sigName, setSigName] = useState('');
+  const [sigEmail, setSigEmail] = useState('');
+  const [sigPhone, setSigPhone] = useState('');
+  const [sigAgreed, setSigAgreed] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -233,6 +238,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   };
 
   const handlePublishToMedia = async () => {
+    if (!sigAgreed || !sigName || !sigEmail || !sigPhone) return;
     setPublishing(true);
     const supabase = createClient();
     await supabase
@@ -241,9 +247,11 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
         status: 'client_approved',
         final_content: cleaned,
         final_approved_at: new Date().toISOString(),
+        admin_notes: `[${new Date().toISOString()}] Publication authorized by: ${sigName} (${sigEmail}, ${sigPhone}). Digital signature on file.`,
       })
       .eq('id', release.id);
     setPublishing(false);
+    setShowDisclaimer(false);
     router.push(`/dashboard/my-releases/${release.id}`);
   };
 
@@ -405,19 +413,14 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                 ) : (
                   <div>
                     <Button
-                      onClick={handlePublishToMedia}
-                      disabled={publishing}
+                      onClick={() => setShowDisclaimer(true)}
                       className="bg-primary hover:bg-primary-700 rounded-sm text-lg px-10 py-3"
                       size="lg"
                     >
-                      {publishing ? (
-                        <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Submitting...</>
-                      ) : (
-                        <><Send className="h-5 w-5 mr-2" /> Publish to Media</>
-                      )}
+                      <Send className="h-5 w-5 mr-2" /> Publish to Media
                     </Button>
                     <p className="text-xs text-ink-muted mt-3">
-                      By publishing, your release will be distributed to journalists, published on our showcase, and included in industry newsletters.
+                      You&apos;ll be asked to review and sign a publication authorization before distribution.
                     </p>
                   </div>
                 )}
@@ -426,6 +429,100 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           </div>
         </div>
       </div>
+
+      {/* Publication Authorization Modal */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/60 backdrop-blur-sm no-print">
+          <div className="bg-paper-light border border-rule rounded-md max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-rule">
+              <h3 className="font-display text-xl text-ink">Publication Authorization</h3>
+              <p className="text-sm text-ink-muted mt-1">Please review and sign before distribution.</p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Disclaimer text */}
+              <div className="bg-paper border border-rule rounded-md p-4 text-xs text-ink-muted leading-relaxed max-h-48 overflow-y-auto">
+                <p className="font-semibold text-ink mb-2">Publication Agreement &amp; Indemnification</p>
+                <p className="mb-2">By authorizing this press release for publication, I represent and warrant that:</p>
+                <ol className="list-decimal ml-4 space-y-1">
+                  <li>All information contained in this press release is true, accurate, and not misleading.</li>
+                  <li>I have obtained all necessary permissions, consents, and authorizations from all parties mentioned, quoted, or referenced in this press release.</li>
+                  <li>The publication of this material does not infringe upon any copyright, trademark, trade secret, right of privacy, right of publicity, or any other right of any third party.</li>
+                  <li>I have the authority to authorize distribution of this content on behalf of the company or organization named in the release.</li>
+                </ol>
+                <p className="mt-2 font-semibold text-ink">Indemnification:</p>
+                <p>I agree to indemnify, defend, and hold harmless PRBuild.ai, its owners, officers, directors, employees, agents, and affiliates from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys&apos; fees) arising from or related to: (a) the content of this press release; (b) any breach of the warranties above; (c) any claim by a third party related to the publication or distribution of this material. This indemnification obligation survives the publication and any subsequent removal of the press release.</p>
+              </div>
+
+              {/* Signature fields */}
+              <div>
+                <label className="block text-sm font-medium text-ink mb-1">Full Legal Name *</label>
+                <input
+                  type="text"
+                  value={sigName}
+                  onChange={(e) => setSigName(e.target.value)}
+                  placeholder="Your full legal name (serves as digital signature)"
+                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  value={sigEmail}
+                  onChange={(e) => setSigEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-ink mb-1">Phone Number *</label>
+                <input
+                  type="tel"
+                  value={sigPhone}
+                  onChange={(e) => setSigPhone(e.target.value)}
+                  placeholder="(555) 123-4567"
+                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                />
+              </div>
+
+              {/* Agreement checkbox */}
+              <label className="flex items-start gap-3 p-3 border border-rule rounded-sm bg-paper cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={sigAgreed}
+                  onChange={(e) => setSigAgreed(e.target.checked)}
+                  className="mt-0.5 accent-primary"
+                />
+                <span className="text-sm text-ink leading-relaxed">
+                  I have read and agree to the Publication Agreement &amp; Indemnification terms above. I confirm that all content is accurate, I have all necessary permissions, and I accept full responsibility for this press release.
+                </span>
+              </label>
+            </div>
+
+            <div className="p-6 border-t border-rule flex gap-3">
+              <Button
+                onClick={handlePublishToMedia}
+                disabled={publishing || !sigAgreed || !sigName || !sigEmail || !sigPhone}
+                className="bg-primary hover:bg-primary-700 rounded-sm flex-1"
+              >
+                {publishing ? (
+                  <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Submitting...</>
+                ) : (
+                  <><Send className="h-4 w-4 mr-2" /> Authorize &amp; Publish</>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowDisclaimer(false)}
+                className="rounded-sm"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
