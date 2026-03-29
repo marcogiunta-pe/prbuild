@@ -252,6 +252,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [requestingPanel, setRequestingPanel] = useState(false);
   const [panelProgress, setPanelProgress] = useState(0);
   const [panelComments, setPanelComments] = useState<string[]>([]);
+  const [processing, setProcessing] = useState(false);
   const [rewriteProgress, setRewriteProgress] = useState(0);
 
   useEffect(() => {
@@ -435,6 +436,49 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     setEditedContent('');
   };
 
+  const handleProcessRequest = async () => {
+    if (!release) return;
+    setProcessing(true);
+    setPanelProgress(0);
+    setPanelComments([]);
+
+    // Animate reviewer progress — ~3.5s per reviewer
+    let currentReviewer = 0;
+    const interval = setInterval(() => {
+      if (currentReviewer >= 16) { clearInterval(interval); return; }
+      setPanelProgress(currentReviewer + 1);
+      setPanelComments(prev => [...prev, REVIEWERS[currentReviewer]?.comment || '']);
+      currentReviewer++;
+    }, 3500);
+
+    try {
+      const response = await fetch('/api/process-release', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
+        },
+        body: JSON.stringify({ releaseRequestId: release.id }),
+      });
+      clearInterval(interval);
+      setPanelProgress(16);
+      setPanelComments(REVIEWERS.map(r => r.comment));
+      if (response.ok) {
+        await new Promise(r => setTimeout(r, 1500));
+        await loadRelease();
+      } else {
+        const err = await response.json();
+        alert(err.error || 'Failed to process request');
+      }
+    } catch {
+      clearInterval(interval);
+      alert('Failed to process request');
+    }
+    setProcessing(false);
+    setPanelProgress(0);
+    setPanelComments([]);
+  };
+
   const REVIEWERS = [
     { name: 'Sarah Lin', beat: 'Tech M&A', comment: 'Checking headline impact and news hook strength...' },
     { name: 'Marcus Reid', beat: 'Enterprise SaaS', comment: 'Evaluating B2B positioning and market context...' },
@@ -568,6 +612,32 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
           </div>
         )}
       </div>
+
+        {/* Process Request button — shown when status is submitted (pipeline didn't run) */}
+        {release.status === 'submitted' && !processing && (
+          <div className="mt-4 p-5 bg-paper-light border border-rule rounded-md flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-ink">Ready to process your request?</p>
+              <p className="text-sm text-ink-muted">We'll write your press release and have our journalist panel review it.</p>
+            </div>
+            <Button
+              onClick={handleProcessRequest}
+              className="bg-primary hover:bg-primary-700 rounded-sm"
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Process Your Request
+            </Button>
+          </div>
+        )}
+        {processing && (
+          <div className="mt-4">
+            <PanelReviewAnimation
+              reviewers={REVIEWERS}
+              progress={panelProgress}
+              comments={panelComments}
+            />
+          </div>
+        )}
 
       <div className="grid gap-6">
         {/* Headline Selection — shown when headlines exist and none selected yet */}
