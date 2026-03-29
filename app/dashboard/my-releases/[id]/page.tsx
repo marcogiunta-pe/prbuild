@@ -299,29 +299,52 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
     setSubmitting(true);
     const supabase = createClient();
+    const finalContent = release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '';
+    const headline = release.ai_selected_headline || release.news_hook || 'Press Release';
+    const now = new Date().toISOString();
 
     // Set to client_approved, then immediately auto-publish
     const { error } = await supabase
       .from('release_requests')
       .update({
-        status: 'client_approved',
+        status: 'published',
+        final_content: finalContent,
+        final_approved_at: now,
+        published_at: now,
       })
       .eq('id', release.id);
 
     if (!error) {
-      // Auto-publish: move straight to published status
-      await supabase
-        .from('release_requests')
-        .update({
-          status: 'published',
-          final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
-          final_approved_at: new Date().toISOString(),
-          published_at: new Date().toISOString(),
+      // Create showcase entry so the release is publicly visible
+      const { data: showcaseEntry } = await supabase
+        .from('showcase_releases')
+        .insert({
+          release_request_id: release.id,
+          headline,
+          subhead: release.ai_subhead || '',
+          company_name: release.company_name,
+          summary: release.news_hook,
+          full_content: finalContent,
+          category: release.announcement_type,
+          industry: release.industry || 'general',
+          contact_name: release.media_contact_name,
+          contact_email: release.media_contact_email,
+          contact_phone: release.media_contact_phone || '',
+          published_at: now,
         })
-        .eq('id', release.id);
+        .select('id')
+        .single();
 
-      alert("Thank you! Your release has been approved and published.");
+      const showcaseUrl = showcaseEntry?.id
+        ? `/showcase/${showcaseEntry.id}`
+        : '/showcase';
+
       await loadRelease();
+
+      // Show success with link to published release
+      if (confirm(`Your release has been approved and published!\n\nView it on the PRBuild Showcase?\n${window.location.origin}${showcaseUrl}`)) {
+        router.push(showcaseUrl);
+      }
     }
     setSubmitting(false);
   };
@@ -558,6 +581,22 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
             <Mail className="h-3.5 w-3.5" />
             {status.emailNote}
           </p>
+        )}
+
+        {/* Published banner with showcase link */}
+        {release.status === 'published' && (
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-md flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <div>
+                <p className="font-semibold text-green-800">Your press release is live!</p>
+                <p className="text-sm text-green-600">Published on the PRBuild Showcase and distributed to journalists.</p>
+              </div>
+            </div>
+            <Link href={`/showcase`} className="text-sm font-medium text-green-700 hover:text-green-800 underline flex items-center gap-1">
+              View on Showcase <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
         )}
       </div>
 
