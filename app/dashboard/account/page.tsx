@@ -12,6 +12,7 @@ import {
   Check,
   Loader2,
   Sparkles,
+  Copy,
 } from 'lucide-react';
 import { INDUSTRIES } from '@/types';
 
@@ -418,10 +419,30 @@ export default function AccountPage() {
             <CardTitle className="font-display text-xl text-ink">Default Media Contact</CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-sm text-ink-muted -mt-1 mb-2">
-              This information will be used as the default media contact on your press releases.
-              You can override it when creating a release.
-            </p>
+            <div className="flex items-center justify-between -mt-1 mb-2">
+              <p className="text-sm text-ink-muted">
+                This information will be used as the default media contact on your press releases.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const fullName = [formData.firstName, formData.lastName].filter(Boolean).join(' ');
+                  setFormData(prev => ({
+                    ...prev,
+                    mediaContactName: fullName || prev.mediaContactName,
+                    mediaContactTitle: prev.jobTitle || prev.mediaContactTitle,
+                    mediaContactEmail: prev.email || prev.mediaContactEmail,
+                    mediaContactPhone: prev.phone || prev.mediaContactPhone,
+                  }));
+                }}
+                className="rounded-sm border-rule text-primary hover:bg-primary/5 flex-shrink-0 text-xs"
+              >
+                <Copy className="h-3 w-3 mr-1" />
+                Copy from Personal Info
+              </Button>
+            </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="mediaContactName" className="text-sm font-medium text-ink">

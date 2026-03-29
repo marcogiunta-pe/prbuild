@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You extract company information from website content. Return ONLY valid JSON with these fields (use null for any field you cannot determine):
+          content: `You extract company information from website content. Return ONLY valid JSON with these fields. IMPORTANT: use null for any field you CANNOT find on the website. Do NOT make up or guess addresses, phone numbers, or other contact info — only include data you actually found on the site:
 {
   "companyName": "string",
   "industry": "string (one of: healthcare, technology, finance, retail, or a custom industry name)",
