@@ -180,6 +180,8 @@ Rules:
 - Write entirely in third person (no you/we/our/us/I outside quotes)
 - Stay within 300-500 words
 - Use proper AP-style dateline format
+- Preserve ALL sections from the original: headline, subhead, dateline, lead, body, quotes, boilerplate, media contact, AND call to action
+- Do NOT remove any sections. If a section exists in the original, it MUST appear in the rewrite.
 - Output as plain text with the same structure as the original:
   - Headline (one improved headline)
   - Subhead (one sentence)
@@ -188,6 +190,7 @@ Rules:
   - Quote(s) with attribution
   - Boilerplate
   - Media contact block
+  - Call to Action
 - Do NOT output HTML tags. Use plain text with **bold** for emphasis and paragraph breaks.`,
     userPrompt: `Original Press Release:
 ${data.originalDraft}
@@ -198,7 +201,7 @@ ${data.panelSynthesis}
 Key Issues to Address:
 ${data.keyIssues}
 
-Please rewrite the press release addressing the feedback while maintaining the core message and facts. Output as plain text (no HTML), using the same structure as the original.`,
+Please rewrite the press release addressing the feedback while maintaining the core message and facts. Preserve every section from the original — including the Call to Action if one exists. Output as plain text (no HTML), using the same structure as the original.`,
   };
 }
 

@@ -63,6 +63,11 @@ function formatDraftAsHtml(content: string): string {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
 
+    // Strip lines that are ONLY a number label like (1), (2), (3) with nothing else
+    if (/^\s*\(\d+\)\s*$/.test(line)) {
+      continue;
+    }
+
     // Strip (1), (2), (3) etc. prefixes (AI numbering artifacts)
     line = line.replace(/^\s*\(\d+\)\s*/, '');
 
@@ -359,6 +364,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [rewriteProgress, setRewriteProgress] = useState(0);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [draftVersion, setDraftVersion] = useState<'latest' | 'rewritten' | 'original'>('latest');
 
   useEffect(() => {
     loadRelease();
@@ -851,16 +857,29 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   </CardDescription>
                 )}
               </div>
-              {canReview && !isEditing && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleStartEditing}
-                >
-                  <Edit3 className="h-4 w-4 mr-1" />
-                  Edit Draft
-                </Button>
-              )}
+              <div className="flex items-center gap-2">
+                {release.admin_refined_content && release.ai_draft_content && release.admin_refined_content !== release.ai_draft_content && (
+                  <select
+                    value={draftVersion}
+                    onChange={(e) => setDraftVersion(e.target.value as 'latest' | 'rewritten' | 'original')}
+                    className="font-mono text-sm border border-rule bg-paper rounded-sm px-2 py-1 text-ink focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="latest">Latest Version</option>
+                    <option value="rewritten">Rewritten Draft</option>
+                    <option value="original">Original Draft</option>
+                  </select>
+                )}
+                {canReview && !isEditing && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleStartEditing}
+                  >
+                    <Edit3 className="h-4 w-4 mr-1" />
+                    Edit Draft
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent>
               {release.ai_subhead && (
@@ -901,13 +920,19 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   </div>
                 </div>
               ) : (
-                <div 
+                <div
                   className="prose prose-sm max-w-none bg-gray-50 p-6 rounded-lg
                     prose-headings:font-bold prose-headings:text-gray-900
                     prose-p:text-gray-700 prose-p:leading-relaxed
                     prose-strong:text-gray-900 prose-em:text-gray-600"
-                  dangerouslySetInnerHTML={{ 
-                    __html: formatDraftAsHtml(release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '')
+                  dangerouslySetInnerHTML={{
+                    __html: formatDraftAsHtml(
+                      draftVersion === 'original'
+                        ? (release.ai_draft_content || '')
+                        : draftVersion === 'rewritten'
+                          ? (release.admin_refined_content || release.ai_draft_content || '')
+                          : (release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '')
+                    )
                   }}
                 />
               )}
