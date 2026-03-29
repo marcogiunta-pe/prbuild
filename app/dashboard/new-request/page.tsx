@@ -36,6 +36,8 @@ export default function NewRequestPage() {
   const [freeReleasesRemaining, setFreeReleasesRemaining] = useState(0);
   const [isFreeRelease, setIsFreeRelease] = useState(false);
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
+  const [showCustomIndustry, setShowCustomIndustry] = useState(false);
+  const [customIndustry, setCustomIndustry] = useState('');
 
   const [formData, setFormData] = useState({
     plan: '' as Plan | '',
@@ -171,7 +173,7 @@ export default function NewRequestPage() {
           media_contact_phone: formData.mediaContactPhone || null,
           visuals_description: formData.visualsDescription || null,
           desired_cta: formData.desiredCta,
-          industry: formData.industry === '_other' ? 'general' : (formData.industry || null),
+          industry: formData.industry || null,
           supporting_context: formData.supportingContext || null,
           plan: formData.plan,
           amount_paid: amountPaid,
@@ -409,11 +411,14 @@ export default function NewRequestPage() {
               <p className="text-xs text-gray-500 mb-1">Used to match your release with journalists who cover your space.</p>
               <select
                 id="industry"
-                value={['healthcare', 'technology', 'finance', 'retail'].includes(formData.industry) ? formData.industry : formData.industry === '' ? '' : '_other'}
+                value={showCustomIndustry ? 'other' : formData.industry}
                 onChange={(e) => {
-                  if (e.target.value === '_other') {
-                    updateField('industry', '_other');
+                  if (e.target.value === 'other') {
+                    setShowCustomIndustry(true);
+                    setCustomIndustry('');
+                    updateField('industry', 'general');
                   } else {
+                    setShowCustomIndustry(false);
                     updateField('industry', e.target.value);
                   }
                 }}
@@ -424,13 +429,16 @@ export default function NewRequestPage() {
                 <option value="technology">Technology</option>
                 <option value="finance">Finance</option>
                 <option value="retail">Retail</option>
-                <option value="_other">Other (type your industry)</option>
+                <option value="other">Other (type your industry)</option>
               </select>
-              {(formData.industry === '_other' || (!['healthcare', 'technology', 'finance', 'retail', ''].includes(formData.industry) && formData.industry)) && (
+              {showCustomIndustry && (
                 <input
                   type="text"
-                  value={formData.industry === '_other' ? '' : formData.industry}
-                  onChange={(e) => updateField('industry', e.target.value || '_other')}
+                  value={customIndustry}
+                  onChange={(e) => {
+                    setCustomIndustry(e.target.value);
+                    updateField('industry', e.target.value || 'general');
+                  }}
                   placeholder="Enter your industry (e.g., Education, Energy, Real Estate, Legal...)"
                   className="w-full px-3 py-2 border rounded-md mt-2"
                   autoFocus
