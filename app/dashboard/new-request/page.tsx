@@ -16,7 +16,8 @@ import {
   ArrowLeft,
   AlertCircle,
   PlusCircle,
-  Trash2
+  Trash2,
+  Sparkles
 } from 'lucide-react';
 import { PRICING, ANNOUNCEMENT_TYPES, INDUSTRIES, Plan, AnnouncementType, Industry, QuoteSource, BillingInterval } from '@/types';
 import { HelpTip } from '@/components/dashboard/HelpTip';
@@ -34,6 +35,7 @@ export default function NewRequestPage() {
   const [isFreeUser, setIsFreeUser] = useState(false);
   const [freeReleasesRemaining, setFreeReleasesRemaining] = useState(0);
   const [isFreeRelease, setIsFreeRelease] = useState(false);
+  const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
 
   const [formData, setFormData] = useState({
     plan: '' as Plan | '',
@@ -436,8 +438,41 @@ export default function NewRequestPage() {
               )}
             </div>
             <div>
-              <Label htmlFor="boilerplate">Company Boilerplate (optional)</Label>
-              <p className="text-xs text-gray-500 mb-1">The "About" paragraph that goes at the bottom. If you have one on your website, paste it here. We'll write one if you skip this.</p>
+              <div className="flex items-center justify-between mb-1">
+                <Label htmlFor="boilerplate">Company Boilerplate (optional)</Label>
+                {formData.companyWebsite && !formData.boilerplate && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setGeneratingBoilerplate(true);
+                      try {
+                        const res = await fetch('/api/ai/generate-boilerplate', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            companyName: formData.companyName,
+                            companyWebsite: formData.companyWebsite.startsWith('http') ? formData.companyWebsite : `https://${formData.companyWebsite}`,
+                          }),
+                        });
+                        if (res.ok) {
+                          const data = await res.json();
+                          if (data.boilerplate) updateField('boilerplate', data.boilerplate);
+                        }
+                      } catch { /* ignore */ }
+                      setGeneratingBoilerplate(false);
+                    }}
+                    disabled={generatingBoilerplate}
+                    className="text-xs text-primary hover:text-primary-700 font-medium flex items-center gap-1"
+                  >
+                    {generatingBoilerplate ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Generating from website...</>
+                    ) : (
+                      <><Sparkles className="h-3 w-3" /> Generate from website</>
+                    )}
+                  </button>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mb-1">The "About" paragraph that goes at the bottom. If you have one on your website, paste it here.</p>
               <Textarea
                 id="boilerplate"
                 value={formData.boilerplate}
