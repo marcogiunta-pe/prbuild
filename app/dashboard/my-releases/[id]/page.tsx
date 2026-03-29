@@ -169,6 +169,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [requestingRewrite, setRequestingRewrite] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState('');
+  const [showPanelDetail, setShowPanelDetail] = useState(false);
+  const [requestingPanel, setRequestingPanel] = useState(false);
+  const [panelProgress, setPanelProgress] = useState(0);
+  const [rewriteProgress, setRewriteProgress] = useState(0);
 
   useEffect(() => {
     loadRelease();
@@ -243,29 +247,50 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     setSubmitting(false);
   };
 
+  const REWRITE_STEPS = [
+    'Analyzing panel feedback...',
+    'Identifying key improvements...',
+    'Restructuring the lead...',
+    'Strengthening the headline...',
+    'Refining quotes and attribution...',
+    'Polishing final draft...',
+  ];
+
   const handleRequestRewrite = async () => {
     if (!release) return;
-    
     setRequestingRewrite(true);
-    
+    setRewriteProgress(0);
+
+    const interval = setInterval(() => {
+      setRewriteProgress(prev => {
+        if (prev >= 5) { clearInterval(interval); return 5; }
+        return prev + 1;
+      });
+    }, 3500);
+
     try {
       const response = await fetch('/api/ai/rewrite-from-panel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ releaseRequestId: release.id }),
       });
-      
+      clearInterval(interval);
+      setRewriteProgress(6);
+
       if (response.ok) {
+        await new Promise(r => setTimeout(r, 800));
         await loadRelease();
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to request rewrite');
       }
     } catch (err) {
+      clearInterval(interval);
       alert('Failed to request rewrite');
     }
-    
+
     setRequestingRewrite(false);
+    setRewriteProgress(0);
   };
 
   const handleAcceptRewrite = async () => {
@@ -337,6 +362,52 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const handleCancelEditing = () => {
     setIsEditing(false);
     setEditedContent('');
+  };
+
+  const REVIEWER_NAMES = [
+    'Sarah Lin', 'Marcus Reid', 'Jenna Huang', 'David Kessler',
+    'Aisha Patel', 'Tom Nguyen', 'Rachel Chen', 'Eli Washington',
+    'Lisa Monroe', 'Jake Barrett', 'Nina Kowalski', 'Wei Chen',
+    'Diana Ortiz', 'Paul Jensen', 'Sofia Martinez', 'Raj Kapoor',
+  ];
+
+  const handleRequestPanelReview = async () => {
+    if (!release) return;
+    setRequestingPanel(true);
+    setPanelProgress(0);
+
+    // Animate reviewer progress while waiting for the API
+    const interval = setInterval(() => {
+      setPanelProgress(prev => {
+        if (prev >= 15) { clearInterval(interval); return 15; }
+        return prev + 1;
+      });
+    }, 1800);
+
+    try {
+      const response = await fetch('/api/process-release', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
+        },
+        body: JSON.stringify({ releaseRequestId: release.id }),
+      });
+      clearInterval(interval);
+      setPanelProgress(16);
+      if (response.ok) {
+        await new Promise(r => setTimeout(r, 1000));
+        await loadRelease();
+      } else {
+        const err = await response.json();
+        alert(err.error || 'Failed to request panel review');
+      }
+    } catch {
+      clearInterval(interval);
+      alert('Failed to request panel review');
+    }
+    setRequestingPanel(false);
+    setPanelProgress(0);
   };
 
   if (loading) {
@@ -587,59 +658,136 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
           </Card>
         )}
 
-        {/* Panel Critique Summary - Shown to Client */}
+        {/* Request Panel Review — shown when no review exists yet */}
+        {release.ai_draft_content && (!release.panel_individual_feedback || (release.panel_individual_feedback as PanelFeedback[]).length === 0) && (
+          <Card className="border-rule bg-paper-light">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-display text-ink">
+                <Users className="h-5 w-5 text-primary" />
+                Journalist Panel Review
+              </CardTitle>
+              <CardDescription>
+                Get your draft reviewed by 16 journalist personas before publishing. They'll score it and tell you exactly what to fix.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!requestingPanel ? (
+                <Button
+                  onClick={handleRequestPanelReview}
+                  className="bg-primary hover:bg-primary-700 rounded-sm"
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Request Journalist Review
+                </Button>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <span className="font-semibold text-ink">Panel review in progress...</span>
+                  </div>
+                  <div className="w-full h-2 bg-paper-dark rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary rounded-full transition-all duration-700"
+                      style={{ width: `${(panelProgress / 16) * 100}%` }}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {REVIEWER_NAMES.map((name, i) => (
+                      <div
+                        key={name}
+                        className={`flex items-center gap-2 p-2 rounded-md border transition-all duration-500 ${
+                          i < panelProgress
+                            ? 'border-green-200 bg-green-50 opacity-100'
+                            : i === panelProgress
+                              ? 'border-primary/30 bg-primary/5 opacity-100 animate-pulse'
+                              : 'border-rule bg-paper opacity-40'
+                        }`}
+                      >
+                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-semibold flex-shrink-0 ${
+                          i < panelProgress ? 'bg-green-100 text-green-700' : i === panelProgress ? 'bg-primary/10 text-primary' : 'bg-paper-dark text-ink-muted'
+                        }`}>
+                          {i < panelProgress ? '✓' : name.split(' ').map(w => w[0]).join('')}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[11px] font-medium text-ink truncate">{name}</div>
+                          <div className="font-mono text-[9px] text-ink-muted">
+                            {i < panelProgress ? 'Reviewed' : i === panelProgress ? 'Reviewing...' : 'Waiting'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-ink-muted font-mono">
+                    {panelProgress} of 16 reviewers complete — takes about 30 seconds
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Panel Critique — Full Detail View */}
         {release.panel_individual_feedback && (release.panel_individual_feedback as PanelFeedback[]).length > 0 && (
           (() => {
             const panelFeedback = release.panel_individual_feedback as PanelFeedback[];
             const compellingCount = panelFeedback.filter(f => f.compelling).length;
             const totalCount = panelFeedback.length;
             const percentage = Math.round((compellingCount / totalCount) * 100);
-            
-            // Get top missing items (suggestions)
+
             const suggestions = panelFeedback
               .filter(f => f.missing && f.missing.trim())
               .map(f => f.missing)
               .slice(0, 3);
-            
+
             return (
-              <Card className="border-indigo-200 bg-gradient-to-br from-indigo-50 to-purple-50">
+              <Card className="border-rule bg-paper-light">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-indigo-700">
-                    <Users className="h-5 w-5" />
-                    Journalist Panel Review
-                  </CardTitle>
-                  <CardDescription>
-                    Your draft was reviewed by our panel of 16 journalist personas
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Score */}
-                  <div className="flex items-center gap-4">
-                    <div className={`text-4xl font-bold ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-yellow-600' : 'text-orange-600'}`}>
-                      {compellingCount}/{totalCount}
-                    </div>
+                  <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-gray-900">reviewers found this compelling</p>
-                      <p className="text-sm text-gray-500">
-                        {percentage >= 70 
-                          ? 'Great score! Your release is ready for publication.' 
-                          : percentage >= 50 
-                            ? 'Good score. Minor improvements could help.' 
-                            : 'Some improvements recommended before publishing.'}
-                      </p>
+                      <CardTitle className="flex items-center gap-2 font-display text-ink">
+                        <Users className="h-5 w-5 text-primary" />
+                        Journalist Panel Review
+                      </CardTitle>
+                      <CardDescription>
+                        Your draft was reviewed by {totalCount} journalist personas
+                      </CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-mono text-3xl font-bold ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-secondary' : 'text-primary'}`}>
+                        {compellingCount}/{totalCount}
+                      </div>
+                      <div className="font-mono text-xs text-ink-muted">
+                        {percentage >= 70 ? 'READY' : percentage >= 50 ? 'GOOD' : 'NEEDS WORK'}
+                      </div>
                     </div>
                   </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Score bar */}
+                  <div className="w-full h-2 bg-paper-dark rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${percentage >= 70 ? 'bg-green-500' : percentage >= 50 ? 'bg-secondary' : 'bg-primary'}`}
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-ink-muted">
+                    {percentage >= 70
+                      ? 'Strong score — your release is ready for publication.'
+                      : percentage >= 50
+                        ? 'Good foundation. Addressing the feedback below will strengthen it.'
+                        : 'The panel identified areas for improvement. Review the feedback below.'}
+                  </p>
 
                   {/* Key Themes */}
                   {release.panel_synthesis && (
-                    <div className="p-3 bg-white/60 rounded-lg">
-                      <h4 className="font-medium text-gray-900 flex items-center gap-2 mb-2">
-                        <Sparkles className="h-4 w-4 text-indigo-500" />
+                    <div className="p-4 bg-paper border border-rule rounded-md">
+                      <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
+                        <Sparkles className="h-4 w-4 text-secondary" />
                         Key Feedback Themes
                       </h4>
-                      <div 
-                        className="text-sm text-gray-700 prose prose-sm max-w-none"
-                        dangerouslySetInnerHTML={{ 
+                      <div
+                        className="text-sm text-ink-muted prose prose-sm max-w-none"
+                        dangerouslySetInnerHTML={{
                           __html: formatDraftAsHtml(release.panel_synthesis)
                         }}
                       />
@@ -648,15 +796,15 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                   {/* Suggestions */}
                   {suggestions.length > 0 && (
-                    <div className="p-3 bg-white/60 rounded-lg">
-                      <h4 className="font-medium text-gray-900 flex items-center gap-2 mb-2">
-                        <Lightbulb className="h-4 w-4 text-yellow-500" />
+                    <div className="p-4 bg-paper border border-rule rounded-md">
+                      <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
+                        <Lightbulb className="h-4 w-4 text-secondary" />
                         Top Suggestions
                       </h4>
-                      <ul className="space-y-1">
+                      <ul className="space-y-2">
                         {suggestions.map((suggestion, i) => (
-                          <li key={i} className="text-sm text-gray-700 flex items-start gap-2">
-                            <span className="text-indigo-400">•</span>
+                          <li key={i} className="text-sm text-ink-muted flex items-start gap-2">
+                            <span className="text-primary font-bold">{i + 1}.</span>
                             {suggestion}
                           </li>
                         ))}
@@ -664,29 +812,108 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     </div>
                   )}
 
-                  {/* Rewrite Button - Only shows if not used yet */}
-                  {canReview && percentage < 70 && !release.rewrite_used && (
-                    <div className="pt-3 border-t border-indigo-200">
-                      <Button
-                        onClick={handleRequestRewrite}
-                        disabled={requestingRewrite}
-                        className="bg-indigo-600 hover:bg-indigo-700"
-                      >
-                        {requestingRewrite ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : (
-                          <RefreshCw className="h-4 w-4 mr-2" />
-                        )}
-                        {requestingRewrite ? 'Rewriting...' : 'Request Rewrite Based on Feedback'}
-                      </Button>
-                      <p className="text-xs text-gray-500 mt-2">
-                        We'll rewrite the draft incorporating the panel's suggestions.
-                      </p>
+                  {/* Toggle Detail View */}
+                  <button
+                    onClick={() => setShowPanelDetail(!showPanelDetail)}
+                    className="w-full flex items-center justify-between p-3 border border-rule rounded-md hover:bg-paper transition-colors text-sm"
+                  >
+                    <span className="font-semibold text-ink flex items-center gap-2">
+                      <MessageSquare className="h-4 w-4 text-primary" />
+                      {showPanelDetail ? 'Hide' : 'Show'} Individual Reviewer Feedback ({totalCount} reviewers)
+                    </span>
+                    <span className="text-ink-muted">{showPanelDetail ? '▲' : '▼'}</span>
+                  </button>
+
+                  {/* Individual Journalist Feedback — Expandable */}
+                  {showPanelDetail && (
+                    <div className="space-y-3">
+                      {panelFeedback.map((fb, i) => (
+                        <div key={i} className="border border-rule rounded-md overflow-hidden bg-paper">
+                          <div className="flex items-center gap-3 p-3 border-b border-rule bg-paper-light">
+                            <div className="w-9 h-9 rounded-full bg-paper-dark flex items-center justify-center font-mono text-xs font-semibold text-ink-muted flex-shrink-0">
+                              {(fb.persona || 'R').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-semibold text-ink">{fb.persona || `Reviewer ${i + 1}`}</div>
+                              <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">{fb.role || 'Journalist'}</div>
+                            </div>
+                            <span className={`font-mono text-[11px] font-semibold px-3 py-1 rounded-sm ${fb.compelling ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
+                              {fb.compelling ? 'PASS' : 'REVISE'}
+                            </span>
+                          </div>
+                          <div className="p-3 space-y-2">
+                            {fb.feedback && (
+                              <div>
+                                <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted mb-1">Feedback</div>
+                                <p className="text-sm text-ink leading-relaxed">{fb.feedback}</p>
+                              </div>
+                            )}
+                            {fb.missing && (
+                              <div>
+                                <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">What&apos;s Missing</div>
+                                <p className="text-sm text-ink-muted">{fb.missing}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Rewrite Button */}
+                  {canReview && (
+                    <div className="pt-3 border-t border-rule">
+                      {!requestingRewrite ? (
+                        <div>
+                          <Button
+                            onClick={handleRequestRewrite}
+                            className="bg-primary hover:bg-primary-700 rounded-sm"
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Rewrite Based on Panel Feedback
+                          </Button>
+                          <p className="text-xs text-ink-muted mt-2">
+                            We&apos;ll rewrite the draft incorporating the panel&apos;s suggestions.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 p-4 bg-paper border border-rule rounded-md">
+                          <div className="flex items-center gap-3">
+                            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                            <span className="font-semibold text-ink">Rewriting your press release...</span>
+                          </div>
+                          <div className="w-full h-2 bg-paper-dark rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary rounded-full transition-all duration-1000"
+                              style={{ width: `${((rewriteProgress + 1) / 7) * 100}%` }}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            {REWRITE_STEPS.map((step, i) => (
+                              <div
+                                key={step}
+                                className={`flex items-center gap-2 text-sm transition-all duration-500 ${
+                                  i < rewriteProgress ? 'text-green-600' : i === rewriteProgress ? 'text-ink animate-pulse' : 'text-ink-muted/40'
+                                }`}
+                              >
+                                {i < rewriteProgress ? (
+                                  <CheckCircle className="h-4 w-4 flex-shrink-0" />
+                                ) : i === rewriteProgress ? (
+                                  <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
+                                ) : (
+                                  <div className="w-4 h-4 rounded-full border border-rule flex-shrink-0" />
+                                )}
+                                {step}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
                   {release.panel_reviewed_at && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-ink-muted font-mono">
                       Reviewed {format(new Date(release.panel_reviewed_at), 'PPp')}
                     </p>
                   )}
