@@ -758,8 +758,8 @@ h1, h2, h3 { font-family: 'Instrument Serif', serif; font-weight: 400; }
       <div class="divider divider--brass divider--center"></div>
       <h1 class="display-xl text-paper" style="max-width:600px;">Your press release,<br>done right.</h1>
       <p class="body-lg" style="color:rgba(245,240,232,0.55); max-width:420px;">From first draft to journalist inboxes, PRBuild handles every step so you can focus on your story.</p>
-      <button class="cta-btn" onclick="window.open('https://prbuild.com','_blank')">Get Started &rarr;</button>
-      <div class="mono" style="font-size:0.7rem; color:rgba(245,240,232,0.25); margin-top:16px;">prbuild.com</div>
+      <button class="cta-btn" onclick="if(window.opener){window.opener.location.href='/dashboard/account';window.close();}else{window.location.href='/dashboard/account';}">Get Started &rarr;</button>
+      <div class="mono" style="font-size:0.7rem; color:rgba(245,240,232,0.25); margin-top:16px;">prbuild.ai</div>
     </div>
   </div>
 
