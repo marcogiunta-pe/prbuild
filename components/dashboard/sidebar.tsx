@@ -7,16 +7,16 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   {
-    title: 'My Releases',
-    href: '/dashboard/my-releases',
-    icon: FileText,
-    guide: 'my-releases',
-  },
-  {
     title: 'New Request',
     href: '/dashboard/new-request',
     icon: PlusCircle,
     guide: 'new-request',
+  },
+  {
+    title: 'My Releases',
+    href: '/dashboard/my-releases',
+    icon: FileText,
+    guide: 'my-releases',
   },
   {
     title: 'Feedback',
