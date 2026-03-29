@@ -328,31 +328,67 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           </div>
 
           {/* Publish CTA */}
-          <div className="no-print mt-12 p-8 bg-paper-light border border-rule rounded-md text-center">
-            <h3 className="font-display text-2xl text-ink mb-2">Ready to share with the world?</h3>
-            <p className="text-ink-muted mb-6 max-w-lg mx-auto">
-              Publishing sends your press release to our journalist network and adds it to the PRBuild Showcase. Journalists who cover {release.industry || 'your industry'} will receive it directly.
-            </p>
-            <Button
-              onClick={handlePublishToMedia}
-              disabled={publishing || release.status === 'client_approved' || release.status === 'published'}
-              className="bg-primary hover:bg-primary-700 rounded-sm text-lg px-8 py-3"
-              size="lg"
-            >
-              {publishing ? (
-                <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Publishing...</>
-              ) : release.status === 'client_approved' || release.status === 'published' ? (
-                <><CheckCircle className="h-5 w-5 mr-2" /> In Publication Queue</>
-              ) : (
-                <><Send className="h-5 w-5 mr-2" /> Publish to Media</>
-              )}
-            </Button>
-            {release.status === 'client_approved' && (
-              <p className="text-sm text-green-600 mt-3 flex items-center justify-center gap-1">
-                <CheckCircle className="h-4 w-4" />
-                Your release is in the publication queue. Our team will publish it shortly.
+          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+            <div className="bg-ink p-8 text-center">
+              <h3 className="font-display text-3xl text-paper-light mb-3">Publish to the Media</h3>
+              <p className="text-paper-light/70 mb-0 max-w-xl mx-auto">
+                Get your story in front of the people who matter.
               </p>
-            )}
+            </div>
+            <div className="p-8 bg-paper-light">
+              <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center">
+                  <div className="font-display text-3xl text-primary mb-1">1,000+</div>
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-ink-muted mb-2">Journalists</div>
+                  <p className="text-sm text-ink-muted">Your release is emailed directly to opted-in journalists covering {release.industry || 'your industry'} — real inboxes, real people.</p>
+                </div>
+                <div className="text-center">
+                  <div className="font-display text-3xl text-secondary mb-1">50+</div>
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-ink-muted mb-2">Partner Sites</div>
+                  <p className="text-sm text-ink-muted">Published on PRBuild Showcase and distributed to our network of industry news sites and syndication partners.</p>
+                </div>
+                <div className="text-center">
+                  <div className="font-display text-3xl text-ink mb-1">24hr</div>
+                  <div className="font-mono text-[10px] uppercase tracking-wider text-ink-muted mb-2">Social & Digest</div>
+                  <p className="text-sm text-ink-muted">Featured in our weekly industry newsletter and shared across social media channels reaching thousands of professionals.</p>
+                </div>
+              </div>
+
+              <div className="border-t border-rule pt-6 text-center">
+                {release.status === 'published' ? (
+                  <div className="flex items-center justify-center gap-2 text-green-600">
+                    <CheckCircle className="h-5 w-5" />
+                    <span className="font-semibold">Your release has been published and distributed!</span>
+                  </div>
+                ) : release.status === 'client_approved' ? (
+                  <div>
+                    <div className="flex items-center justify-center gap-2 text-green-600 mb-2">
+                      <CheckCircle className="h-5 w-5" />
+                      <span className="font-semibold">Submitted for publication!</span>
+                    </div>
+                    <p className="text-sm text-ink-muted">Our team is reviewing your release and will distribute it to our journalist network within 24 hours.</p>
+                  </div>
+                ) : (
+                  <div>
+                    <Button
+                      onClick={handlePublishToMedia}
+                      disabled={publishing}
+                      className="bg-primary hover:bg-primary-700 rounded-sm text-lg px-10 py-3"
+                      size="lg"
+                    >
+                      {publishing ? (
+                        <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Submitting...</>
+                      ) : (
+                        <><Send className="h-5 w-5 mr-2" /> Publish to Media</>
+                      )}
+                    </Button>
+                    <p className="text-xs text-ink-muted mt-3">
+                      By publishing, your release will be distributed to journalists, published on our showcase, and included in industry newsletters.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
