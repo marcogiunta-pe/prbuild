@@ -160,6 +160,84 @@ const statusConfig: Record<ReleaseStatus, { label: string; color: string; descri
   },
 };
 
+function PanelReviewAnimation({ reviewers, progress, comments }: {
+  reviewers: { name: string; beat: string; comment: string }[];
+  progress: number;
+  comments: string[];
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 mb-2">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        <div>
+          <span className="font-semibold text-ink">Panel review in progress...</span>
+          <p className="text-xs text-ink-muted">Each journalist is reading and scoring your release</p>
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="w-full h-2 bg-paper-dark rounded-full overflow-hidden">
+        <div
+          className="h-full bg-primary rounded-full transition-all duration-1000"
+          style={{ width: `${(progress / 16) * 100}%` }}
+        />
+      </div>
+      <p className="text-xs text-ink-muted font-mono text-center">
+        {progress} of 16 reviewers complete
+      </p>
+
+      {/* Reviewer cards with live comments */}
+      <div className="space-y-2 max-h-[400px] overflow-y-auto">
+        {reviewers.map((reviewer, i) => (
+          <div
+            key={reviewer.name}
+            className={`flex items-start gap-3 p-3 rounded-md border transition-all duration-700 ${
+              i < progress
+                ? 'border-green-200 bg-green-50 opacity-100'
+                : i === progress
+                  ? 'border-primary/40 bg-primary/5 opacity-100'
+                  : 'border-rule bg-paper opacity-30'
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center font-mono text-[11px] font-semibold flex-shrink-0 mt-0.5 ${
+              i < progress ? 'bg-green-100 text-green-700' : i === progress ? 'bg-primary/10 text-primary animate-pulse' : 'bg-paper-dark text-ink-muted'
+            }`}>
+              {i < progress ? '✓' : reviewer.name.split(' ').map(w => w[0]).join('')}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-ink">{reviewer.name}</span>
+                <span className="font-mono text-[9px] uppercase tracking-wider text-primary">{reviewer.beat}</span>
+              </div>
+              {i < progress && (
+                <p className="text-xs text-green-700 mt-1 animate-fade-up">
+                  {comments[i] || reviewer.comment} <span className="font-mono">Done.</span>
+                </p>
+              )}
+              {i === progress && (
+                <p className="text-xs text-ink-muted mt-1 animate-pulse">
+                  {reviewer.comment}
+                </p>
+              )}
+              {i > progress && (
+                <p className="text-xs text-ink-muted/40 mt-1">Waiting to review...</p>
+              )}
+            </div>
+            {i < progress && (
+              <span className="font-mono text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-sm flex-shrink-0">
+                DONE
+              </span>
+            )}
+            {i === progress && (
+              <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0 mt-1" />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ReleaseDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const [release, setRelease] = useState<ReleaseRequest | null>(null);
@@ -172,6 +250,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [showPanelDetail, setShowPanelDetail] = useState(false);
   const [requestingPanel, setRequestingPanel] = useState(false);
   const [panelProgress, setPanelProgress] = useState(0);
+  const [panelComments, setPanelComments] = useState<string[]>([]);
   const [rewriteProgress, setRewriteProgress] = useState(0);
 
   useEffect(() => {
@@ -364,25 +443,39 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     setEditedContent('');
   };
 
-  const REVIEWER_NAMES = [
-    'Sarah Lin', 'Marcus Reid', 'Jenna Huang', 'David Kessler',
-    'Aisha Patel', 'Tom Nguyen', 'Rachel Chen', 'Eli Washington',
-    'Lisa Monroe', 'Jake Barrett', 'Nina Kowalski', 'Wei Chen',
-    'Diana Ortiz', 'Paul Jensen', 'Sofia Martinez', 'Raj Kapoor',
+  const REVIEWERS = [
+    { name: 'Sarah Lin', beat: 'Tech M&A', comment: 'Checking headline impact and news hook strength...' },
+    { name: 'Marcus Reid', beat: 'Enterprise SaaS', comment: 'Evaluating B2B positioning and market context...' },
+    { name: 'Jenna Huang', beat: 'Consumer Brands', comment: 'Looking for the human story angle...' },
+    { name: 'David Kessler', beat: 'PR Veteran', comment: 'Verifying AP style, dateline, and boilerplate...' },
+    { name: 'Aisha Patel', beat: 'Healthcare', comment: 'Checking clinical claims and regulatory language...' },
+    { name: 'Tom Nguyen', beat: 'Fintech', comment: 'Reviewing financial context and regulatory framing...' },
+    { name: 'Rachel Chen', beat: 'Marketing', comment: 'Testing whether this would move pipeline...' },
+    { name: 'Eli Washington', beat: 'Target Customer', comment: 'Reading as a buyer — does this make me care?' },
+    { name: 'Lisa Monroe', beat: 'Corp Comms', comment: 'Assessing tone and corporate messaging alignment...' },
+    { name: 'Jake Barrett', beat: 'Startup Press', comment: 'Checking if this would land on TechCrunch...' },
+    { name: 'Nina Kowalski', beat: 'Data & AI', comment: 'Evaluating technical accuracy and depth...' },
+    { name: 'Wei Chen', beat: 'Supply Chain', comment: 'Reviewing operational impact and logistics angle...' },
+    { name: 'Diana Ortiz', beat: 'Growth', comment: 'Testing conversion potential and CTA clarity...' },
+    { name: 'Paul Jensen', beat: 'Content Strategy', comment: 'Analyzing readability and narrative structure...' },
+    { name: 'Sofia Martinez', beat: 'SMB Owner', comment: 'Reading as a small business — is this relatable?' },
+    { name: 'Raj Kapoor', beat: 'Enterprise Buyer', comment: 'Evaluating from a procurement perspective...' },
   ];
 
   const handleRequestPanelReview = async () => {
     if (!release) return;
     setRequestingPanel(true);
     setPanelProgress(0);
+    setPanelComments([]);
 
-    // Animate reviewer progress while waiting for the API
+    // Animate reviewer progress — ~3.5s per reviewer = ~56s total
+    let currentReviewer = 0;
     const interval = setInterval(() => {
-      setPanelProgress(prev => {
-        if (prev >= 15) { clearInterval(interval); return 15; }
-        return prev + 1;
-      });
-    }, 1800);
+      if (currentReviewer >= 16) { clearInterval(interval); return; }
+      setPanelProgress(currentReviewer + 1);
+      setPanelComments(prev => [...prev, REVIEWERS[currentReviewer]?.comment || '']);
+      currentReviewer++;
+    }, 3500);
 
     try {
       const response = await fetch('/api/process-release', {
@@ -395,8 +488,9 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
       });
       clearInterval(interval);
       setPanelProgress(16);
+      setPanelComments(REVIEWERS.map(r => r.comment));
       if (response.ok) {
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 1500));
         await loadRelease();
       } else {
         const err = await response.json();
@@ -408,6 +502,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     }
     setRequestingPanel(false);
     setPanelProgress(0);
+    setPanelComments([]);
   };
 
   if (loading) {
@@ -680,47 +775,11 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   Request Journalist Review
                 </Button>
               ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                    <span className="font-semibold text-ink">Panel review in progress...</span>
-                  </div>
-                  <div className="w-full h-2 bg-paper-dark rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-700"
-                      style={{ width: `${(panelProgress / 16) * 100}%` }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {REVIEWER_NAMES.map((name, i) => (
-                      <div
-                        key={name}
-                        className={`flex items-center gap-2 p-2 rounded-md border transition-all duration-500 ${
-                          i < panelProgress
-                            ? 'border-green-200 bg-green-50 opacity-100'
-                            : i === panelProgress
-                              ? 'border-primary/30 bg-primary/5 opacity-100 animate-pulse'
-                              : 'border-rule bg-paper opacity-40'
-                        }`}
-                      >
-                        <div className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-[10px] font-semibold flex-shrink-0 ${
-                          i < panelProgress ? 'bg-green-100 text-green-700' : i === panelProgress ? 'bg-primary/10 text-primary' : 'bg-paper-dark text-ink-muted'
-                        }`}>
-                          {i < panelProgress ? '✓' : name.split(' ').map(w => w[0]).join('')}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[11px] font-medium text-ink truncate">{name}</div>
-                          <div className="font-mono text-[9px] text-ink-muted">
-                            {i < panelProgress ? 'Reviewed' : i === panelProgress ? 'Reviewing...' : 'Waiting'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-ink-muted font-mono">
-                    {panelProgress} of 16 reviewers complete — takes about 30 seconds
-                  </p>
-                </div>
+                <PanelReviewAnimation
+                  reviewers={REVIEWERS}
+                  progress={panelProgress}
+                  comments={panelComments}
+                />
               )}
             </CardContent>
           </Card>
@@ -912,9 +971,35 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     </div>
                   )}
 
-                  {release.panel_reviewed_at && (
+                  {/* Re-review button + animation */}
+                  {canReview && !requestingPanel && (
+                    <div className="pt-3 border-t border-rule">
+                      <Button
+                        onClick={handleRequestPanelReview}
+                        variant="outline"
+                        className="rounded-sm border-rule"
+                      >
+                        <Users className="h-4 w-4 mr-2" />
+                        Request New Review
+                      </Button>
+                      <p className="text-xs text-ink-muted mt-1">
+                        Run the 16-journalist panel again after making changes.
+                      </p>
+                    </div>
+                  )}
+                  {requestingPanel && (
+                    <div className="pt-3 border-t border-rule">
+                      <PanelReviewAnimation
+                        reviewers={REVIEWERS}
+                        progress={panelProgress}
+                        comments={panelComments}
+                      />
+                    </div>
+                  )}
+
+                  {release.panel_reviewed_at && !requestingPanel && (
                     <p className="text-xs text-ink-muted font-mono">
-                      Reviewed {format(new Date(release.panel_reviewed_at), 'PPp')}
+                      Last reviewed {format(new Date(release.panel_reviewed_at), 'PPp')}
                     </p>
                   )}
                 </CardContent>
