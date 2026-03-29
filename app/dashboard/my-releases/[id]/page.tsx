@@ -451,8 +451,8 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
       .eq('id', release.id);
 
     if (!error) {
-      alert("Thank you! Your release has been approved and is now in the publication queue. Our team will review and publish it shortly.");
-      await loadRelease();
+      router.push(`/dashboard/my-releases/${release.id}/preview`);
+      return;
     }
     setSubmitting(false);
   };
