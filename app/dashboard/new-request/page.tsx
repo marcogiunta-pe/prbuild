@@ -249,6 +249,7 @@ export default function NewRequestPage() {
       {/* Progress Steps */}
       {(() => {
         const stepLabels: Record<Step, string> = {
+          plan: 'Plan',
           company: 'Company',
           announcement: 'Details',
           quotes: 'Quotes',
