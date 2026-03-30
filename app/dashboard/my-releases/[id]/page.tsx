@@ -32,9 +32,34 @@ import {
 import { ReleaseRequest, ReleaseStatus, PanelFeedback } from '@/types';
 import { format } from 'date-fns';
 
+// Section labels to strip
+const DRAFT_LABEL_WORDS = ['headline', 'headline options', 'headline option 1', 'headline option 2', 'headline option 3',
+  'subhead', 'subheadline', 'dateline', 'dateline + lead paragraph', 'dateline + lead',
+  'lead paragraph', 'lead', 'body paragraph', 'body paragraphs', 'body paragraph 1',
+  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'quote(s)',
+  'suggested quote', 'boilerplate', 'about', 'about the company',
+  'media contact', 'contact information', 'contact info', 'contact',
+  'call to action', 'call-to-action', 'cta', 'next steps',
+  'visuals suggestions', 'visuals', 'visual suggestions',
+  'distribution checklist', 'distribution'];
+
+function isDraftLabel(line: string): boolean {
+  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').replace(/:+\s*$/, '').trim().toLowerCase();
+  return DRAFT_LABEL_WORDS.includes(cleaned);
+}
+
 // Convert markdown-style text to HTML
 function formatDraftAsHtml(content: string): string {
   if (!content) return '';
+
+  // Pre-filter: remove section label lines and stray markers
+  content = content.split('\n').filter(line => {
+    const t = line.trim();
+    if (isDraftLabel(t)) return false;
+    if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(t)) return false;
+    if (/^\s*[-–]?\s*\*{2,}\s*$/.test(t)) return false;
+    return true;
+  }).join('\n');
 
   // If content contains HTML block-level tags, treat as HTML
   // Strip scripts/styles/event handlers but keep formatting tags

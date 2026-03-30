@@ -19,16 +19,21 @@ import {
 import { ReleaseRequest } from '@/types';
 
 // Section labels the AI includes that should be stripped from display
-const LABEL_WORDS = ['headline', 'headline options', 'subhead', 'dateline', 'dateline + lead paragraph',
-  'dateline + lead', 'lead paragraph', 'body paragraph', 'body paragraphs', 'body paragraph 1',
-  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'boilerplate',
-  'media contact', 'call to action', 'visuals suggestions', 'visuals', 'distribution checklist',
-  'distribution', 'call-to-action', 'cta'];
+const LABEL_WORDS = ['headline', 'headline options', 'headline option 1', 'headline option 2', 'headline option 3',
+  'subhead', 'subheadline', 'dateline', 'dateline + lead paragraph', 'dateline + lead',
+  'lead paragraph', 'lead', 'body paragraph', 'body paragraphs', 'body paragraph 1',
+  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'quote(s)', 'quote(s):',
+  'suggested quote', 'suggested quotes', 'boilerplate', 'about', 'about the company',
+  'media contact', 'media contact:', 'contact information', 'contact info', 'contact',
+  'call to action', 'call-to-action', 'cta', 'next steps',
+  'visuals suggestions', 'visuals', 'visual suggestions', 'suggested visuals',
+  'distribution checklist', 'distribution', 'distribution notes',
+  'end', '###', '# # #', '- # # # -'];
 
 function isSectionLabel(line: string): boolean {
-  // Strip ** markers, #, -, numbers, and whitespace to get the raw text
-  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').trim().toLowerCase();
-  return LABEL_WORDS.includes(cleaned);
+  // Strip ** markers, #, -, numbers, colons, and whitespace to get the raw text
+  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').replace(/:+\s*$/, '').trim().toLowerCase();
+  return LABEL_WORDS.includes(cleaned) || LABEL_WORDS.includes(cleaned + ':');
 }
 
 function cleanContent(raw: string): string {
