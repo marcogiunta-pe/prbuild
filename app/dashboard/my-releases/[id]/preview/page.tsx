@@ -15,6 +15,8 @@ import {
   Code,
   FileText,
   CheckCircle,
+  RefreshCw,
+  Loader2,
 } from 'lucide-react';
 import { ReleaseRequest } from '@/types';
 
@@ -184,6 +186,8 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const [sigEmail, setSigEmail] = useState('');
   const [sigPhone, setSigPhone] = useState('');
   const [sigAgreed, setSigAgreed] = useState(false);
+  const [generatingPitches, setGeneratingPitches] = useState(false);
+  const [copiedPitch, setCopiedPitch] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -268,6 +272,32 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     setPublishing(false);
     setShowDisclaimer(false);
     router.push(`/dashboard/my-releases/${release.id}`);
+  };
+
+  const handleGeneratePitches = async () => {
+    if (!release) return;
+    setGeneratingPitches(true);
+    try {
+      const res = await fetch('/api/ai/generate-pitches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseRequestId: release.id }),
+      });
+      const data = await res.json();
+      if (data.success && data.pitches) {
+        setRelease({ ...release, pitch_emails: data.pitches });
+      }
+    } catch (err) {
+      console.error('Failed to generate pitches:', err);
+    } finally {
+      setGeneratingPitches(false);
+    }
+  };
+
+  const copyPitchText = async (text: string, key: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedPitch(key);
+    setTimeout(() => setCopiedPitch(null), 2000);
   };
 
   return (
@@ -382,6 +412,130 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           {/* End mark */}
           <div className="border-t border-rule pt-6 text-center">
             <p className="font-mono text-xs text-ink-muted">###</p>
+          </div>
+
+          {/* Journalist Pitch Emails */}
+          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+            <div className="p-6 border-b border-rule bg-paper-light">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-5 w-5 text-primary" />
+                  <div>
+                    <h3 className="font-display text-xl text-ink">Journalist Pitch Emails</h3>
+                    <p className="text-sm text-ink-muted mt-0.5">
+                      Personalized pitch emails ready to send to journalists. Copy any email and send it directly.
+                    </p>
+                  </div>
+                </div>
+                {release.pitch_emails && release.pitch_emails.length > 0 && (
+                  <button
+                    onClick={handleGeneratePitches}
+                    disabled={generatingPitches}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ink-muted hover:text-ink border border-rule rounded-sm hover:bg-paper transition-colors disabled:opacity-50"
+                  >
+                    {generatingPitches ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    )}
+                    Regenerate
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 bg-paper-light">
+              {!release.pitch_emails || release.pitch_emails.length === 0 ? (
+                <div className="text-center py-8">
+                  <Mail className="h-10 w-10 text-ink-muted/40 mx-auto mb-3" />
+                  <p className="text-sm text-ink-muted mb-4">
+                    Generate personalized pitch emails tailored to different journalist beats.
+                  </p>
+                  <Button
+                    onClick={handleGeneratePitches}
+                    disabled={generatingPitches}
+                    className="bg-primary hover:bg-primary-700 rounded-sm"
+                  >
+                    {generatingPitches ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                    ) : (
+                      <><Mail className="h-4 w-4 mr-2" /> Generate 5 Pitch Emails</>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {release.pitch_emails.map((pitch, index) => {
+                    const subjectKey = `subject-${index}`;
+                    const bodyKey = `body-${index}`;
+                    const mailtoHref = `mailto:?subject=${encodeURIComponent(pitch.subject)}&body=${encodeURIComponent(pitch.body)}`;
+                    return (
+                      <div key={index} className="border border-rule rounded-sm bg-paper">
+                        <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
+                          <div>
+                            <span className="font-display text-sm text-ink font-semibold">{pitch.reporterName}</span>
+                            <span className="text-ink-muted text-sm"> &mdash; </span>
+                            <span className="text-sm text-ink-muted">{pitch.outlet}</span>
+                          </div>
+                          <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                            {pitch.beat}
+                          </span>
+                        </div>
+
+                        <div className="px-4 py-3 space-y-3">
+                          {/* Subject line */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted">Subject</span>
+                              <button
+                                onClick={() => copyPitchText(pitch.subject, subjectKey)}
+                                className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors"
+                              >
+                                {copiedPitch === subjectKey ? (
+                                  <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                                ) : (
+                                  <><Copy className="h-3 w-3" /> Copy</>
+                                )}
+                              </button>
+                            </div>
+                            <p className="text-sm text-ink font-semibold">{pitch.subject}</p>
+                          </div>
+
+                          {/* Body */}
+                          <div>
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted">Body</span>
+                              <button
+                                onClick={() => copyPitchText(pitch.body, bodyKey)}
+                                className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors"
+                              >
+                                {copiedPitch === bodyKey ? (
+                                  <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                                ) : (
+                                  <><Copy className="h-3 w-3" /> Copy</>
+                                )}
+                              </button>
+                            </div>
+                            <p className="text-sm text-ink-soft leading-relaxed whitespace-pre-line">{pitch.body}</p>
+                          </div>
+
+                          {/* Send via Email */}
+                          <div className="pt-2 border-t border-rule">
+                            <a
+                              href={mailtoHref}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                            >
+                              <Send className="h-3 w-3" />
+                              Send via Email
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Publish CTA */}

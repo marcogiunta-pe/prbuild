@@ -105,6 +105,15 @@ export interface ReleaseRequest {
   client_feedback: string | null;
   client_feedback_at: string | null;
   
+  // Pitch Emails
+  pitch_emails: Array<{
+    reporterName: string;
+    outlet: string;
+    beat: string;
+    subject: string;
+    body: string;
+  }> | null;
+
   // Final Content
   final_content: string | null;
   final_approved_at: string | null;
