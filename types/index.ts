@@ -114,6 +114,12 @@ export interface ReleaseRequest {
     body: string;
   }> | null;
 
+  // Announcement Content (client email + LinkedIn post)
+  announcement_content: {
+    clientEmail?: { subject: string; body: string };
+    linkedInPost?: string;
+  } | null;
+
   // Final Content
   final_content: string | null;
   final_approved_at: string | null;
@@ -226,7 +232,47 @@ export interface PanelFeedback {
   feedback: string;
   compelling: boolean;
   missing: string;
+  suggestion: string;
   verdict: string;
+}
+
+/**
+ * Derive a 0-10 newsroom score from panel feedback.
+ * The `compelling` field is often unpopulated, so we analyze the feedback text.
+ */
+export function deriveNewsroomScore(feedback: PanelFeedback[]): { score: number; compellingCount: number; total: number } {
+  const total = feedback.length;
+  if (total === 0) return { score: 0, compellingCount: 0, total: 0 };
+
+  const negativeSignals = /\bnot compelling\b|\bwould not\b|\bwouldn't\b|\bfails\b|\bweak\b|\bmissing\b|\blacks\b|\bignore\b|\bskip\b|\bdelete\b|\btrash\b|\bnot newsworthy\b|\bnot run\b|\bpass on\b|\bwould pass\b|\bdo not publish\b/i;
+  const positiveSignals = /(?<!\bnot\s)\bcompelling\b|\bwould run\b|\bstrong\b|\beffective\b|\bsolid\b|\bnewsworthy\b|\bwell[- ]crafted\b|(?<!\bnot\s|do not\s)\bpublish\b|\bwould cover\b|\bwould pick up\b|\bsucceeds\b/i;
+
+  // Detect if this is old data where the parser always set compelling=false
+  // If ALL reviewers have compelling=false AND some have positive text signals,
+  // fall back to text analysis for everyone
+  const allFalse = feedback.every(fb => fb.compelling === false);
+  const anyPositiveText = feedback.some(fb => positiveSignals.test(fb.feedback || ''));
+  const useTextAnalysis = allFalse && anyPositiveText;
+
+  let compellingCount = 0;
+  for (const fb of feedback) {
+    if (!useTextAnalysis && typeof fb.compelling === 'boolean') {
+      if (fb.compelling) compellingCount++;
+      continue;
+    }
+    // Derive from text
+    const text = fb.feedback || '';
+    const hasNeg = negativeSignals.test(text);
+    const hasPos = positiveSignals.test(text);
+    if (hasPos && !hasNeg) {
+      compellingCount++;
+    } else if (hasPos && hasNeg) {
+      compellingCount += 0.5;
+    }
+  }
+
+  const score = Math.round((compellingCount / total) * 100) / 10;
+  return { score, compellingCount: Math.round(compellingCount), total };
 }
 
 export interface ContrarianRecommendation {
@@ -331,6 +377,20 @@ export const PRICING = {
       'Dedicated account support',
     ],
   },
+} as const;
+
+export const KIT_PRICING = {
+  name: 'Launch PR Kit',
+  price: 49,
+  priceInCents: 4900,
+  description: 'One-time funding announcement kit',
+  includes: [
+    'AP-style press release tailored to your raise',
+    '5 personalized journalist pitch emails',
+    '16-journalist AI panel newsroom score',
+    '1 revision round',
+    'Export: Google Doc, PDF, plain text',
+  ],
 } as const;
 
 export const CATEGORIES = [

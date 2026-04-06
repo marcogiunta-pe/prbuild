@@ -1,44 +1,48 @@
 // lib/prompts/panel-critique.ts
 
 export const PANEL_CRITIQUE_SYSTEM_PROMPT = `Act as a structured review panel evaluating the following press release.
+Return your response as valid JSON only — no markdown fences, no extra text.
 
 Panel composition:
-* 5 journalists (health policy, state government, rural health, investigative health, health innovation)
-* 3 professional press release writers (agency, corporate comms, former newsroom editor)
-* 3 senior marketing experts (B2G, healthcare growth, positioning)
-* 5 distinct target customers (Governor office policy staffer, State Medicaid director, rural hospital CEO, public health foundation executive, health plan executive)
+* 5 journalists (Connie Loizos — TechCrunch, Erin Griffith — NYT, Tom Dotan — WSJ, Kia Kokalitcheva — Axios, Zoë Schiffer — Platformer)
+* 3 press release / copy experts (Ed Zitron — PR critic, corporate comms VP, Harry Dry — Marketing Examples founder and legendary copywriter)
+* 3 senior marketing experts (Kipp Bodnar — HubSpot CMO, Dave Gerhardt — Exit Five B2B marketing, April Dunford — positioning expert)
+* 5 distinct target customers / industry voices (Jason Lemkin — SaaStr, Hiten Shah — FYI, Rand Fishkin — SparkToro, Dharmesh Shah — HubSpot CTO, mid-market CEO)
 
 For each persona:
 * Assign a realistic first name and only the first letter of the last name.
 * Respond independently in the voice of that role.
 * Be critical and specific. No politeness. No hedging.
+* EVERY piece of feedback MUST include a concrete suggestion — what specifically to change, add, or remove. "This is weak" is useless without "Replace X with Y" or "Add a sentence about Z".
 
-Step 1: Individual Feedback
-
-Provide concise feedback from each persona answering:
-* Would this be compelling to you. Why or why not.
-* What is missing that would force action.
-* One sentence on how this fails or succeeds for your role.
-
-Step 2: Synthesis
-
-Identify the top 3 recurring themes or conflicts across all responses.
-* Call out alignment and disagreement explicitly.
-* Avoid generic summaries.
-
-Step 3: Contrarian Recommendation
-
-Provide a recommended action plan that intentionally goes against the current press release consensus, including:
-* What to remove.
-* What to sharpen.
-* What risk to take that the current draft avoids.
-* Who this revised release should deliberately ignore.
+Return this exact JSON structure:
+{
+  "reviewers": [
+    {
+      "persona": "First L.",
+      "role": "their role title",
+      "compelling": true/false,
+      "feedback": "Critical assessment — what works and what doesn't",
+      "missing": "What is missing that would force action",
+      "suggestion": "SPECIFIC rewrite instruction: e.g. 'Replace the headline with: [concrete headline]' or 'Add this sentence after paragraph 2: [exact sentence]' or 'Delete the third paragraph and replace with: [specific text]'",
+      "verdict": "One sentence: how this fails or succeeds for their role"
+    }
+  ],
+  "synthesis": "Top 3 recurring themes as a numbered list. Call out alignment and disagreement explicitly.",
+  "contrarian": {
+    "remove": "What to remove",
+    "sharpen": "What to sharpen",
+    "risk": "What risk to take that the current draft avoids",
+    "ignore": "Who this revised release should deliberately ignore"
+  }
+}
 
 Rules:
 * No marketing buzzwords unless criticizing them.
 * Short sentences. Clear thinking.
 * Prioritize tension, urgency, and decision making.
-* Output only the analysis. No rewriting unless asked.`;
+* The "suggestion" field is the MOST IMPORTANT — it must be specific enough that someone could apply it without thinking. Include exact replacement text, not vague advice.
+* "compelling" must be true only if you would genuinely run/use/act on this release as-is.`;
 
 export function buildPanelCritiqueUserPrompt(pressRelease: string): string {
   return `Please review and critique the following press release:
@@ -65,19 +69,19 @@ interface PanelConfig {
 const PANEL_CONFIGS: Record<Industry, PanelConfig> = {
   healthcare: {
     journalists: [
-      'health policy journalist',
-      'state government health reporter',
-      'rural health correspondent',
-      'investigative health journalist',
-      'health innovation writer',
+      'Christina Farr — CNBC health tech reporter',
+      'Casey Ross — STAT News health technology journalist',
+      'Tina Reed — Axios healthcare industry reporter',
+      'Arthur Allen — Politico health IT correspondent',
+      'Rebecca Pifer — Healthcare Dive hospital operations reporter',
     ],
     prWriters: [
       'healthcare PR agency director',
       'hospital system corporate comms lead',
-      'former health trade newsroom editor',
+      'Harry Dry — Marketing Examples founder, legendary copywriter (evaluate headline, hook, and every word choice)',
     ],
     marketingExperts: [
-      'B2G healthcare marketing executive',
+      'Kipp Bodnar — HubSpot CMO (evaluate whether this would move pipeline and drive action)',
       'healthcare growth marketing director',
       'health tech positioning strategist',
     ],
@@ -91,47 +95,47 @@ const PANEL_CONFIGS: Record<Industry, PanelConfig> = {
   },
   technology: {
     journalists: [
-      'enterprise tech journalist',
-      'startup/VC reporter',
-      'cybersecurity correspondent',
-      'AI/ML technology writer',
-      'SaaS industry analyst',
+      'Connie Loizos — TechCrunch VC and startups reporter',
+      'Erin Griffith — New York Times startup culture reporter',
+      'Tom Dotan — Wall Street Journal enterprise tech reporter',
+      'Zoë Schiffer — Platformer tech industry journalist',
+      'Kia Kokalitcheva — Axios venture capital reporter',
     ],
     prWriters: [
-      'tech PR agency founder',
+      'Ed Zitron — PR critic and agency founder',
       'Fortune 500 tech corporate comms director',
-      'former TechCrunch editor',
+      'Harry Dry — Marketing Examples founder, legendary copywriter (evaluate headline, hook, and every word choice)',
     ],
     marketingExperts: [
-      'B2B SaaS marketing executive',
-      'developer marketing director',
-      'enterprise positioning strategist',
+      'Kipp Bodnar — HubSpot CMO (evaluate whether this would move pipeline and drive action)',
+      'Dave Gerhardt — Exit Five founder, B2B marketing expert',
+      'April Dunford — positioning expert and Obviously Awesome author',
     ],
     targetCustomers: [
-      'Fortune 500 CTO',
+      'Jason Lemkin — SaaStr founder and SaaS investor',
       'Series B startup founder',
       'enterprise IT procurement director',
       'VC partner at top-tier firm',
-      'mid-market CIO',
+      'Dharmesh Shah — HubSpot CTO and founder',
     ],
   },
   finance: {
     journalists: [
-      'financial services reporter',
-      'fintech correspondent',
-      'banking industry analyst',
-      'investment/markets journalist',
-      'regulatory affairs writer',
+      'Ryan Browne — CNBC fintech reporter',
+      'Penny Crosman — American Banker technology reporter',
+      'Sujata Rao — Reuters financial markets reporter',
+      'Mary Ann Azevedo — TechCrunch fintech reporter',
+      'Tanaya Macheel — Fortune fintech correspondent',
     ],
     prWriters: [
       'financial PR agency MD',
       'bank corporate communications SVP',
-      'former WSJ financial editor',
+      'Harry Dry — Marketing Examples founder, legendary copywriter (evaluate headline, hook, and every word choice)',
     ],
     marketingExperts: [
-      'wealth management marketing director',
+      'Kipp Bodnar — HubSpot CMO (evaluate whether this would move pipeline and drive action)',
       'fintech growth executive',
-      'institutional positioning strategist',
+      'April Dunford — positioning expert and Obviously Awesome author',
     ],
     targetCustomers: [
       'regional bank CEO',
@@ -143,54 +147,54 @@ const PANEL_CONFIGS: Record<Industry, PanelConfig> = {
   },
   retail: {
     journalists: [
-      'retail industry reporter',
-      'consumer trends correspondent',
-      'e-commerce analyst',
-      'supply chain journalist',
-      'CPG industry writer',
+      'Melissa Repko — CNBC retail industry reporter',
+      'Suzanne Kapner — Wall Street Journal retail reporter',
+      'Leticia Miranda — NBC News retail and e-commerce reporter',
+      'Daphne Howland — Retail Dive strategy reporter',
+      'Adrianne Pasquarelli — Ad Age retail marketing reporter',
     ],
     prWriters: [
       'consumer PR agency VP',
       'retail brand corporate comms director',
-      'former Retail Week editor',
+      'Harry Dry — Marketing Examples founder, legendary copywriter (evaluate headline, hook, and every word choice)',
     ],
     marketingExperts: [
+      'Kipp Bodnar — HubSpot CMO (evaluate whether this would move pipeline and drive action)',
       'DTC brand marketing executive',
-      'retail growth director',
-      'omnichannel positioning strategist',
+      'April Dunford — positioning expert and Obviously Awesome author',
     ],
     targetCustomers: [
       'national retail chain CMO',
       'DTC brand founder',
       'department store buyer',
       'e-commerce platform executive',
-      'retail REIT investment manager',
+      'Rand Fishkin — SparkToro founder, audience research expert',
     ],
   },
   general: {
     journalists: [
-      'business news reporter',
-      'industry trends correspondent',
-      'investigative business journalist',
-      'local business editor',
-      'trade publication writer',
+      'Connie Loizos — TechCrunch VC and startups reporter',
+      'Erin Griffith — New York Times startup culture reporter',
+      'Tom Dotan — Wall Street Journal enterprise tech reporter',
+      'Kia Kokalitcheva — Axios venture capital reporter',
+      'Zoë Schiffer — Platformer tech industry journalist',
     ],
     prWriters: [
-      'general PR agency director',
+      'Ed Zitron — PR critic and agency founder',
       'corporate communications VP',
-      'former AP business editor',
+      'Harry Dry — Marketing Examples founder, legendary copywriter (evaluate headline, hook, and every word choice)',
     ],
     marketingExperts: [
-      'B2B marketing executive',
-      'growth marketing director',
-      'brand positioning strategist',
+      'Kipp Bodnar — HubSpot CMO (evaluate whether this would move pipeline and drive action)',
+      'Dave Gerhardt — Exit Five founder, B2B marketing expert',
+      'April Dunford — positioning expert and Obviously Awesome author',
     ],
     targetCustomers: [
+      'Jason Lemkin — SaaStr founder and SaaS investor',
+      'Hiten Shah — FYI founder, product and growth expert',
+      'Rand Fishkin — SparkToro founder, audience research expert',
+      'Dharmesh Shah — HubSpot CTO and founder',
       'mid-market company CEO',
-      'private equity operating partner',
-      'industry association executive',
-      'chamber of commerce director',
-      'business development VP',
     ],
   },
 };
@@ -199,6 +203,7 @@ export function buildIndustryPanelPrompt(industry: Industry): string {
   const config = PANEL_CONFIGS[industry];
 
   return `Act as a structured review panel evaluating the following press release.
+Return your response as valid JSON only — no markdown fences, no extra text.
 
 Panel composition:
 * 5 journalists (${config.journalists.join(', ')})
@@ -210,33 +215,36 @@ For each persona:
 * Assign a realistic first name and only the first letter of the last name.
 * Respond independently in the voice of that role.
 * Be critical and specific. No politeness. No hedging.
+* EVERY piece of feedback MUST include a concrete suggestion — what specifically to change, add, or remove.
 
-Step 1: Individual Feedback
-
-Provide concise feedback from each persona answering:
-* Would this be compelling to you. Why or why not.
-* What is missing that would force action.
-* One sentence on how this fails or succeeds for your role.
-
-Step 2: Synthesis
-
-Identify the top 3 recurring themes or conflicts across all responses.
-* Call out alignment and disagreement explicitly.
-* Avoid generic summaries.
-
-Step 3: Contrarian Recommendation
-
-Provide a recommended action plan that intentionally goes against the current press release consensus, including:
-* What to remove.
-* What to sharpen.
-* What risk to take that the current draft avoids.
-* Who this revised release should deliberately ignore.
+Return this exact JSON structure:
+{
+  "reviewers": [
+    {
+      "persona": "First L.",
+      "role": "their role title",
+      "compelling": true/false,
+      "feedback": "Critical assessment — what works and what doesn't",
+      "missing": "What is missing that would force action",
+      "suggestion": "SPECIFIC rewrite instruction: e.g. 'Replace the headline with: [concrete headline]' or 'Add this sentence after paragraph 2: [exact sentence]' or 'Delete the third paragraph and replace with: [specific text]'",
+      "verdict": "One sentence: how this fails or succeeds for their role"
+    }
+  ],
+  "synthesis": "Top 3 recurring themes as a numbered list. Call out alignment and disagreement explicitly.",
+  "contrarian": {
+    "remove": "What to remove",
+    "sharpen": "What to sharpen",
+    "risk": "What risk to take that the current draft avoids",
+    "ignore": "Who this revised release should deliberately ignore"
+  }
+}
 
 Rules:
 * No marketing buzzwords unless criticizing them.
 * Short sentences. Clear thinking.
 * Prioritize tension, urgency, and decision making.
-* Output only the analysis. No rewriting unless asked.`;
+* The "suggestion" field is the MOST IMPORTANT — it must be specific enough that someone could apply it without thinking. Include exact replacement text, not vague advice.
+* "compelling" must be true only if you would genuinely run/use/act on this release as-is.`;
 }
 
 // Parser for panel critique response
@@ -245,6 +253,10 @@ export interface ParsedPanelCritique {
     persona: string;
     role: string;
     feedback: string;
+    compelling: boolean;
+    missing: string;
+    suggestion: string;
+    verdict: string;
   }[];
   synthesis: string;
   themes: string[];
@@ -258,55 +270,89 @@ export interface ParsedPanelCritique {
 }
 
 export function parsePanelCritiqueResponse(response: string): ParsedPanelCritique {
-  // Extract Step 1 - Individual Feedback
+  // Try JSON parse first (new format)
+  try {
+    const cleaned = response.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+    const json = JSON.parse(cleaned);
+
+    if (json.reviewers && Array.isArray(json.reviewers)) {
+      const individualFeedback = json.reviewers.map((r: any) => ({
+        persona: r.persona || 'Unknown',
+        role: r.role || '',
+        feedback: r.feedback || '',
+        compelling: typeof r.compelling === 'boolean' ? r.compelling : false,
+        missing: r.missing || '',
+        suggestion: r.suggestion || '',
+        verdict: r.verdict || '',
+      }));
+
+      const synthesis = json.synthesis || '';
+      const themeMatches = synthesis.match(/\d+\.\s*([^\n]+)/g) || [];
+      const themes = themeMatches.map((t: string) => t.replace(/^\d+\.\s*/, '').trim());
+
+      const c = json.contrarian || {};
+      return {
+        individualFeedback,
+        synthesis,
+        themes,
+        contrarianRecommendation: {
+          raw: JSON.stringify(c),
+          remove: c.remove || '',
+          sharpen: c.sharpen || '',
+          risk: c.risk || '',
+          ignore: c.ignore || '',
+        },
+      };
+    }
+  } catch {
+    // Fall through to legacy text parsing
+  }
+
+  // Legacy text-based parsing (for older responses)
   const step1Match = response.match(/Step 1[:\s]*Individual Feedback([\s\S]*?)(?=Step 2|$)/i);
   const step1Text = step1Match ? step1Match[1] : '';
-  
-  // Parse individual personas - look for name patterns like "Sarah M." or "Michael T."
+
   const personaMatches = step1Text.match(/([A-Z][a-z]+\s[A-Z]\.)[^A-Z]*([\s\S]*?)(?=[A-Z][a-z]+\s[A-Z]\.|$)/g) || [];
-  
+
   const individualFeedback = personaMatches.map(match => {
     const nameMatch = match.match(/^([A-Z][a-z]+\s[A-Z]\.)/);
     const name = nameMatch ? nameMatch[1] : 'Unknown';
-    const feedback = match.replace(/^[A-Z][a-z]+\s[A-Z]\.\s*[-–—]?\s*/, '').trim();
-    
+    const feedbackText = match.replace(/^[A-Z][a-z]+\s[A-Z]\.\s*[-–—]?\s*/, '').trim();
+
     return {
       persona: name,
-      role: extractRole(feedback),
-      feedback: feedback,
+      role: extractRole(feedbackText),
+      feedback: feedbackText,
+      compelling: false,
+      missing: '',
+      suggestion: '',
+      verdict: '',
     };
   });
 
-  // Extract Step 2 - Synthesis
   const step2Match = response.match(/Step 2[:\s]*Synthesis([\s\S]*?)(?=Step 3|$)/i);
   const synthesis = step2Match ? step2Match[1].trim() : '';
-  
-  // Extract themes from synthesis
   const themeMatches = synthesis.match(/\d+\.\s*([^\n]+)/g) || [];
   const themes = themeMatches.map(t => t.replace(/^\d+\.\s*/, '').trim());
 
-  // Extract Step 3 - Contrarian Recommendation
   const step3Match = response.match(/Step 3[:\s]*Contrarian Recommendation([\s\S]*?)$/i);
   const step3Text = step3Match ? step3Match[1] : '';
-
-  const contrarianRecommendation = {
-    raw: step3Text.trim(),
-    remove: extractBullet(step3Text, 'remove'),
-    sharpen: extractBullet(step3Text, 'sharpen'),
-    risk: extractBullet(step3Text, 'risk'),
-    ignore: extractBullet(step3Text, 'ignore'),
-  };
 
   return {
     individualFeedback,
     synthesis,
     themes,
-    contrarianRecommendation,
+    contrarianRecommendation: {
+      raw: step3Text.trim(),
+      remove: extractBullet(step3Text, 'remove'),
+      sharpen: extractBullet(step3Text, 'sharpen'),
+      risk: extractBullet(step3Text, 'risk'),
+      ignore: extractBullet(step3Text, 'ignore'),
+    },
   };
 }
 
 function extractRole(text: string): string {
-  // Try to extract role from the beginning of feedback
   const roleMatch = text.match(/^([^:]+):/);
   return roleMatch ? roleMatch[1].trim() : '';
 }
@@ -316,7 +362,7 @@ function extractBullet(text: string, keyword: string): string {
     new RegExp(`\\*?\\s*(?:What to )?${keyword}[:\\s]*([^\\n*]+)`, 'i'),
     new RegExp(`${keyword}[:\\s]*([^\\n]+)`, 'i'),
   ];
-  
+
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match) return match[1].trim();

@@ -92,12 +92,23 @@ ${draftContent}
     // Parse the response
     const parsed = parsePanelCritiqueResponse(aiResponse);
 
+    // Map to PanelFeedback format with all fields
+    const panelFeedback = parsed.individualFeedback.map(f => ({
+      persona: f.persona,
+      role: f.role,
+      feedback: f.feedback,
+      compelling: f.compelling,
+      missing: f.missing,
+      suggestion: f.suggestion || '',
+      verdict: f.verdict || '',
+    }));
+
     // Update the release request with panel critique
     const { error: updateError } = await supabase
       .from('release_requests')
       .update({
         panel_critique_raw: { raw: aiResponse, parsed },
-        panel_individual_feedback: parsed.individualFeedback,
+        panel_individual_feedback: panelFeedback,
         panel_synthesis: parsed.synthesis || parsed.themes.join('; '),
         panel_contrarian_recommendation: parsed.contrarianRecommendation,
         panel_reviewed_at: new Date().toISOString(),

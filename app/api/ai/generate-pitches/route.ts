@@ -22,12 +22,44 @@ function getOpenAIClient() {
   });
 }
 
-const REPORTER_PROFILES = [
-  { reporterName: 'Sarah Chen', outlet: 'TechCrunch', beat: 'startups and emerging technology' },
-  { reporterName: 'Michael Torres', outlet: 'Bloomberg', beat: 'business and finance' },
-  { reporterName: 'Priya Sharma', outlet: 'Industry Dive', beat: 'industry-specific trade coverage' },
-  { reporterName: 'James O\'Brien', outlet: 'Local Business Journal', beat: 'local business and economic development' },
-  { reporterName: 'Rachel Kim', outlet: 'Associated Press', beat: 'general news and trending stories' },
+// Industry-specific real journalist profiles
+const REPORTER_PROFILES_BY_INDUSTRY: Record<string, typeof DEFAULT_REPORTER_PROFILES> = {
+  technology: [
+    { reporterName: 'Connie Loizos', outlet: 'TechCrunch', beat: 'venture capital and startups' },
+    { reporterName: 'Erin Griffith', outlet: 'The New York Times', beat: 'Silicon Valley and startup culture' },
+    { reporterName: 'Tom Dotan', outlet: 'The Wall Street Journal', beat: 'enterprise technology and AI' },
+    { reporterName: 'Zoë Schiffer', outlet: 'Platformer', beat: 'tech industry and workplace' },
+    { reporterName: 'Kia Kokalitcheva', outlet: 'Axios', beat: 'venture capital and tech deals' },
+  ],
+  healthcare: [
+    { reporterName: 'Christina Farr', outlet: 'CNBC', beat: 'health tech and digital health' },
+    { reporterName: 'Casey Ross', outlet: 'STAT News', beat: 'health technology and AI in medicine' },
+    { reporterName: 'Tina Reed', outlet: 'Axios', beat: 'healthcare industry and policy' },
+    { reporterName: 'Arthur Allen', outlet: 'Politico', beat: 'health IT and policy' },
+    { reporterName: 'Rebecca Pifer', outlet: 'Healthcare Dive', beat: 'hospital operations and health systems' },
+  ],
+  finance: [
+    { reporterName: 'Ryan Browne', outlet: 'CNBC', beat: 'fintech and digital finance' },
+    { reporterName: 'Penny Crosman', outlet: 'American Banker', beat: 'banking technology and innovation' },
+    { reporterName: 'Sujata Rao', outlet: 'Reuters', beat: 'financial markets and fintech' },
+    { reporterName: 'Mary Ann Azevedo', outlet: 'TechCrunch', beat: 'fintech startups and funding' },
+    { reporterName: 'Tanaya Macheel', outlet: 'Fortune', beat: 'fintech and crypto' },
+  ],
+  retail: [
+    { reporterName: 'Melissa Repko', outlet: 'CNBC', beat: 'retail industry and consumer trends' },
+    { reporterName: 'Suzanne Kapner', outlet: 'The Wall Street Journal', beat: 'retail and department stores' },
+    { reporterName: 'Leticia Miranda', outlet: 'NBC News', beat: 'retail and e-commerce' },
+    { reporterName: 'Daphne Howland', outlet: 'Retail Dive', beat: 'retail strategy and operations' },
+    { reporterName: 'Adrianne Pasquarelli', outlet: 'Ad Age', beat: 'retail marketing and brands' },
+  ],
+};
+
+const DEFAULT_REPORTER_PROFILES = [
+  { reporterName: 'Kia Kokalitcheva', outlet: 'Axios', beat: 'venture capital and tech deals' },
+  { reporterName: 'Erin Griffith', outlet: 'The New York Times', beat: 'startups and venture capital' },
+  { reporterName: 'Rolfe Winkler', outlet: 'The Wall Street Journal', beat: 'technology and business' },
+  { reporterName: 'Kate Clark', outlet: 'The Information', beat: 'venture capital and startups' },
+  { reporterName: 'Aisha Counts', outlet: 'Bloomberg', beat: 'business and finance' },
 ];
 
 export async function POST(request: NextRequest) {
@@ -62,7 +94,8 @@ export async function POST(request: NextRequest) {
     const companyName = release.company_name || '';
     const industry = release.industry || 'general';
 
-    const reporterList = REPORTER_PROFILES.map(
+    const reporters = REPORTER_PROFILES_BY_INDUSTRY[industry] || DEFAULT_REPORTER_PROFILES;
+    const reporterList = reporters.map(
       (r, i) => `${i + 1}. ${r.reporterName} at ${r.outlet} — covers ${r.beat}`
     ).join('\n');
 

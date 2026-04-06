@@ -29,24 +29,9 @@ import {
   Mail,
   Trash2
 } from 'lucide-react';
-import { ReleaseRequest, ReleaseStatus, PanelFeedback } from '@/types';
+import { ReleaseRequest, ReleaseStatus, PanelFeedback, deriveNewsroomScore } from '@/types';
+import { isSectionLabel } from '@/lib/release-formatting';
 import { format } from 'date-fns';
-
-// Section labels to strip
-const DRAFT_LABEL_WORDS = ['headline', 'headline options', 'headline option 1', 'headline option 2', 'headline option 3',
-  'subhead', 'subheadline', 'dateline', 'dateline + lead paragraph', 'dateline + lead',
-  'lead paragraph', 'lead', 'body paragraph', 'body paragraphs', 'body paragraph 1',
-  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'quote(s)',
-  'suggested quote', 'boilerplate', 'about', 'about the company',
-  'media contact', 'contact information', 'contact info', 'contact',
-  'call to action', 'call-to-action', 'cta', 'next steps',
-  'visuals suggestions', 'visuals', 'visual suggestions',
-  'distribution checklist', 'distribution'];
-
-function isDraftLabel(line: string): boolean {
-  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').replace(/:+\s*$/, '').trim().toLowerCase();
-  return DRAFT_LABEL_WORDS.includes(cleaned);
-}
 
 // Convert markdown-style text to HTML
 function formatDraftAsHtml(content: string): string {
@@ -55,7 +40,7 @@ function formatDraftAsHtml(content: string): string {
   // Pre-filter: remove section label lines and stray markers
   content = content.split('\n').filter(line => {
     const t = line.trim();
-    if (isDraftLabel(t)) return false;
+    if (isSectionLabel(t)) return false;
     if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(t)) return false;
     if (/^\s*[-–]?\s*\*{2,}\s*$/.test(t)) return false;
     return true;
@@ -385,6 +370,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [userRole, setUserRole] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [draftVersion, setDraftVersion] = useState<'latest' | 'rewritten' | 'original'>('latest');
+  const [applyingSuggestion, setApplyingSuggestion] = useState<number | null>(null);
+  const [reviewerVotes, setReviewerVotes] = useState<Record<number, 'agree' | 'disagree'>>({});
+  const [reviewerReplies, setReviewerReplies] = useState<Record<number, string>>({});
+  const [showReplyFor, setShowReplyFor] = useState<number | null>(null);
 
   useEffect(() => {
     loadRelease();
@@ -568,6 +557,35 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     setSubmitting(false);
   };
 
+  const handleApplySuggestion = async (suggestion: string, persona: string, index: number) => {
+    if (!release) return;
+    setApplyingSuggestion(index);
+    const userReply = reviewerReplies[index];
+    const fullSuggestion = userReply
+      ? `${suggestion}\n\nAdditional context from the author: ${userReply}`
+      : suggestion;
+    try {
+      const res = await fetch('/api/ai/apply-suggestion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          releaseRequestId: release.id,
+          suggestion: fullSuggestion,
+          persona,
+        }),
+      });
+      if (res.ok) {
+        await loadRelease();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to apply suggestion');
+      }
+    } catch {
+      alert('Failed to apply suggestion');
+    }
+    setApplyingSuggestion(null);
+  };
+
   const handleStartEditing = () => {
     if (!release) return;
     const currentContent = release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '';
@@ -647,22 +665,26 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   };
 
   const REVIEWERS = [
-    { name: 'Sarah Lin', beat: 'Tech M&A', comment: 'Checking headline impact and news hook strength...' },
-    { name: 'Marcus Reid', beat: 'Enterprise SaaS', comment: 'Evaluating B2B positioning and market context...' },
-    { name: 'Jenna Huang', beat: 'Consumer Brands', comment: 'Looking for the human story angle...' },
-    { name: 'David Kessler', beat: 'PR Veteran', comment: 'Verifying AP style, dateline, and boilerplate...' },
-    { name: 'Aisha Patel', beat: 'Healthcare', comment: 'Checking clinical claims and regulatory language...' },
-    { name: 'Tom Nguyen', beat: 'Fintech', comment: 'Reviewing financial context and regulatory framing...' },
-    { name: 'Rachel Chen', beat: 'Marketing', comment: 'Testing whether this would move pipeline...' },
-    { name: 'Eli Washington', beat: 'Target Customer', comment: 'Reading as a buyer — does this make me care?' },
-    { name: 'Lisa Monroe', beat: 'Corp Comms', comment: 'Assessing tone and corporate messaging alignment...' },
-    { name: 'Jake Barrett', beat: 'Startup Press', comment: 'Checking if this would land on TechCrunch...' },
-    { name: 'Nina Kowalski', beat: 'Data & AI', comment: 'Evaluating technical accuracy and depth...' },
-    { name: 'Wei Chen', beat: 'Supply Chain', comment: 'Reviewing operational impact and logistics angle...' },
-    { name: 'Diana Ortiz', beat: 'Growth', comment: 'Testing conversion potential and CTA clarity...' },
-    { name: 'Paul Jensen', beat: 'Content Strategy', comment: 'Analyzing readability and narrative structure...' },
-    { name: 'Sofia Martinez', beat: 'SMB Owner', comment: 'Reading as a small business — is this relatable?' },
-    { name: 'Raj Kapoor', beat: 'Enterprise Buyer', comment: 'Evaluating from a procurement perspective...' },
+    // Journalists
+    { name: 'Connie Loizos', beat: 'TechCrunch — VC & Startups', comment: 'Checking if this is a real story or a vanity announcement...' },
+    { name: 'Erin Griffith', beat: 'NYT — Startup Culture', comment: 'Looking for the human angle behind the news...' },
+    { name: 'Tom Dotan', beat: 'WSJ — Enterprise Tech', comment: 'Evaluating whether enterprise buyers would care...' },
+    { name: 'Kia Kokalitcheva', beat: 'Axios — VC Deals', comment: 'Checking if numbers and deal terms hold up...' },
+    { name: 'Zoë Schiffer', beat: 'Platformer — Tech Industry', comment: 'Reading for what this really means for the industry...' },
+    // PR Professionals
+    { name: 'Ed Zitron', beat: 'PR Critic & Founder', comment: 'Checking if this would survive my inbox filter...' },
+    { name: 'Amanda Milligan', beat: 'Content & PR Strategy', comment: 'Verifying AP style, dateline, and boilerplate...' },
+    { name: 'Molly McPherson', beat: 'Crisis Comms Expert', comment: 'Assessing tone and corporate messaging alignment...' },
+    // Copywriters & Marketing
+    { name: 'Harry Dry', beat: 'Marketing Examples — Copywriting', comment: 'Is the headline doing any work? Testing every word...' },
+    { name: 'Kipp Bodnar', beat: 'HubSpot CMO', comment: 'Testing whether this would move pipeline...' },
+    { name: 'Dave Gerhardt', beat: 'Exit Five — B2B Marketing', comment: 'Would I share this? Does anyone actually care?...' },
+    // Target Customers & Buyers
+    { name: 'Jason Lemkin', beat: 'SaaStr — SaaS Founder/Investor', comment: 'Reading as an investor — is this fundable news?...' },
+    { name: 'Hiten Shah', beat: 'FYI — Product & Growth', comment: 'Evaluating product positioning and market fit...' },
+    { name: 'April Dunford', beat: 'Positioning Expert', comment: 'Does this position the company or just describe it?...' },
+    { name: 'Rand Fishkin', beat: 'SparkToro — Audience Research', comment: 'Who is this actually written for? Testing audience fit...' },
+    { name: 'Dharmesh Shah', beat: 'HubSpot CTO & Founder', comment: 'Reading as a founder — would I signal boost this?...' },
   ];
 
   const handleRequestPanelReview = async () => {
@@ -1093,9 +1115,9 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
         {release.panel_individual_feedback && (release.panel_individual_feedback as PanelFeedback[]).length > 0 && (
           (() => {
             const panelFeedback = release.panel_individual_feedback as PanelFeedback[];
-            const compellingCount = panelFeedback.filter(f => f.compelling).length;
-            const totalCount = panelFeedback.length;
+            const { score: numScore, compellingCount, total: totalCount } = deriveNewsroomScore(panelFeedback);
             const percentage = Math.round((compellingCount / totalCount) * 100);
+            const score = numScore.toFixed(1);
 
             const suggestions = panelFeedback
               .filter(f => f.missing && f.missing.trim())
@@ -1109,15 +1131,15 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     <div>
                       <CardTitle className="flex items-center gap-2 font-display text-ink">
                         <Users className="h-5 w-5 text-primary" />
-                        Journalist Panel Review
+                        Newsroom Score
                       </CardTitle>
                       <CardDescription>
-                        Your draft was reviewed by {totalCount} journalist personas
+                        Reviewed by {totalCount} journalist personas
                       </CardDescription>
                     </div>
                     <div className="text-right">
                       <div className={`font-mono text-3xl font-bold ${percentage >= 70 ? 'text-green-600' : percentage >= 50 ? 'text-secondary' : 'text-primary'}`}>
-                        {compellingCount}/{totalCount}
+                        {score}<span className="text-base font-normal text-ink-muted">/10</span>
                       </div>
                       <div className="font-mono text-xs text-ink-muted">
                         {percentage >= 70 ? 'READY' : percentage >= 50 ? 'GOOD' : 'NEEDS WORK'}
@@ -1137,8 +1159,8 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     {percentage >= 70
                       ? 'Strong score — your release is ready for publication.'
                       : percentage >= 50
-                        ? 'Good foundation. Addressing the feedback below will strengthen it.'
-                        : 'The panel identified areas for improvement. Review the feedback below.'}
+                        ? 'Good foundation. Addressing the fixes below will strengthen it.'
+                        : 'The panel identified areas for improvement. Review the fixes below.'}
                   </p>
 
                   {/* Key Themes */}
@@ -1146,7 +1168,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     <div className="p-4 bg-paper border border-rule rounded-md">
                       <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
                         <Sparkles className="h-4 w-4 text-secondary" />
-                        Key Feedback Themes
+                        Top Fixes
                       </h4>
                       <div
                         className="text-sm text-ink-muted prose prose-sm max-w-none"
@@ -1162,7 +1184,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                     <div className="p-4 bg-paper border border-rule rounded-md">
                       <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
                         <Lightbulb className="h-4 w-4 text-secondary" />
-                        Top Suggestions
+                        Additional Fixes
                       </h4>
                       <ul className="space-y-2">
                         {suggestions.map((suggestion, i) => (
@@ -1190,36 +1212,147 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   {/* Individual Journalist Feedback — Expandable */}
                   {showPanelDetail && (
                     <div className="space-y-3">
-                      {panelFeedback.map((fb, i) => (
-                        <div key={i} className="border border-rule rounded-md overflow-hidden bg-paper">
-                          <div className="flex items-center gap-3 p-3 border-b border-rule bg-paper-light">
-                            <div className="w-9 h-9 rounded-full bg-paper-dark flex items-center justify-center font-mono text-xs font-semibold text-ink-muted flex-shrink-0">
-                              {(fb.persona || 'R').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                      {panelFeedback.map((fb, i) => {
+                        const vote = reviewerVotes[i];
+                        const suggestion = (fb as any).suggestion || fb.missing || '';
+                        const cleanFeedback = (fb.feedback || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim();
+                        const cleanMissing = (fb.missing || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim();
+
+                        return (
+                          <div key={i} className={`border rounded-md overflow-hidden bg-paper ${vote === 'agree' ? 'border-green-300' : vote === 'disagree' ? 'border-ink-muted/30' : 'border-rule'}`}>
+                            <div className="flex items-center gap-3 p-3 border-b border-rule bg-paper-light">
+                              <div className="w-9 h-9 rounded-full bg-paper-dark flex items-center justify-center font-mono text-xs font-semibold text-ink-muted flex-shrink-0">
+                                {(fb.persona || 'R').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-semibold text-ink">{fb.persona || `Reviewer ${i + 1}`}</div>
+                                <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">{fb.role || 'Journalist'}</div>
+                              </div>
+                              <span className={`font-mono text-[11px] font-semibold px-3 py-1 rounded-sm ${fb.compelling ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
+                                {fb.compelling ? 'PASS' : 'REVISE'}
+                              </span>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-semibold text-ink">{fb.persona || `Reviewer ${i + 1}`}</div>
-                              <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">{fb.role || 'Journalist'}</div>
+                            <div className="p-3 space-y-2">
+                              {cleanFeedback && (
+                                <div>
+                                  <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted mb-1">Feedback</div>
+                                  <p className="text-sm text-ink leading-relaxed">{cleanFeedback}</p>
+                                </div>
+                              )}
+                              {cleanMissing && (
+                                <div>
+                                  <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">What&apos;s Missing</div>
+                                  <p className="text-sm text-ink-muted">{cleanMissing}</p>
+                                </div>
+                              )}
+
+                              {/* Suggested Fix */}
+                              {(fb as any).suggestion && (
+                                <div className="mt-2 p-3 bg-primary/5 border border-primary/20 rounded-sm">
+                                  <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">Suggested Fix</div>
+                                  <p className="text-sm text-ink leading-relaxed">{(fb as any).suggestion}</p>
+                                </div>
+                              )}
+
+                              {/* Agree / Disagree + Reply */}
+                              {canReview && (
+                                <div className="mt-3 pt-3 border-t border-rule space-y-2">
+                                  <div className="flex items-center gap-2">
+                                    <button
+                                      onClick={() => setReviewerVotes(prev => ({ ...prev, [i]: prev[i] === 'agree' ? undefined as any : 'agree' }))}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border transition-colors ${
+                                        vote === 'agree'
+                                          ? 'bg-green-50 border-green-300 text-green-700'
+                                          : 'border-rule text-ink-muted hover:text-ink hover:bg-paper-light'
+                                      }`}
+                                    >
+                                      <ThumbsUp className="h-3 w-3" />
+                                      Agree
+                                    </button>
+                                    <button
+                                      onClick={() => setReviewerVotes(prev => ({ ...prev, [i]: prev[i] === 'disagree' ? undefined as any : 'disagree' }))}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border transition-colors ${
+                                        vote === 'disagree'
+                                          ? 'bg-orange-50 border-orange-300 text-orange-700'
+                                          : 'border-rule text-ink-muted hover:text-ink hover:bg-paper-light'
+                                      }`}
+                                    >
+                                      <X className="h-3 w-3" />
+                                      Disagree
+                                    </button>
+                                    <button
+                                      onClick={() => setShowReplyFor(showReplyFor === i ? null : i)}
+                                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border border-rule text-ink-muted hover:text-ink hover:bg-paper-light transition-colors"
+                                    >
+                                      <MessageSquare className="h-3 w-3" />
+                                      Reply
+                                    </button>
+
+                                    {/* Apply button — shown when agreed or has a suggestion */}
+                                    {vote === 'agree' && suggestion && (
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
+                                        disabled={applyingSuggestion !== null}
+                                        className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3 ml-auto"
+                                      >
+                                        {applyingSuggestion === i ? (
+                                          <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying...</>
+                                        ) : (
+                                          <><Sparkles className="h-3 w-3 mr-1" /> Apply This</>
+                                        )}
+                                      </Button>
+                                    )}
+                                  </div>
+
+                                  {/* Reply text field */}
+                                  {showReplyFor === i && (
+                                    <div className="space-y-2">
+                                      <Textarea
+                                        value={reviewerReplies[i] || ''}
+                                        onChange={(e) => setReviewerReplies(prev => ({ ...prev, [i]: e.target.value }))}
+                                        placeholder="Add context or corrections for the rewrite (e.g. 'We actually do have third-party validation from DNV GL' or 'The safety record spans 15 years, not just recent')..."
+                                        rows={2}
+                                        className="text-sm"
+                                      />
+                                      {suggestion && (
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
+                                          disabled={applyingSuggestion !== null}
+                                          className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3"
+                                        >
+                                          {applyingSuggestion === i ? (
+                                            <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying with your context...</>
+                                          ) : (
+                                            <><Sparkles className="h-3 w-3 mr-1" /> Apply with My Context</>
+                                          )}
+                                        </Button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </div>
-                            <span className={`font-mono text-[11px] font-semibold px-3 py-1 rounded-sm ${fb.compelling ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
-                              {fb.compelling ? 'PASS' : 'REVISE'}
-                            </span>
                           </div>
-                          <div className="p-3 space-y-2">
-                            {fb.feedback && (
-                              <div>
-                                <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted mb-1">Feedback</div>
-                                <p className="text-sm text-ink leading-relaxed">{(fb.feedback || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim()}</p>
-                              </div>
-                            )}
-                            {fb.missing && (
-                              <div>
-                                <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">What&apos;s Missing</div>
-                                <p className="text-sm text-ink-muted">{(fb.missing || '').replace(/^\s*\)?\*{0,2}\s*[-–]\s*/, '').replace(/\*\*[^(]*\(\s*$/, '').replace(/\*\*/g, '').trim()}</p>
-                              </div>
-                            )}
+                        );
+                      })}
+
+                      {/* Rewrite with all agreed suggestions */}
+                      {canReview && Object.values(reviewerVotes).some(v => v === 'agree') && (
+                        <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm font-semibold text-green-800">
+                                {Object.values(reviewerVotes).filter(v => v === 'agree').length} suggestion{Object.values(reviewerVotes).filter(v => v === 'agree').length !== 1 ? 's' : ''} accepted
+                              </p>
+                              <p className="text-xs text-green-600 mt-0.5">
+                                Click &quot;Apply This&quot; on individual suggestions, or rewrite the entire draft below.
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      ))}
+                      )}
                     </div>
                   )}
 

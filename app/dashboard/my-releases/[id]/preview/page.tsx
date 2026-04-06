@@ -18,114 +18,9 @@ import {
   RefreshCw,
   Loader2,
 } from 'lucide-react';
-import { ReleaseRequest } from '@/types';
-
-// Section labels the AI includes that should be stripped from display
-const LABEL_WORDS = ['headline', 'headline options', 'headline option 1', 'headline option 2', 'headline option 3',
-  'subhead', 'subheadline', 'dateline', 'dateline + lead paragraph', 'dateline + lead',
-  'lead paragraph', 'lead', 'body paragraph', 'body paragraphs', 'body paragraph 1',
-  'body paragraph 2', 'body paragraph 3', 'body', 'quote', 'quotes', 'quote(s)', 'quote(s):',
-  'suggested quote', 'suggested quotes', 'boilerplate', 'about', 'about the company',
-  'media contact', 'media contact:', 'contact information', 'contact info', 'contact',
-  'call to action', 'call-to-action', 'cta', 'next steps',
-  'visuals suggestions', 'visuals', 'visual suggestions', 'suggested visuals',
-  'distribution checklist', 'distribution', 'distribution notes',
-  'end', '###', '# # #', '- # # # -'];
-
-function isSectionLabel(line: string): boolean {
-  // Strip ** markers, #, -, numbers, colons, and whitespace to get the raw text
-  const cleaned = line.replace(/\*{1,2}/g, '').replace(/^#+\s*/, '').replace(/^[-–•]\s*/, '').replace(/^\d+[.)]\s*/, '').replace(/:+\s*$/, '').trim().toLowerCase();
-  return LABEL_WORDS.includes(cleaned) || LABEL_WORDS.includes(cleaned + ':');
-}
-
-function cleanContent(raw: string): string {
-  if (!raw) return '';
-  return raw
-    .split('\n')
-    .filter(line => {
-      const trimmed = line.trim();
-      // Remove section label lines (with or without ** bold markers)
-      if (isSectionLabel(trimmed)) return false;
-      // Remove standalone (1), (2), (3) with optional **
-      if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(trimmed)) return false;
-      // Remove lines that are just ** or - **
-      if (/^\s*[-–]?\s*\*{2,}\s*$/.test(trimmed)) return false;
-      // Remove numbered labels like "1." "2." "3." alone on a line
-      if (/^\s*\d+\.\s*$/.test(trimmed)) return false;
-      return true;
-    })
-    .join('\n')
-    // Clean remaining inline artifacts
-    .replace(/\(\d+\)\s*\*{0,2}\s*/g, '')
-    .replace(/^\s*\*\*\s*$/gm, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
-
-function extractHeadlineFromContent(content: string): string {
-  if (!content) return '';
-  const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
-
-  for (const line of lines) {
-    // Skip section labels
-    if (isSectionLabel(line)) continue;
-    // Skip artifacts like (1)** or standalone markers
-    if (/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line)) continue;
-    if (/^\s*[-–]?\s*\*{2,}\s*$/.test(line)) continue;
-    // Skip very short lines
-    if (line.length < 15) continue;
-
-    // Found a real content line — extract text
-    let headline = line
-      .replace(/^\*\*(.+?)\*\*$/, '$1')  // **Headline**
-      .replace(/^\*\*/, '').replace(/\*\*$/, '')
-      .replace(/<[^>]+>/g, '')
-      .trim();
-
-    if (headline.length > 15) return headline;
-  }
-
-  // HTML fallback
-  const h1Match = content.match(/<h1[^>]*>(.+?)<\/h1>/i);
-  if (h1Match) return h1Match[1].replace(/<[^>]+>/g, '').trim();
-  const strongMatch = content.match(/<strong>(.+?)<\/strong>/i);
-  if (strongMatch && strongMatch[1].length > 15) return strongMatch[1].trim();
-
-  return '';
-}
-
-function contentToHtml(content: string): string {
-  if (!content) return '';
-  // Already HTML
-  if (/<(?:p|div|h[1-6]|ul|ol|li|br|table|blockquote)[\s>]/i.test(content)) {
-    return content
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/\(\d+\)\s*\*{0,2}/g, '');
-  }
-  // Clean section labels and artifacts first, then convert to HTML
-  const cleaned = content
-    .split('\n')
-    .filter(line => !isSectionLabel(line.trim()))
-    .filter(line => !/^\s*\(?\d+\)?\s*\*{0,2}\s*$/.test(line.trim()))
-    .filter(line => !/^\s*[-–]?\s*\*{2,}\s*$/.test(line.trim()))
-    .join('\n');
-
-  let html = cleaned
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^\s*---+\s*$/gm, '<hr class="my-6 border-rule">')
-    .replace(/^\s*\*\*\*+\s*$/gm, '<hr class="my-6 border-rule">')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-    .replace(/\n\n+/g, '</p><p class="mb-4">')
-    .replace(/\n/g, '<br>')
-    .replace(/^\s*/, '<p class="mb-4">')
-    .replace(/\s*$/, '</p>')
-    .replace(/<p class="mb-4"><\/p>/g, '')
-    .replace(/<p class="mb-4">\s*<\/p>/g, '')
-    .replace(/<p class="mb-4">\s*<br>\s*<\/p>/g, '');
-  return html;
-}
+import { ReleaseRequest, deriveNewsroomScore } from '@/types';
+import type { PanelFeedback } from '@/types';
+import { isSectionLabel, cleanContent, extractHeadlineFromContent, contentToHtml } from '@/lib/release-formatting';
 
 function contentToMarkdown(content: string, headline: string, release: ReleaseRequest): string {
   let text = content
@@ -188,6 +83,8 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const [sigAgreed, setSigAgreed] = useState(false);
   const [generatingPitches, setGeneratingPitches] = useState(false);
   const [copiedPitch, setCopiedPitch] = useState<string | null>(null);
+  const [generatingAnnouncement, setGeneratingAnnouncement] = useState(false);
+  const [copiedAnnouncement, setCopiedAnnouncement] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -298,6 +195,38 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     await navigator.clipboard.writeText(text);
     setCopiedPitch(key);
     setTimeout(() => setCopiedPitch(null), 2000);
+  };
+
+  const handleGenerateAnnouncement = async () => {
+    if (!release) return;
+    setGeneratingAnnouncement(true);
+    try {
+      const res = await fetch('/api/ai/generate-announcement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ releaseRequestId: release.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRelease({
+          ...release,
+          announcement_content: {
+            clientEmail: data.clientEmail,
+            linkedInPost: data.linkedInPost,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Failed to generate announcement:', err);
+    } finally {
+      setGeneratingAnnouncement(false);
+    }
+  };
+
+  const copyAnnouncementText = async (text: string, key: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedAnnouncement(key);
+    setTimeout(() => setCopiedAnnouncement(null), 2000);
   };
 
   return (
@@ -414,6 +343,52 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
             <p className="font-mono text-xs text-ink-muted">###</p>
           </div>
 
+          {/* Newsroom Score */}
+          {release.panel_individual_feedback && (release.panel_individual_feedback as any[]).length > 0 && (
+            <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+              <div className="p-6 border-b border-rule bg-paper-light">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                    <div>
+                      <h3 className="font-display text-xl text-ink">Newsroom Score</h3>
+                      <p className="text-sm text-ink-muted mt-0.5">
+                        Reviewed by {(release.panel_individual_feedback as any[]).length} journalist personas before any real reporter sees it.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-mono text-3xl font-bold text-ink">
+                      {deriveNewsroomScore(release.panel_individual_feedback as PanelFeedback[]).score.toFixed(1)}
+                      <span className="text-base font-normal text-ink-muted">/10</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 bg-paper-light space-y-4">
+                {/* Top fixes from synthesis */}
+                {release.panel_synthesis && (
+                  <div>
+                    <div className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted mb-3">Top fixes</div>
+                    <div className="space-y-2">
+                      {release.panel_synthesis
+                        .split(/\n/)
+                        .map((line: string) => line.replace(/^\s*[-–•*]\s*/, '').replace(/^\d+[.)]\s*/, '').replace(/\*\*/g, '').trim())
+                        .filter((line: string) => line.length > 10)
+                        .slice(0, 3)
+                        .map((fix: string, i: number) => (
+                          <div key={i} className="flex items-start gap-3">
+                            <span className="font-mono text-sm text-primary font-medium mt-0.5">{i + 1}.</span>
+                            <p className="text-sm text-ink leading-relaxed">{fix}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Journalist Pitch Emails */}
           <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
             <div className="p-6 border-b border-rule bg-paper-light">
@@ -448,8 +423,13 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               {!release.pitch_emails || release.pitch_emails.length === 0 ? (
                 <div className="text-center py-8">
                   <Mail className="h-10 w-10 text-ink-muted/40 mx-auto mb-3" />
-                  <p className="text-sm text-ink-muted mb-4">
-                    Generate personalized pitch emails tailored to different journalist beats.
+                  <h4 className="font-display text-lg text-ink mb-2">Ready to pitch journalists?</h4>
+                  <p className="text-sm text-ink-muted mb-1 max-w-md mx-auto">
+                    We&apos;ll generate 5 personalized emails for reporters who cover your industry.
+                    Each pitch references the journalist&apos;s beat and explains why your news matters to their readers.
+                  </p>
+                  <p className="text-xs text-ink-muted mb-5">
+                    Emails appear here — copy them and send directly from your inbox.
                   </p>
                   <Button
                     onClick={handleGeneratePitches}
@@ -538,6 +518,169 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
             </div>
           </div>
 
+          {/* Client / Stakeholder Announcement Email + LinkedIn Post */}
+          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+            <div className="p-6 border-b border-rule bg-paper-light">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Send className="h-5 w-5 text-primary" />
+                  <div>
+                    <h3 className="font-display text-xl text-ink">Share the News</h3>
+                    <p className="text-sm text-ink-muted mt-0.5">
+                      A ready-to-send email for clients &amp; stakeholders, plus a LinkedIn post for your followers.
+                    </p>
+                  </div>
+                </div>
+                {release.announcement_content && (
+                  <button
+                    onClick={handleGenerateAnnouncement}
+                    disabled={generatingAnnouncement}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ink-muted hover:text-ink border border-rule rounded-sm hover:bg-paper transition-colors disabled:opacity-50"
+                  >
+                    {generatingAnnouncement ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3.5 w-3.5" />
+                    )}
+                    Regenerate
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="p-6 bg-paper-light">
+              {!release.announcement_content ? (
+                <div className="text-center py-8">
+                  <Send className="h-10 w-10 text-ink-muted/40 mx-auto mb-3" />
+                  <h4 className="font-display text-lg text-ink mb-2">Spread the word beyond the press</h4>
+                  <p className="text-sm text-ink-muted mb-1 max-w-md mx-auto">
+                    We&apos;ll generate a stakeholder announcement email and a LinkedIn post so you can share your news with clients, partners, and followers.
+                  </p>
+                  <p className="text-xs text-ink-muted mb-5">
+                    Copy them and send directly — no editing needed.
+                  </p>
+                  <Button
+                    onClick={handleGenerateAnnouncement}
+                    disabled={generatingAnnouncement}
+                    className="bg-primary hover:bg-primary-700 rounded-sm"
+                  >
+                    {generatingAnnouncement ? (
+                      <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
+                    ) : (
+                      <><Send className="h-4 w-4 mr-2" /> Generate Announcements</>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Client / Stakeholder Email */}
+                  {release.announcement_content.clientEmail && (
+                    <div className="border border-rule rounded-sm bg-paper">
+                      <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
+                        <div>
+                          <span className="font-display text-sm text-ink font-semibold">Stakeholder Announcement Email</span>
+                          <span className="text-ink-muted text-sm"> &mdash; </span>
+                          <span className="text-sm text-ink-muted">Clients, partners &amp; investors</span>
+                        </div>
+                        <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                          email
+                        </span>
+                      </div>
+                      <div className="px-4 py-3 space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted">Subject</span>
+                            <button
+                              onClick={() => copyAnnouncementText(release.announcement_content!.clientEmail!.subject, 'email-subject')}
+                              className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors"
+                            >
+                              {copiedAnnouncement === 'email-subject' ? (
+                                <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                              ) : (
+                                <><Copy className="h-3 w-3" /> Copy</>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-ink font-semibold">{release.announcement_content.clientEmail.subject}</p>
+                        </div>
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted">Body</span>
+                            <button
+                              onClick={() => copyAnnouncementText(release.announcement_content!.clientEmail!.body, 'email-body')}
+                              className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors"
+                            >
+                              {copiedAnnouncement === 'email-body' ? (
+                                <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                              ) : (
+                                <><Copy className="h-3 w-3" /> Copy</>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-ink-soft leading-relaxed whitespace-pre-line">{release.announcement_content.clientEmail.body}</p>
+                        </div>
+                        <div className="pt-2 border-t border-rule">
+                          <a
+                            href={`mailto:?subject=${encodeURIComponent(release.announcement_content.clientEmail.subject)}&body=${encodeURIComponent(release.announcement_content.clientEmail.body)}`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                          >
+                            <Mail className="h-3 w-3" />
+                            Send via Email
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* LinkedIn Post */}
+                  {release.announcement_content.linkedInPost && (
+                    <div className="border border-rule rounded-sm bg-paper">
+                      <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
+                        <div>
+                          <span className="font-display text-sm text-ink font-semibold">LinkedIn Post</span>
+                          <span className="text-ink-muted text-sm"> &mdash; </span>
+                          <span className="text-sm text-ink-muted">Share with your followers</span>
+                        </div>
+                        <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                          linkedin
+                        </span>
+                      </div>
+                      <div className="px-4 py-3 space-y-3">
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-ink-muted">Post</span>
+                            <button
+                              onClick={() => copyAnnouncementText(release.announcement_content!.linkedInPost!, 'linkedin')}
+                              className="flex items-center gap-1 text-[11px] text-ink-muted hover:text-ink transition-colors"
+                            >
+                              {copiedAnnouncement === 'linkedin' ? (
+                                <><Check className="h-3 w-3 text-green-600" /> Copied</>
+                              ) : (
+                                <><Copy className="h-3 w-3" /> Copy</>
+                              )}
+                            </button>
+                          </div>
+                          <p className="text-sm text-ink-soft leading-relaxed whitespace-pre-line">{release.announcement_content.linkedInPost}</p>
+                        </div>
+                        <div className="pt-2 border-t border-rule flex gap-2">
+                          <a
+                            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(release.company_website || '')}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                          >
+                            <Send className="h-3 w-3" />
+                            Open LinkedIn
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Publish CTA */}
           <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
             <div className="bg-ink p-8 text-center">
@@ -573,11 +716,18 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   </div>
                 ) : release.status === 'client_approved' ? (
                   <div>
-                    <div className="flex items-center justify-center gap-2 text-green-600 mb-2">
+                    <div className="flex items-center justify-center gap-2 text-green-600 mb-3">
                       <CheckCircle className="h-5 w-5" />
                       <span className="font-semibold">Submitted for publication!</span>
                     </div>
-                    <p className="text-sm text-ink-muted">Our team is reviewing your release and will distribute it to our journalist network within 24 hours.</p>
+                    <p className="text-sm text-ink-muted mb-4">Our team is reviewing your release and will distribute it to our journalist network within 24 hours.</p>
+                    <Button
+                      onClick={() => setShowDisclaimer(true)}
+                      variant="outline"
+                      className="border-rule text-ink-muted hover:text-ink rounded-sm"
+                    >
+                      <FileText className="h-4 w-4 mr-2" /> View Publication Authorization
+                    </Button>
                   </div>
                 ) : (
                   <div>
