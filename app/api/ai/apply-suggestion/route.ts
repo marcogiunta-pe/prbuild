@@ -62,26 +62,30 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `You are a press release editor. Apply the following reviewer suggestion to the press release draft.
-Make ONLY the change described in the suggestion. Do not rewrite the entire release.
-Preserve the existing tone, style, and formatting.
-IMPORTANT: Return ONLY the body text of the press release. Do NOT include the headline or dateline at the top. Start with the body content directly.`,
+          content: `You are a press release editor. Your job is to apply ONE specific suggestion to a press release draft.
+
+Rules:
+1. Return the COMPLETE press release from start to finish. Every paragraph, every quote, every section.
+2. Change ONLY what the suggestion asks for. Everything else must remain word-for-word identical.
+3. Do NOT add a headline or dateline at the top. The body starts with the first paragraph of content.
+4. Do NOT summarize or shorten. The output must be the same length as the input (plus/minus the specific change).
+5. If the suggestion asks to change the call to action, change ONLY the call to action. Leave all other paragraphs untouched.`,
         },
         {
           role: 'user',
-          content: `CURRENT HEADLINE: ${headline}
+          content: `CURRENT HEADLINE (do not include this in your output): ${headline}
 
-CURRENT DRAFT:
+CURRENT DRAFT (return this in full with only the suggested change applied):
 ${currentDraft}
 
-REVIEWER SUGGESTION${persona ? ` (from ${persona})` : ''}:
+SUGGESTION TO APPLY${persona ? ` (from ${persona})` : ''}:
 ${suggestion}
 
-Apply this suggestion and return the updated press release. Change only what the suggestion asks for.`,
+Return the COMPLETE updated press release. Every paragraph must be present. Only modify what the suggestion asks for.`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 3000,
+      temperature: 0.2,
+      max_tokens: 4500,
     });
 
     const updatedContent = completion.choices[0].message.content || '';
