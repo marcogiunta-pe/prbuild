@@ -181,7 +181,7 @@ ${draftContent}
           { role: 'user', content: panelUserPrompt },
         ],
         temperature: 0.8,
-        max_tokens: 4000,
+        max_tokens: 8000,
       });
     } catch (panelErr: any) {
       console.error('Panel critique failed:', panelErr);
