@@ -371,6 +371,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [deleting, setDeleting] = useState(false);
   const [draftVersion, setDraftVersion] = useState<'latest' | 'rewritten' | 'original'>('latest');
   const [applyingSuggestion, setApplyingSuggestion] = useState<number | null>(null);
+  const [appliedSuggestion, setAppliedSuggestion] = useState<number | null>(null);
   const [reviewerVotes, setReviewerVotes] = useState<Record<number, 'agree' | 'disagree'>>({});
   const [reviewerReplies, setReviewerReplies] = useState<Record<number, string>>({});
   const [showReplyFor, setShowReplyFor] = useState<number | null>(null);
@@ -575,6 +576,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
         }),
       });
       if (res.ok) {
+        setAppliedSuggestion(index);
         await loadRelease();
       } else {
         const data = await res.json();
@@ -1290,18 +1292,24 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                                     {/* Apply button — shown when agreed or has a suggestion */}
                                     {vote === 'agree' && suggestion && (
-                                      <Button
-                                        size="sm"
-                                        onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
-                                        disabled={applyingSuggestion !== null}
-                                        className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3 ml-auto"
-                                      >
-                                        {applyingSuggestion === i ? (
-                                          <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying...</>
-                                        ) : (
-                                          <><Sparkles className="h-3 w-3 mr-1" /> Apply This</>
-                                        )}
-                                      </Button>
+                                      appliedSuggestion === i ? (
+                                        <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-sm ml-auto">
+                                          <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
+                                        </span>
+                                      ) : (
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
+                                          disabled={applyingSuggestion !== null}
+                                          className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3 ml-auto"
+                                        >
+                                          {applyingSuggestion === i ? (
+                                            <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying...</>
+                                          ) : (
+                                            <><Sparkles className="h-3 w-3 mr-1" /> Apply This</>
+                                          )}
+                                        </Button>
+                                      )
                                     )}
                                   </div>
 
@@ -1316,18 +1324,24 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                         className="text-sm"
                                       />
                                       {suggestion && (
-                                        <Button
-                                          size="sm"
-                                          onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
-                                          disabled={applyingSuggestion !== null}
-                                          className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3"
-                                        >
-                                          {applyingSuggestion === i ? (
-                                            <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying with your context...</>
-                                          ) : (
-                                            <><Sparkles className="h-3 w-3 mr-1" /> Apply with My Context</>
-                                          )}
-                                        </Button>
+                                        appliedSuggestion === i ? (
+                                          <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-sm">
+                                            <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
+                                          </span>
+                                        ) : (
+                                          <Button
+                                            size="sm"
+                                            onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
+                                            disabled={applyingSuggestion !== null}
+                                            className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3"
+                                          >
+                                            {applyingSuggestion === i ? (
+                                              <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying with your context...</>
+                                            ) : (
+                                              <><Sparkles className="h-3 w-3 mr-1" /> Apply with My Context</>
+                                            )}
+                                          </Button>
+                                        )
                                       )}
                                     </div>
                                   )}
