@@ -35,6 +35,27 @@ export async function POST(request: NextRequest) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       
+      // Handle one-time kit purchases (no userId — buyer may not have an account)
+      if (session.metadata?.product === 'launch_kit') {
+        const customerEmail = session.customer_details?.email;
+        const { error: kitError } = await supabase
+          .from('kit_purchases')
+          .upsert({
+            stripe_session_id: session.id,
+            customer_email: customerEmail,
+            amount_cents: session.amount_total ?? 4900,
+            status: 'paid',
+          }, { onConflict: 'stripe_session_id' });
+
+        if (kitError) {
+          console.error('Failed to persist kit purchase:', kitError);
+          return NextResponse.json({ error: 'DB write failed' }, { status: 500 });
+        }
+
+        console.log(`Kit purchase recorded: ${session.id}`);
+        break;
+      }
+
       const userId = session.metadata?.userId;
       const plan = session.metadata?.plan;
       const interval = session.metadata?.interval;
