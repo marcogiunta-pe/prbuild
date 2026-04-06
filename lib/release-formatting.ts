@@ -64,6 +64,11 @@ export function extractHeadlineFromContent(content: string): string {
       .replace(/<[^>]+>/g, '')
       .trim();
 
+    // Skip lines that look like datelines or full paragraphs (too long for a headline)
+    if (headline.length > 200) continue;
+    // Skip lines starting with a dateline pattern (CITY — Date —)
+    if (/^[A-Z]{2,}[\s,]+[A-Z][a-z]+/.test(headline) && headline.includes('—')) continue;
+
     if (headline.length > 15) return headline;
   }
 

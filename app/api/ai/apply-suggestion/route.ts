@@ -64,7 +64,8 @@ export async function POST(request: NextRequest) {
           role: 'system',
           content: `You are a press release editor. Apply the following reviewer suggestion to the press release draft.
 Make ONLY the change described in the suggestion. Do not rewrite the entire release.
-Preserve the existing tone, style, and formatting. Return ONLY the updated press release text.`,
+Preserve the existing tone, style, and formatting.
+IMPORTANT: Return ONLY the body text of the press release. Do NOT include the headline or dateline at the top. Start with the body content directly.`,
         },
         {
           role: 'user',
