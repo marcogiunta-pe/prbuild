@@ -127,7 +127,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     || 'Press Release';
   const subhead = release.ai_subhead || '';
 
-  const renderedContent = contentToHtml(cleaned);
+  const renderedContent = contentToHtml(cleaned, headline);
 
   const copyAs = async (format: 'text' | 'markdown' | 'html') => {
     let text = '';

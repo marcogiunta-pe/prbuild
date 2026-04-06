@@ -80,7 +80,7 @@ export function extractHeadlineFromContent(content: string): string {
   return '';
 }
 
-export function contentToHtml(content: string): string {
+export function contentToHtml(content: string, headline?: string): string {
   if (!content) return '';
 
   // Pre-filter: remove section label lines
@@ -91,6 +91,21 @@ export function contentToHtml(content: string): string {
     if (/^\s*[-–]?\s*\*{2,}\s*$/.test(t)) return false;
     return true;
   }).join('\n');
+
+  // Strip the headline if it appears at the top of the body
+  if (headline) {
+    const cleanHL = headline.replace(/\*\*/g, '').trim();
+    const lines = content.split('\n');
+    // Remove the first non-empty line if it matches the headline
+    const firstContentIdx = lines.findIndex(l => l.trim().length > 0);
+    if (firstContentIdx >= 0) {
+      const firstLine = lines[firstContentIdx].replace(/\*\*/g, '').trim();
+      if (firstLine === cleanHL || firstLine.startsWith(cleanHL)) {
+        lines.splice(firstContentIdx, 1);
+        content = lines.join('\n');
+      }
+    }
+  }
 
   // Already HTML
   if (/<(?:p|div|h[1-6]|ul|ol|li|br|table|blockquote)[\s>]/i.test(content)) {
@@ -103,35 +118,43 @@ export function contentToHtml(content: string): string {
       .replace(/\*([^*]+)\*/g, '<em>$1</em>');
   }
 
-  // Plain text / markdown
+  // Plain text / markdown — split on double newlines for paragraph breaks
   let html = content
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  const lines = html.split('\n');
+  // Split into paragraphs on double newlines
+  const paragraphs = html.split(/\n{2,}/);
   const processed: string[] = [];
 
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
+  for (const para of paragraphs) {
+    let text = para.trim();
+    if (!text) continue;
 
-    if (/^\s*\(\d+\)\s*$/.test(line)) continue;
-    line = line.replace(/^\s*\(\d+\)\s*/, '');
+    // Strip numbering artifacts
+    text = text.replace(/^\s*\(\d+\)\s*/gm, '');
 
-    if (/^\s*(?:---+|\*\*\*+)\s*$/.test(line)) {
+    // Horizontal rules
+    if (/^\s*(?:---+|\*\*\*+)\s*$/.test(text)) {
       processed.push('<hr/>');
       continue;
     }
 
-    line = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    line = line.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Inline formatting
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-    if (line.trim() === '') {
-      processed.push('</p><p>');
+    // Replace single newlines within a paragraph with spaces (prose wrapping)
+    text = text.replace(/\n/g, ' ');
+
+    // Detect quote paragraphs (starts with " or ")
+    if (/^[""\u201C]/.test(text)) {
+      processed.push(`<blockquote class="border-l-2 border-rule pl-4 my-4 italic">${text}</blockquote>`);
     } else {
-      processed.push(line);
+      processed.push(`<p class="mb-4">${text}</p>`);
     }
   }
 
-  return '<p>' + processed.join('\n') + '</p>';
+  return processed.join('\n');
 }
