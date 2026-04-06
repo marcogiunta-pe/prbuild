@@ -171,9 +171,12 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     router.push(`/dashboard/my-releases/${release.id}`);
   };
 
+  const [pitchError, setPitchError] = useState<string | null>(null);
+
   const handleGeneratePitches = async () => {
     if (!release) return;
     setGeneratingPitches(true);
+    setPitchError(null);
     try {
       const res = await fetch('/api/ai/generate-pitches', {
         method: 'POST',
@@ -183,9 +186,12 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
       const data = await res.json();
       if (data.success && data.pitches) {
         setRelease({ ...release, pitch_emails: data.pitches });
+      } else {
+        setPitchError(data.error || 'Failed to generate pitch emails. Please try again.');
       }
     } catch (err) {
       console.error('Failed to generate pitches:', err);
+      setPitchError('Network error. Please check your connection and try again.');
     } finally {
       setGeneratingPitches(false);
     }
@@ -442,6 +448,9 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                       <><Mail className="h-4 w-4 mr-2" /> Generate 5 Pitch Emails</>
                     )}
                   </Button>
+                  {pitchError && (
+                    <p className="text-sm text-red-600 mt-3 max-w-md mx-auto">{pitchError}</p>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
