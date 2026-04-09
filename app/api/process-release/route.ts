@@ -174,10 +174,17 @@ ${draftContent}
 
     let panelCompletion;
     try {
+      // OpenAI json_object mode requires the word "json" in the messages, otherwise
+      // it 400s. Guarantee it by injecting a short reminder into the system prompt
+      // when the loaded prompt doesn't already mention it (DB-stored prompts may not).
+      const safeSystemPrompt = /json/i.test(panelSystemPrompt)
+        ? panelSystemPrompt
+        : panelSystemPrompt + '\n\nReturn your response as valid JSON only with the shape {reviewers: [...], synthesis, contrarian}. No markdown fences, no extra text.';
+
       panelCompletion = await openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: panelSystemPrompt },
+          { role: 'system', content: safeSystemPrompt },
           { role: 'user', content: panelUserPrompt },
         ],
         temperature: 0.8,

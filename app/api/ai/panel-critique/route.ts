@@ -77,15 +77,19 @@ ${draftContent}
 
     // Call OpenAI
     const openai = getOpenAIClient();
+    // OpenAI json_object mode requires the word "json" in messages, else 400.
+    const safeSystemPrompt = /json/i.test(systemPrompt)
+      ? systemPrompt
+      : systemPrompt + '\n\nReturn your response as valid JSON only with the shape {reviewers: [...], synthesis, contrarian}. No markdown fences, no extra text.';
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
-        { role: 'system', content: systemPrompt },
+        { role: 'system', content: safeSystemPrompt },
         { role: 'user', content: userPrompt },
       ],
       temperature: 0.8,
       max_tokens: 8000,
-      // Force valid JSON — parser expects {reviewers: [...], synthesis, contrarian}
       response_format: { type: 'json_object' },
     });
 

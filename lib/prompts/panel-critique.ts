@@ -270,12 +270,41 @@ export interface ParsedPanelCritique {
 }
 
 export function parsePanelCritiqueResponse(response: string): ParsedPanelCritique {
-  // Try JSON parse first (new format)
-  try {
-    const cleaned = response.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
-    const json = JSON.parse(cleaned);
+  // Strategy 1: direct JSON parse with markdown-fence stripping
+  const tryParseJson = (text: string): any | null => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  };
 
-    if (json.reviewers && Array.isArray(json.reviewers)) {
+  const stripFences = (text: string): string =>
+    text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+
+  // Strategy 2: extract the largest JSON object substring
+  const extractJsonSubstring = (text: string): string | null => {
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
+    return text.slice(firstBrace, lastBrace + 1);
+  };
+
+  let json: any = tryParseJson(stripFences(response));
+  if (!json || !json.reviewers) {
+    const sub = extractJsonSubstring(response);
+    if (sub) json = tryParseJson(sub);
+  }
+
+  // Strategy 3: maybe the reviewers are at the top level under a different key
+  if (json && !json.reviewers) {
+    if (Array.isArray(json.panel)) json.reviewers = json.panel;
+    else if (Array.isArray(json.individualFeedback)) json.reviewers = json.individualFeedback;
+    else if (Array.isArray(json.feedback)) json.reviewers = json.feedback;
+  }
+
+  try {
+    if (json && json.reviewers && Array.isArray(json.reviewers)) {
       const individualFeedback = json.reviewers.map((r: any) => ({
         persona: r.persona || 'Unknown',
         role: r.role || '',
@@ -315,7 +344,11 @@ export function parsePanelCritiqueResponse(response: string): ParsedPanelCritiqu
   const personaMatches = step1Text.match(/([A-Z][a-z]+\s[A-Z]\.)[^A-Z]*([\s\S]*?)(?=[A-Z][a-z]+\s[A-Z]\.|$)/g) || [];
 
   if (personaMatches.length === 0) {
-    throw new Error('parsePanelCritiqueResponse: legacy fallback extracted zero personas. Raw response is malformed.');
+    const snippet = response.slice(0, 800).replace(/\s+/g, ' ').trim();
+    throw new Error(
+      `parsePanelCritiqueResponse: could not extract reviewers from any of 3 strategies (direct JSON, JSON substring, legacy regex). ` +
+      `Response length: ${response.length}. First 800 chars: ${snippet}`
+    );
   }
 
   const individualFeedback = personaMatches.map(match => {
