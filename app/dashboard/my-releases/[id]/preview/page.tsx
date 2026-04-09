@@ -91,6 +91,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const [copiedAnnouncement, setCopiedAnnouncement] = useState<string | null>(null);
   const [feedback, setFeedback] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [pitchError, setPitchError] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -217,8 +218,6 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     setShowDisclaimer(false);
     router.push(`/dashboard/my-releases/${release.id}`);
   };
-
-  const [pitchError, setPitchError] = useState<string | null>(null);
 
   const handleGeneratePitches = async () => {
     if (!release) return;
