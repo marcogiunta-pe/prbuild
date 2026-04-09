@@ -38,39 +38,39 @@ export function PricingSection() {
   const collapseAll = () => setFaqOpen(new Set());
 
   return (
-    <section id="pricing" className="py-20 bg-paper">
+    <section id="pricing" className="py-24 bg-surface-container-low">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-display text-ink mb-4">
-            PRWeb: $400. Us: $9.
+          <h2 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4">
+            PRWeb: $400. Us: <span className="italic text-primary-container">$9</span>.
           </h2>
-          <p className="text-lg text-ink-muted mb-8">
+          <p className="font-editorial text-lg text-on-surface-variant mb-10">
             Same result. 97% less money. Cancel anytime.
           </p>
 
-          {/* Billing Toggle */}
-          <div className="flex items-center justify-center gap-4">
+          {/* Billing Toggle — pill shaped per DESIGN.md */}
+          <div className="inline-flex items-center gap-1 bg-surface-container p-1 rounded-full">
             <button
               onClick={() => setInterval('monthly')}
-              className={`px-4 py-2 rounded-sm font-medium transition-colors min-h-[44px] touch-manipulation ${
+              className={`px-6 py-2 rounded-full font-label text-xs uppercase tracking-widest transition-all min-h-[40px] touch-manipulation ${
                 interval === 'monthly'
-                  ? 'bg-primary text-white'
-                  : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
+                  ? 'bg-gradient-to-r from-primary to-primary-container text-on-primary'
+                  : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
               Monthly
             </button>
             <button
               onClick={() => setInterval('yearly')}
-              className={`px-4 py-2 rounded-sm font-medium transition-colors relative min-h-[44px] touch-manipulation ${
+              className={`relative px-6 py-2 rounded-full font-label text-xs uppercase tracking-widest transition-all min-h-[40px] touch-manipulation ${
                 interval === 'yearly'
-                  ? 'bg-primary text-white'
-                  : 'bg-paper-dark text-ink-muted hover:bg-paper-dark'
+                  ? 'bg-gradient-to-r from-primary to-primary-container text-on-primary'
+                  : 'text-on-surface-variant hover:text-on-surface'
               }`}
             >
               Yearly
-              <span className="absolute -top-2 -right-2 bg-green-700 text-white text-xs px-1.5 py-0.5 rounded-sm">
-                Save 17%
+              <span className="absolute -top-2 -right-2 bg-tertiary text-on-tertiary text-[10px] font-label px-2 py-0.5 rounded-full tracking-wider">
+                -17%
               </span>
             </button>
           </div>
@@ -86,28 +86,39 @@ export function PricingSection() {
               <AnimateOnScroll key={key} delay={i * 80} variant="scale">
               <Card
                 key={key}
-                className={`relative bg-paper-light border-rule ${isPopular ? 'border-primary border-2 md:scale-105' : ''}`}
+                className={`relative border-0 rounded-xl ${
+                  isPopular
+                    ? 'bg-surface-container-lowest md:scale-105'
+                    : 'bg-surface-container-lowest/70'
+                }`}
+                style={isPopular ? { boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' } : undefined}
               >
                 {isPopular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="bg-primary">Most Popular</Badge>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-4 py-1 rounded-full font-label text-xs uppercase tracking-widest font-bold">
+                      Most Popular
+                    </span>
                   </div>
                 )}
-                <CardHeader>
-                  <CardTitle>{plan.name}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                  <div className="mt-4">
-                    <span className="text-4xl font-display">${pricing.price}</span>
-                    <span className="text-ink-muted">/{interval === 'monthly' ? 'mo' : 'yr'}</span>
+                <CardHeader className="pt-10">
+                  <CardTitle className="font-headline text-on-surface">{plan.name}</CardTitle>
+                  <CardDescription className="font-editorial text-on-surface-variant">
+                    {plan.description}
+                  </CardDescription>
+                  <div className="mt-6">
+                    <span className="font-headline text-5xl font-extrabold text-on-surface">${pricing.price}</span>
+                    <span className="font-label text-on-surface-variant text-sm uppercase tracking-wider ml-1">
+                      /{interval === 'monthly' ? 'mo' : 'yr'}
+                    </span>
                     {interval === 'yearly' && 'savings' in yearlyPricing && (
-                      <div className="text-sm text-green-600 font-medium mt-1">
+                      <div className="font-label text-xs uppercase tracking-widest text-tertiary mt-2">
                         Save ${yearlyPricing.savings}/year
                       </div>
                     )}
                     {interval === 'monthly' && (
-                      <div className="text-sm text-ink-muted mt-1">
+                      <div className="font-editorial text-sm text-on-surface-variant mt-2">
                         or ${plan.yearly.price}/year{' '}
-                        <span className="inline-flex items-center font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-sm text-xs">
+                        <span className="inline-flex items-center font-label text-[10px] uppercase tracking-wider text-tertiary bg-tertiary/10 px-2 py-0.5 rounded-full ml-1">
                           Save ${('savings' in yearlyPricing ? yearlyPricing.savings : 0)}
                         </span>
                       </div>
@@ -117,8 +128,8 @@ export function PricingSection() {
                 <CardContent>
                   <ul className="space-y-3">
                     {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-start">
-                        <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
+                      <li key={feature} className="flex items-start font-editorial text-on-surface">
+                        <Check className="h-5 w-5 text-primary-container mr-2 mt-0.5 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -127,8 +138,9 @@ export function PricingSection() {
                 <CardFooter>
                   <Link href="/signup" className="w-full" data-cta={`pricing-${key}`}>
                     <Button
-                      className={`w-full ${isPopular ? 'bg-primary hover:bg-primary-700 rounded-sm' : ''}`}
-                      variant={isPopular ? 'default' : 'outline'}
+                      className="w-full"
+                      variant={isPopular ? 'editorial' : 'editorial-secondary'}
+                      size="lg"
                     >
                       Get Your Free Release
                     </Button>
