@@ -783,16 +783,14 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
             <Badge className={`${status.color} text-sm px-3 py-1`}>
               {status.label}
             </Badge>
-            {(release.ai_draft_content || release.admin_refined_content || release.client_edited_content) && (
-              <Button
-                size="sm"
-                onClick={() => router.push(`/dashboard/my-releases/${release.id}/preview`)}
-                className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
-              >
-                <ArrowRight className="h-4 w-4 mr-1.5" />
-                See Final Product
-              </Button>
-            )}
+            <Button
+              size="sm"
+              onClick={() => router.push(`/dashboard/my-releases/${release.id}/preview`)}
+              className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
+            >
+              <ArrowRight className="h-4 w-4 mr-1.5" />
+              See Final Product
+            </Button>
             {(release.status !== 'published' || userRole === 'admin') && (
               <Button
                 variant="outline"
