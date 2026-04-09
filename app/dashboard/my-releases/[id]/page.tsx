@@ -371,7 +371,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
   const [deleting, setDeleting] = useState(false);
   const [draftVersion, setDraftVersion] = useState<'latest' | 'rewritten' | 'original'>('latest');
   const [applyingSuggestion, setApplyingSuggestion] = useState<number | null>(null);
-  const [appliedSuggestion, setAppliedSuggestion] = useState<number | null>(null);
+  const [appliedSuggestions, setAppliedSuggestions] = useState<Set<number>>(new Set());
   const [reviewerVotes, setReviewerVotes] = useState<Record<number, 'agree' | 'disagree'>>({});
   const [reviewerReplies, setReviewerReplies] = useState<Record<number, string>>({});
   const [showReplyFor, setShowReplyFor] = useState<number | null>(null);
@@ -576,7 +576,11 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
         }),
       });
       if (res.ok) {
-        setAppliedSuggestion(index);
+        setAppliedSuggestions(prev => {
+          const next = new Set(prev);
+          next.add(index);
+          return next;
+        });
         await loadRelease();
       } else {
         const data = await res.json();
@@ -1320,7 +1324,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                                     {/* Apply button — shown when agreed or has a suggestion */}
                                     {vote === 'agree' && suggestion && (
-                                      appliedSuggestion === i ? (
+                                      appliedSuggestions.has(i) ? (
                                         <span className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-green-700 bg-green-50 rounded-full ml-auto">
                                           <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
                                         </span>
@@ -1352,7 +1356,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                         className="text-sm"
                                       />
                                       {suggestion && (
-                                        appliedSuggestion === i ? (
+                                        appliedSuggestions.has(i) ? (
                                           <span className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-green-700 bg-green-50 rounded-full">
                                             <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
                                           </span>
