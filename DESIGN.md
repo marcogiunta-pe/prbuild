@@ -1,108 +1,83 @@
-# Design System — PRBuild
+# Design System Strategy: The PR Authority
 
-## Product Context
-- **What this is:** AI-powered press release writing service with human quality control
-- **Who it's for:** Startups and small businesses that need professional press releases
-- **Space/industry:** PR services, AI writing tools — competitors include PRWeb, Newswire, BrandPush, Copy.ai, Jasper
-- **Project type:** Marketing site + SaaS web app (landing pages, client dashboard, admin dashboard, journalist showcase)
+## 1. Overview & Creative North Star
+This design system moves away from the sterile, modular appearance of traditional B2B SaaS and moves toward a **"High-End Editorial"** North Star. We treat every screen like a premium digital publication—blending the urgency of a newsroom with the sophistication of a luxury brand.
 
-## Aesthetic Direction
-- **Direction:** Editorial / Publication
-- **Decoration level:** Intentional — hairline rules, column dividers, subtle paper-grain texture. No blobs, no gradients, no floating shapes. Decoration comes from typographic hierarchy and spatial rhythm.
-- **Mood:** A modern newsroom's digital design system — warm paper, dark ink, editorial red accents, taut asymmetric layouts that feel urgent, credible, and pre-publication. The product IS publishing — the design signals that.
-- **Reference sites:** Financial Times, The Economist, The Atlantic (aesthetic DNA); Jasper, Copy.ai, PRWeb, Newswire, BrandPush (competitive landscape — deliberately departed from)
+We reject the "boxed-in" look. By using intentional asymmetry, overlapping layers, and a typography scale that favors dramatic contrast, we create an experience that feels curated rather than generated. This system is designed for a PR and launch service that values precision, narrative, and bold impact.
 
-## Typography
-- **Display/Hero:** Instrument Serif — modern editorial authority, tight letterspacing. Used for hero headlines, section headers, page titles. Never lightweight — always regular or italic.
-- **Body:** DM Sans — geometric warmth, excellent readability at all sizes. Used for body text, UI labels, buttons, navigation.
-- **Pull Quotes/Taglines:** Cormorant Garamond Italic — classical accent, used very sparingly for testimonials, editorial pull quotes, and taglines only.
-- **Data/Tables:** JetBrains Mono — review counts, timestamps, pricing figures, status badges, panel scores. Signals precision. Not decorative — only for data.
-- **Code:** JetBrains Mono
-- **Loading:** Google Fonts CDN
-  ```html
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  ```
-- **Scale:**
-  - Hero: clamp(48px, 5.5vw, 80px)
-  - H2: 36px
-  - H3: 28px
-  - H4: 20px
-  - Body: 16px
-  - Small/UI: 14px
-  - Caption/Label: 13px
-  - Mono metadata: 12px
-  - Micro label: 10-11px (uppercase, tracked)
+---
 
-## Color
+## 2. Colors & Surface Philosophy
 
-### Light Mode
-- **Approach:** Restrained — editorial red is the only strong color. Used sparingly and with authority.
-- **Background (--bg):** `#F5F0E8` — warm paper, not app gray
-- **Surface (--surface):** `#FFFDF8` — printed stock, cards, panels
-- **Surface 2 (--surface-2):** `#E8E0D2` — kraft, secondary backgrounds, sidebar active states
-- **Text Primary (--text-primary):** `#141414` — pressroom black
-- **Text Muted (--text-muted):** `#6B6660` — column gray, secondary text
-- **Ink Soft (--ink-soft):** `#2A2A2A` — softer black for body text
-- **Accent (--accent):** `#C23B22` — editorial red, CTAs, active states, badges
-- **Accent Dark (--accent-dark):** `#8E2F1D` — hover states on accent
-- **Secondary (--secondary):** `#B5873A` — aged brass, used sparingly for premium moments (pricing labels, featured badges)
-- **Rule (--rule):** `#CCC0AD` — hairline dividers, borders, table rules
-- **Semantic:** success `#2E7D32`, warning `#E65100`, error `#C23B22` (same as accent), info `#6B6660` (same as muted)
+The palette is anchored by a deep, authoritative `primary` red and a high-voltage `tertiary` violet, balanced against a warm, paper-like `background`.
 
-### Dark Mode
-- **Background:** `#1A1917`
-- **Surface:** `#242320`
-- **Surface 2:** `#2E2D29`
-- **Text Primary:** `#EDE8DF`
-- **Text Muted:** `#9B9590`
-- **Accent:** `#E05A45` (slightly brighter for contrast)
-- **Accent Dark:** `#C23B22`
-- **Secondary:** `#D4A34E`
-- **Rule:** `#3D3A34`
+### The "No-Line" Rule
+Standard 1px borders are strictly prohibited for sectioning. They create visual friction and look "cheap." Instead, boundaries must be defined through:
+- **Tonal Shifts:** Transitioning from `surface` to `surface-container-low`.
+- **Negative Space:** Using expansive white space to denote the end of a narrative block.
+- **Color Blocks:** Utilizing full-bleed `secondary_container` or `primary` sections to pivot the user's attention.
 
-## Spacing
-- **Base unit:** 4px
-- **Density:** Comfortable
-- **Scale:** 2xs(2) xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48) 3xl(64)
+### Surface Hierarchy & Nesting
+Treat the UI as a physical desk of stacked materials. 
+1. **Base Layer:** `surface` (#fafaf5) – the canvas.
+2. **Structural Blocks:** `surface_container_low` (#f4f4ef) – for grouping related content.
+3. **Interactive Cards:** `surface_container_lowest` (#ffffff) – the highest "lift," used for actionable items like pricing or launch kits.
 
-## Layout
-- **Approach:** Creative-editorial — asymmetric grids, sections that break out of centered boxes
-- **Grid:** Hero is 60/40 asymmetric split. Content sections use 1200px max-width but can bleed to edges for emphasis.
-- **Max content width:** 1200px
-- **Dashboard:** Newsroom desk feel — sidebar + data table, not glassy card farm. Lists, annotations, statuses, queues.
-- **Journalist showcase:** Masthead grid — personas as publication contributors with initials, name, beat, bio. Not feature icons.
-- **Border radius:** Hierarchical — sm: 3px (buttons, badges), md: 6px (cards, inputs), lg: 10px (modals, large panels), full: 9999px (avatars)
+### The "Glass & Gradient" Rule
+To inject "soul" into the B2B context:
+- **Glassmorphism:** Use `surface` colors at 70% opacity with a `24px` backdrop blur for navigation bars and floating action menus. This allows the vibrant brand colors to bleed through as the user scrolls.
+- **Signature Gradients:** For high-impact CTAs, use a subtle linear gradient from `primary` (#a0220b) to `primary_container` (#c23b22). This provides a tactile, "lit-from-within" quality.
 
-### UI Language
-- **Buttons:** Dark ink or editorial red, nearly rectangular (3px radius), compact, assertive
-- **Borders:** Hairline rules in `--rule`, used often. Prefer `border-bottom` dividers over box shadows
-- **Cards:** Rare. Prefer panels, columns, strips, and ruled sections. When cards are necessary, use 1px border in `--rule`, not shadow
-- **Tables:** Mono font for data columns, hairline row separators, uppercase tracked column headers
-- **Status badges:** Mono font, 2px radius, subtle background tint
+---
 
-## Motion
-- **Approach:** Minimal-functional — restrained and purposeful
-- **Easing:** enter(ease-out) exit(ease-in) move(ease-in-out)
-- **Duration:** micro(50-100ms) short(150-250ms) medium(250-400ms) long(400-700ms)
-- **Patterns:** Slide-ins like sheets entering an editor's desk. Highlight sweeps on review comments. Fade-up for scroll-triggered sections (0.4s ease-out). No bouncy microinteractions, no confetti, no pulse-glow.
-- **Reduced motion:** Always respect `prefers-reduced-motion: reduce`
+## 3. Typography: Editorial Authority
 
-## Anti-Patterns (never use)
-- Purple/violet gradients
-- 3-column feature grid with icons in colored circles
-- Centered everything with uniform spacing
-- Uniform bubbly border-radius on all elements
-- Gradient buttons
-- Generic stock-photo hero sections
-- Decorative blobs, floating shapes, or AI sparkle effects
-- Generic shadcn default card farms
-- System fonts as primary typography
+We use a tri-font strategy to balance character with readability.
 
-## Decisions Log
-| Date | Decision | Rationale |
-|------|----------|-----------|
-| 2026-03-26 | Initial design system created | Created by /design-consultation. Three-model consensus (Claude + Codex + Claude subagent): editorial/publication aesthetic because PRBuild produces content for journalists — the design should signal publishing authority, not generic SaaS. |
-| 2026-03-26 | Instrument Serif over Playfair Display | Both proposed by different models. Instrument Serif chosen for modern freshness vs. Playfair's increasing overuse in editorial web design. |
-| 2026-03-26 | Warm paper backgrounds over white/gray | All three models converged on this. Warm paper (#F5F0E8) gives tangible, physical quality — like holding a newspaper. No competitor in the space does this. |
-| 2026-03-26 | Editorial red (#C23B22) over navy/teal | Current navy (#1E3A5F) + teal (#0B7A6F) reads "healthcare fintech." Editorial red signals urgency and credibility — the language of newsrooms. |
-| 2026-03-26 | Journalist personas as masthead, not feature icons | Transforms a feature list into a cast of characters. Makes the AI feel like a team you hired, not software. |
+*   **Display & Headlines (Plus Jakarta Sans):** These are our "shout" moments. We use large scales (`display-lg` at 3.5rem) with tight letter-spacing to create a "hip" B2B feel that demands attention.
+*   **Titles & Body (Inter):** The workhorse. Inter provides a clean, neutral balance to the expressive headlines. Use `body-lg` (1rem) for general copy to ensure a premium, readable density.
+*   **System & Technical (Space Grotesk):** Reserved for `labels`. Its monospaced influence suggests precision—perfect for metadata, launch dates, or "Kit ID" numbers.
+
+---
+
+## 4. Elevation & Depth
+
+We achieve hierarchy through **Tonal Layering** rather than drop shadows.
+
+*   **The Layering Principle:** Instead of adding a shadow to a card, place a `surface_container_lowest` (pure white) card onto a `surface_container` (off-white) background. The subtle shift in hex value creates a modern, sophisticated lift.
+*   **Ambient Shadows:** If an element must float (e.g., a modal or a primary floating button), use a shadow tinted with the `on_surface` color: `box-shadow: 0 20px 40px rgba(26, 28, 25, 0.06)`. This mimics soft, natural gallery lighting.
+*   **The "Ghost Border" Fallback:** If a container sits on a background of the exact same color, use a 1px border with `outline_variant` at **15% opacity**. It should be felt, not seen.
+
+---
+
+## 5. Components
+
+### Buttons
+*   **Primary:** A pill-shaped (`full` roundedness) gradient of `primary` to `primary_container`. No border. White text.
+*   **Secondary:** `surface_container_highest` background with `on_surface` text. For an "editorial" look, use a `md` roundedness (0.375rem).
+*   **Tertiary:** Transparent background, `tertiary` text color, with a subtle underline on hover.
+
+### Input Fields
+*   **Styling:** Large padding (1rem). Background set to `surface_container_low`. 
+*   **Interaction:** On focus, the background shifts to `surface_container_lowest` and a 2px "Ghost Border" appears in `tertiary`.
+
+### Cards & Lists
+*   **The "Anti-Divider" Rule:** Never use horizontal lines to separate list items. Use 24px–32px of vertical padding and a background shift on hover to `surface_container_high`.
+*   **Media Cards:** Incorporate high-quality imagery with a `lg` (0.5rem) corner radius. Overlap text elements (using `title-lg`) slightly over the image edge to break the grid.
+
+### Specialty Component: The "Status Badge"
+For PR tracking (e.g., "In Review," "Published"), use the `label-md` scale in `tertiary_container` with `on_tertiary_container` text. Use a `full` roundedness to make them look like high-end tactile chips.
+
+---
+
+## 6. Do’s and Don’ts
+
+### Do:
+*   **Do** use asymmetrical layouts. A 60/40 split for hero sections feels more bespoke than a centered 50/50.
+*   **Do** embrace the "paper" feel of the background (`#fafaf5`). Pure white should only be used to highlight specific cards.
+*   **Do** use `tertiary` (Electric Violet) for subtle accents—like a single word in a headline or a notification dot—to keep the system feeling "hip."
+
+### Don’t:
+*   **Don't** use 100% black. Use `on_surface` (#1a1c19) for text to maintain a high-end, soft-contrast feel.
+*   **Don't** use "standard" shadows. Avoid any shadow that looks like a dark grey smudge; if you can see the shadow clearly, it’s too heavy.
+*   **Don't** overcrowd. If a section feels busy, double the padding. This system relies on "The Luxury of Space."
