@@ -1,590 +1,328 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle, FileText, Users, Send, Zap, Target, Shield, ArrowRight, Check, Star, Menu, X, AlertTriangle } from 'lucide-react';
+import { Rocket, XCircle, CheckCircle2, BookOpen, Brain, Send, BarChart3 } from 'lucide-react';
 import { PricingSection } from '@/components/landing/pricing-section';
-import { AnimatedStatsBanner } from '@/components/AnimatedStats';
-import { TrustBadges, TrustBadgesCompact } from '@/components/TrustBadges';
-import { AnimateOnScroll } from '@/components/landing/AnimateOnScroll';
-import { LogoBar } from '@/components/landing/LogoBar';
-import { HeroMockup } from '@/components/landing/HeroMockup';
-import { BeforeAfterComparison } from '@/components/landing/BeforeAfterComparison';
-import { PressReleasePreview } from '@/components/landing/PressReleasePreview';
-import { SectionErrorBoundary } from '@/components/SectionErrorBoundary';
 
-const ExitIntentPopup = dynamic(() => import('@/components/ExitIntent').then((m) => ({ default: m.ExitIntentPopup })), { ssr: false });
-const StickyCTA = dynamic(() => import('@/components/StickyCTA').then((m) => ({ default: m.StickyCTA })), { ssr: false });
-const ROICalculator = dynamic(() => import('@/components/ROICalculator').then((m) => ({ default: m.ROICalculator })), { ssr: false });
-const TestimonialsGrid = dynamic(() => import('@/components/landing/TestimonialsGrid').then((m) => ({ default: m.TestimonialsGrid })), { ssr: false });
-const SocialProofTicker = dynamic(() => import('@/components/landing/SocialProofTicker').then((m) => ({ default: m.SocialProofTicker })), { ssr: false });
-const QuizTeaser = dynamic(() => import('@/components/quiz/QuizTeaser').then((m) => ({ default: m.QuizTeaser })), { ssr: false });
+const NAV_LINKS = [
+  { label: 'Process', href: '#workflow' },
+  { label: 'Authority Levels', href: '#pricing' },
+  { label: 'Success Stories', href: '#testimonials' },
+];
 
-const NAV_SECTIONS = [
-  { id: 'how-it-works', label: 'How It Works', href: '/how-it-works' },
-  { id: 'features', label: 'Features' },
-  { id: 'pricing', label: 'Pricing' },
+const WORKFLOW_STEPS = [
+  {
+    step: '01. STRATEGY',
+    title: 'Narrative Extraction',
+    body: 'Our AI analyzes your announcement to find the hook that matters to humans, not algorithms.',
+    Icon: BookOpen,
+  },
+  {
+    step: '02. REVIEW',
+    title: 'Journalist Panel',
+    body: '16 journalist personas score every draft before it leaves the building. No guesswork.',
+    Icon: Brain,
+  },
+  {
+    step: '03. DELIVERY',
+    title: 'Newsroom-Ready Draft',
+    body: 'You approve the final version. We polish, format, and prep pitch emails ready to send.',
+    Icon: Send,
+  },
+  {
+    step: '04. IMPACT',
+    title: 'Pickup Tracking',
+    body: 'Track opens, mentions, and real coverage with transparent attribution.',
+    Icon: BarChart3,
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    quote:
+      'PRBuild turned a half-baked launch idea into a headline-ready release in under an hour. The journalist panel feedback was sharper than the feedback I got from a paid agency.',
+    name: 'Founder, SaaS startup',
+    role: 'Seed-stage',
+  },
+  {
+    quote:
+      "The AI doesn't just write, it thinks. The narrative hook it pulled out of our funding announcement was the angle we'd been missing for weeks.",
+    name: 'Founder, AI startup',
+    role: 'Series A',
+  },
+  {
+    quote:
+      'Finally a PR tool built for founders. Transparent, fast, and the price is a tenth of what the legacy wires charge for a worse product.',
+    name: 'Founder, Nonprofit',
+    role: 'Mission-driven',
+  },
 ];
 
 export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [navScrolled, setNavScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setNavScrolled(window.scrollY > 120);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-    );
-    NAV_SECTIONS.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div className="flex flex-col min-h-screen font-body">
-      {/* Navigation — editorial masthead style */}
-      <header
-        className={`sticky top-0 z-50 w-full border-b border-rule backdrop-blur transition-all duration-300 ${
-          navScrolled ? 'bg-paper-light/98 py-2' : 'bg-paper-light/95 py-0'
+    <div className="bg-surface text-on-surface font-editorial selection:bg-primary/15 selection:text-primary min-h-screen">
+      {/* Nav — glassmorphic masthead */}
+      <nav
+        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+          scrolled ? 'backdrop-blur-2xl bg-surface/70' : 'bg-transparent'
         }`}
+        style={scrolled ? { boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' } : undefined}
       >
-        <div className={`container mx-auto flex items-center justify-between px-4 transition-all duration-300 ${navScrolled ? 'h-14' : 'h-16'}`}>
-          <Link href="/" className="flex items-center space-x-2">
-            <FileText className="h-5 w-5 text-primary" />
-            <span className="font-display text-xl text-ink">PRBuild</span>
+        <div className="flex justify-between items-center px-6 md:px-8 py-4 max-w-7xl mx-auto">
+          <Link href="/" className="flex items-center gap-2 group">
+            <Rocket className="h-7 w-7 text-primary-container transition-transform group-hover:scale-110" strokeWidth={2} />
+            <span className="font-headline text-2xl font-extrabold tracking-tighter text-on-surface">PRBuild</span>
           </Link>
-
-          <nav className="hidden md:flex items-center space-x-6">
-            {NAV_SECTIONS.map(({ id, label, href }) => (
-              <Link
-                key={id}
-                href={href || `#${id}`}
-                className={`text-sm font-medium transition-colors hover:text-primary py-3 ${activeSection === id ? 'text-primary' : 'text-ink-muted'}`}
-                aria-current={activeSection === id ? 'true' : undefined}
+          <div className="hidden md:flex gap-8 items-center">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="font-label text-sm tracking-wide uppercase text-on-surface hover:text-primary-container transition-colors duration-300"
               >
-                {label}
-              </Link>
+                {link.label}
+              </a>
             ))}
-            <Link href="/showcase" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-showcase">
-              Showcase
-            </Link>
-            <Link href="/resources/how-to-write-press-release" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-resources">
-              Resources
-            </Link>
-            <Link href="/login" className="text-sm font-medium text-ink-muted hover:text-primary py-3" data-cta="nav-login">
-              Login
-            </Link>
-          </nav>
-
-          <div className="flex items-center space-x-2">
-            <Link href="/signup" className="hidden sm:block" data-cta="nav-signup">
-              <Button className="bg-primary hover:bg-primary-700 min-h-[44px] rounded-sm">
-                Get Your Free Release
-              </Button>
-            </Link>
-            <button
-              type="button"
-              className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center touch-manipulation rounded-sm hover:bg-paper-dark"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            <Link
+              href="/start"
+              className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-2 rounded-full font-headline font-bold text-sm hover:opacity-90 transition-all active:scale-95"
             >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+              Get Started
+            </Link>
           </div>
+          <Link
+            href="/start"
+            className="md:hidden bg-gradient-to-r from-primary to-primary-container text-on-primary px-4 py-2 rounded-full font-headline font-bold text-xs"
+          >
+            Start
+          </Link>
+        </div>
+      </nav>
+
+      <main className="pt-24">
+        {/* Hero — asymmetric 60/40 split */}
+        <section className="max-w-7xl mx-auto px-6 md:px-8 py-20 lg:py-32 grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7">
+            <h1 className="font-headline text-5xl lg:text-7xl font-extrabold tracking-tight text-on-surface leading-[1.05] mb-6">
+              Stop sending press <span className="text-primary-container italic">releases</span> that get ignored.
+            </h1>
+            <p className="font-editorial text-xl text-on-surface-variant max-w-xl mb-10 leading-relaxed">
+              PRBuild uses AI and a 16-journalist review panel to craft press releases that reporters actually want to read. First release free.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/start"
+                className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-8 py-4 rounded-full font-headline font-bold text-lg hover:shadow-[0_20px_40px_rgba(26,28,25,0.06)] transition-all active:scale-95 text-center"
+              >
+                Launch Your Story
+              </Link>
+              <Link
+                href="/how-it-works"
+                className="bg-surface-container-highest text-on-surface px-8 py-4 rounded-md font-headline font-bold text-lg hover:bg-surface-container-high transition-all text-center"
+              >
+                See the Process
+              </Link>
+            </div>
+          </div>
+          <div className="lg:col-span-5 relative">
+            {/* Tonal-layered floating card, no drop shadow */}
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-tertiary/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
+            <div
+              className="relative z-10 rounded-xl p-8 bg-surface-container-lowest"
+              style={{ boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' }}
+            >
+              <p className="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-6">Live Panel Review</p>
+              <div className="space-y-3">
+                {['Compelling hook, strong lede', 'Numbers support the claim', 'Quote lands, cleanly attributed', '16 / 16 would run this'].map((line) => (
+                  <div key={line} className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary-container mt-0.5 shrink-0" />
+                    <p className="font-editorial text-sm text-on-surface">{line}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(225, 191, 184, 0.15)' }}>
+                <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant">Newsroom Score</p>
+                <p className="font-headline text-4xl font-extrabold text-primary-container mt-1">9.4 / 10</p>
+              </div>
+            </div>
+            <div className="absolute -bottom-6 -right-6 bg-tertiary-container text-on-tertiary px-4 py-3 rounded-xl font-label text-xs uppercase tracking-widest z-20">
+              AI Review Active
+            </div>
+          </div>
+        </section>
+
+        {/* Social Proof — tonal shift, no borders */}
+        <section className="bg-surface-container-low py-14">
+          <div className="max-w-7xl mx-auto px-6 md:px-8">
+            <p className="font-label text-xs text-center uppercase tracking-[0.2em] text-on-surface-variant mb-8">
+              Trusted by founders shipping real news
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-60">
+              <span className="font-headline text-2xl font-black italic tracking-tighter">Seedworks</span>
+              <span className="font-headline text-2xl font-extrabold uppercase tracking-widest">Relay</span>
+              <span className="font-headline text-2xl font-bold lowercase">halo</span>
+              <span className="font-headline text-2xl font-extrabold tracking-tight">Northwind</span>
+              <span className="font-headline text-2xl font-black uppercase tracking-tighter">Atlas</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Problem vs Solution */}
+        <section className="max-w-7xl mx-auto px-6 md:px-8 py-24">
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* Old */}
+            <div className="bg-surface-container-low rounded-xl p-10 relative overflow-hidden">
+              <div className="absolute top-4 right-6 font-label text-sm text-on-surface-variant/40 font-bold tracking-widest">OLD WAY</div>
+              <h3 className="font-headline text-3xl font-bold mb-8 text-on-surface-variant">The Legacy Struggle</h3>
+              <ul className="space-y-6">
+                {[
+                  'Generic mass email blasts that land straight in spam.',
+                  'Dry, corporate language with no actual narrative hook.',
+                  'Wait weeks for account managers to manually research contacts.',
+                  'Pay $400 to $1,200 per release for zero pickup.',
+                ].map((line) => (
+                  <li key={line} className="flex items-start gap-4">
+                    <XCircle className="h-5 w-5 text-on-surface-variant/50 mt-1 shrink-0" />
+                    <p className="font-editorial text-on-surface-variant leading-relaxed">{line}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* New — primary color block */}
+            <div
+              className="bg-gradient-to-br from-primary to-primary-container text-on-primary rounded-xl p-10 relative overflow-hidden lg:scale-[1.02]"
+              style={{ boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' }}
+            >
+              <div className="absolute top-4 right-6 font-label text-sm text-on-primary/60 font-bold tracking-widest">NEW WAY</div>
+              <h3 className="font-headline text-3xl font-bold mb-8">The PRBuild Authority</h3>
+              <ul className="space-y-6">
+                {[
+                  '16 journalist personas review every draft before you send it.',
+                  'AI-tuned narrative hooks specific to your announcement type.',
+                  'Professional release written, reviewed, and formatted in hours.',
+                  'Transparent $9 pricing. First release free. Cancel anytime.',
+                ].map((line) => (
+                  <li key={line} className="flex items-start gap-4">
+                    <CheckCircle2 className="h-5 w-5 text-on-primary mt-1 shrink-0" />
+                    <p className="font-editorial leading-relaxed">{line}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Workflow — 4 step */}
+        <section className="bg-surface py-24" id="workflow">
+          <div className="max-w-7xl mx-auto px-6 md:px-8 text-center mb-16">
+            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-on-surface">
+              The Launch Workflow
+            </h2>
+            <p className="font-editorial text-on-surface-variant max-w-2xl mx-auto text-lg">
+              From idea to headline-ready draft in four tactical moves.
+            </p>
+          </div>
+          <div className="max-w-7xl mx-auto px-6 md:px-8 grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {WORKFLOW_STEPS.map(({ step, title, body, Icon }) => (
+              <div key={step} className="group">
+                <div className="w-16 h-16 bg-surface-container-high rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-300">
+                  <Icon className="h-7 w-7 text-primary group-hover:text-on-primary transition-colors" strokeWidth={2} />
+                </div>
+                <span className="font-label text-xs text-primary-container font-bold tracking-widest mb-2 block">{step}</span>
+                <h4 className="font-headline text-xl font-bold mb-3 text-on-surface">{title}</h4>
+                <p className="font-editorial text-sm text-on-surface-variant leading-relaxed">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Pricing — real prices from existing component */}
+        <div id="pricing">
+          <PricingSection />
         </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-rule bg-paper-light">
-            <nav className="container mx-auto px-4 py-4 flex flex-col space-y-1">
-              <Link href="/how-it-works" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-how-it-works">
-                How It Works
-              </Link>
-              <Link href="#features" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-features">
-                Features
-              </Link>
-              <Link href="#pricing" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-pricing">
-                Pricing
-              </Link>
-              <Link href="/showcase" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-showcase">
-                Showcase
-              </Link>
-              <Link href="/resources/how-to-write-press-release" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-resources">
-                Resources
-              </Link>
-              <Link href="/login" className="min-h-[44px] flex items-center text-sm font-medium text-ink-muted hover:text-primary touch-manipulation" onClick={() => setMobileMenuOpen(false)} data-cta="mobile-login">
-                Login
-              </Link>
-              <Link href="/signup" onClick={() => setMobileMenuOpen(false)} className="mt-2" data-cta="mobile-signup">
-                <Button className="w-full bg-primary hover:bg-primary-700 min-h-[44px] touch-manipulation rounded-sm">
-                  Get Your Free Release
-                </Button>
-              </Link>
-            </nav>
-          </div>
-        )}
-      </header>
-
-      <main id="main-content" className="flex-1">
-        {/* Hero — Editorial asymmetric layout */}
-        <section className="bg-paper-light border-b border-rule">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-[1.1fr_0.9fr] gap-12 min-h-[85vh] items-center">
-              <div className="py-20 md:py-32">
-                <div className="animate-fade-up" style={{ animationDuration: '0.5s' }}>
-                  <div className="flex items-center gap-3 mb-8">
-                    <span className="font-mono text-[11px] tracking-[0.15em] uppercase text-ink-muted">PRBuild</span>
-                    <span className="w-1 h-1 rounded-full bg-primary" />
-                    <span className="font-mono text-[11px] tracking-[0.15em] uppercase text-ink-muted">Est. 2024</span>
-                    <span className="w-1 h-1 rounded-full bg-primary" />
-                    <span className="font-mono text-[11px] tracking-[0.15em] uppercase text-ink-muted">Vol. 847</span>
-                  </div>
-                  <h1 className="font-display text-5xl md:text-7xl leading-[1.05] tracking-tight text-ink mb-6">
-                    97% of Press Releases Get <em className="text-primary italic">Ignored.</em> Yours Won&apos;t.
-                  </h1>
-                </div>
-                <p className="text-lg text-ink-muted mb-10 max-w-lg leading-relaxed">
-                  You get a press release that 16 journalists already tried to kill. What survived is what gets published.
-                </p>
-
-                <div className="flex flex-col sm:flex-row items-start gap-4 mb-8">
-                  <Link href="/signup" data-cta="hero-signup">
-                    <Button size="lg" className="bg-primary hover:bg-primary-700 text-lg px-8 min-h-[44px] touch-manipulation rounded-sm">
-                      Get Your First Release Free
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link href="#how-it-works" data-cta="hero-how-it-works">
-                    <Button size="lg" variant="outline" className="text-lg px-8 min-h-[44px] touch-manipulation rounded-sm border-rule text-ink hover:bg-paper-dark">
-                      See how it works
-                    </Button>
-                  </Link>
-                </div>
-
-                <p className="text-sm text-ink-muted mb-8">No credit card required &bull; Setup in 2 minutes</p>
-
-                <div className="flex gap-8 pt-6 border-t border-rule">
-                  <div>
-                    <div className="font-display text-3xl text-ink">847</div>
-                    <div className="font-mono text-xs text-ink-muted">Releases published</div>
-                  </div>
-                  <div>
-                    <div className="font-display text-3xl text-ink">23%</div>
-                    <div className="font-mono text-xs text-ink-muted">Pickup rate</div>
-                  </div>
-                  <div>
-                    <div className="font-display text-3xl text-ink">16</div>
-                    <div className="font-mono text-xs text-ink-muted">Journalist reviewers</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Review Stack — editorial panel preview */}
-              <div className="hidden md:block py-10">
-                <div className="bg-paper border border-rule rounded-md p-6">
-                  <div className="flex justify-between items-center pb-4 border-b border-rule mb-4">
-                    <span className="font-mono text-[11px] tracking-[0.1em] uppercase text-ink-muted">Panel Review</span>
-                    <span className="font-mono text-[11px] bg-primary text-white px-3 py-1 rounded-sm">16 / 16</span>
-                  </div>
-                  {[
-                    { initials: 'SL', name: 'Sarah Lin', beat: 'Tech M&A Reporter', comment: '"Strong headline. Add specific metrics in paragraph 2."', pass: true },
-                    { initials: 'MR', name: 'Marcus Reid', beat: 'Enterprise SaaS', comment: '"Quote placement is excellent. Consider a stronger CTA."', pass: true },
-                    { initials: 'JH', name: 'Jenna Huang', beat: 'Consumer Brands', comment: '"Needs more human angle. The lead is too product-focused."', pass: false },
-                    { initials: 'DK', name: 'David Kessler', beat: 'PR Agency Veteran', comment: '"Dateline formatting is correct. Boilerplate is tight."', pass: true },
-                  ].map((review) => (
-                    <div key={review.initials} className="flex gap-3 py-3 border-b border-rule last:border-b-0 items-start">
-                      <div className="w-9 h-9 rounded-full bg-paper-dark flex items-center justify-center font-mono text-xs font-semibold text-ink-muted flex-shrink-0">
-                        {review.initials}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-ink">{review.name}</div>
-                        <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">{review.beat}</div>
-                        <div className="text-sm text-ink-muted leading-snug">{review.comment}</div>
-                      </div>
-                      <span className={`font-mono text-[11px] font-semibold px-2 py-0.5 rounded-sm flex-shrink-0 ${review.pass ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
-                        {review.pass ? 'PASS' : 'REVISE'}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <LogoBar />
-        </section>
-
-        <AnimatedStatsBanner />
-
-        {/* Pain Points — editorial modules, not cards */}
-        <section className="py-20 bg-paper">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="font-display text-3xl md:text-4xl text-ink mb-4">
-                You&apos;ve Tried This Before
-              </h2>
-              <p className="text-lg text-ink-muted max-w-2xl mx-auto">
-                <Link href="/compare/prweb" className="text-primary underline hover:text-primary-700">$400 to PRWeb</Link>. Zero coverage. Sound familiar?
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-0 max-w-5xl mx-auto border border-rule rounded-md overflow-hidden">
-              {[
-                { icon: AlertTriangle, title: 'ChatGPT Press Releases', items: ['"We are excited to announce..." — delete.', 'Journalists spot AI copy instantly', 'You end up rewriting 75% anyway'] },
-                { icon: Target, title: 'Wire Services', items: ['$400 to "distribute" to nobody', 'Published on sites with 12 monthly visitors', 'Real journalists never see it'] },
-                { icon: Users, title: 'PR Agencies', items: ['$3,000/month retainer', '5 rounds of revision, still bland', 'No guarantee anyone reads it'] },
-              ].map((card, i) => (
-                <AnimateOnScroll key={card.title} delay={i * 100}>
-                  <div className={`p-8 bg-paper-light ${i < 2 ? 'md:border-r border-b md:border-b-0 border-rule' : ''}`}>
-                    <div className="w-10 h-10 bg-paper-dark rounded-sm flex items-center justify-center mb-4">
-                      <card.icon className="h-5 w-5 text-secondary" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-ink mb-3">{card.title}</h3>
-                    <ul className="text-ink-muted space-y-2 text-sm">
-                      {card.items.map((item) => (
-                        <li key={item} className="flex items-start gap-2">
-                          <span className="text-secondary mt-1">&bull;</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </AnimateOnScroll>
-              ))}
-            </div>
-
-            <div className="mt-16 max-w-3xl mx-auto text-center">
-              <h3 className="font-display text-2xl text-ink mb-4">
-                The problem isn&apos;t your news. It&apos;s the delivery.
-              </h3>
-              <p className="text-lg text-ink-muted">
-                Bad tools, bad results. No amount of &quot;optimization&quot; fixes a broken system.
-              </p>
-            </div>
-            <BeforeAfterComparison />
-          </div>
-        </section>
-
-        {/* Solution */}
-        <section className="py-20 bg-paper-light border-y border-rule">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="font-display text-3xl md:text-4xl text-ink mb-4">
-                Here&apos;s What We Do Differently
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-0 max-w-5xl mx-auto border border-rule rounded-md overflow-hidden">
-              {[
-                { icon: CheckCircle, title: "Copy That Doesn't Sound Like AI", text: 'No "excited to announce." No "innovative solutions." Clean copy that reads like a human wrote it — because the good parts, a human did.' },
-                { icon: Star, title: "Feedback Before You Hit Send", text: "16 journalists review every release and tell you what's boring, what's missing, and what to cut. Fix it before the real audience sees it." },
-                { icon: Send, title: "Distribution to People Who Care", text: "No junk sites. No spray-and-pray. Your release goes to journalists who opted in for your category." },
-              ].map((item, i) => (
-                <AnimateOnScroll key={item.title} delay={i * 100}>
-                  <div className={`p-8 bg-paper-light ${i < 2 ? 'md:border-r border-b md:border-b-0 border-rule' : ''}`}>
-                    <div className="w-10 h-10 bg-primary/10 rounded-sm flex items-center justify-center mb-4">
-                      <item.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-ink mb-2">{item.title}</h3>
-                    <p className="text-ink-muted text-sm leading-relaxed">{item.text}</p>
-                  </div>
-                </AnimateOnScroll>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works — editorial timeline */}
-        <section id="how-it-works" className="py-20 bg-paper">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="font-display text-3xl md:text-4xl text-ink mb-4">
-                How It Works
-              </h2>
-              <p className="text-lg text-ink-muted max-w-2xl mx-auto">
-                From &quot;I have news&quot; to &quot;journalists are reading it&quot; in 48 hours.
-              </p>
-            </div>
-
-            <div className="max-w-3xl mx-auto">
-              {[
-                { step: '1', title: 'You Fill Out a Form', description: 'Company name. What happened. Why it matters. 5 minutes, tops.', icon: FileText, highlight: '5 minutes' },
-                { step: '2', title: 'We Write It', description: 'AI drafts it. Humans fix it. 16 journalists tear it apart. What survives is good.', icon: Users, highlight: '16 reviewers' },
-                { step: '3', title: 'You Approve It', description: 'Review the draft and feedback. Request changes or ship it. Unlimited revisions.', icon: CheckCircle, highlight: 'Unlimited revisions' },
-                { step: '4', title: 'Journalists Get It', description: 'Published to our showcase and emailed to journalists who opted in for your category. Real inboxes, real people.', icon: Send, highlight: '23% pickup rate' },
-              ].map((item, index) => (
-                <AnimateOnScroll key={item.step} delay={index * 120}>
-                  <div className="relative flex gap-6 pb-12 last:pb-0">
-                    {index < 3 && (
-                      <div className="absolute left-6 top-14 w-px h-full bg-rule" />
-                    )}
-                    <div className="relative z-10 flex-shrink-0">
-                      <div className="w-12 h-12 bg-ink text-paper-light rounded-sm flex items-center justify-center font-display text-xl">
-                        {item.step}
-                      </div>
-                    </div>
-                    <div className="flex-1 bg-paper-light rounded-md p-6 border border-rule hover:border-ink-muted/30 transition-colors">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <item.icon className="h-5 w-5 text-primary" />
-                            <h3 className="text-lg font-semibold text-ink">{item.title}</h3>
-                          </div>
-                          <p className="text-ink-muted mb-3 text-sm">{item.description}</p>
-                          <span className="inline-flex items-center font-mono text-xs text-primary bg-primary/10 px-3 py-1 rounded-sm">
-                            {item.highlight}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </AnimateOnScroll>
-              ))}
-            </div>
-
-            <div className="text-center mt-12 space-y-3">
-              <Link href="/signup" data-cta="how-it-works-signup">
-                <Button size="lg" className="bg-primary hover:bg-primary-700 rounded-sm">
-                  Start Your Press Release
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-              <div>
-                <Link href="/showcase" className="text-sm text-ink-muted hover:text-primary transition-colors" data-cta="how-it-works-showcase">
-                  See a real example →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features — editorial grid, not icon cards */}
-        <section id="features" className="py-20 bg-paper-light border-y border-rule">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="font-display text-3xl md:text-4xl text-ink mb-4">
-                What&apos;s Included
-              </h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {[
-                { icon: FileText, title: 'AI + Human Writing', description: 'AI does the heavy lifting. Humans make it not sound like AI.' },
-                { icon: Users, title: 'Journalist Panel Review', description: 'Real journalists flag weak leads, missing hooks, and buried news — before your audience sees it.' },
-                { icon: CheckCircle, title: 'Quality Score', description: 'Every release rated on newsworthiness, clarity, and publishability.' },
-                { icon: Shield, title: 'Human Quality Check', description: 'A real person reviews every release before it goes out. No garbage gets through.' },
-                { icon: Send, title: 'Opt-in Distribution', description: 'Sent only to journalists who opted in for your type of news.' },
-                { icon: Target, title: 'Category Newsletters', description: 'Your release appears in our weekly digest to journalists covering your industry.' },
-              ].map((feature, i) => (
-                <AnimateOnScroll key={feature.title} delay={i * 100}>
-                  <div className="flex flex-col items-start pb-8 border-b border-rule last:border-b-0 md:border-b-0">
-                    <div className="w-10 h-10 bg-paper-dark rounded-sm flex items-center justify-center mb-4">
-                      <feature.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-ink mb-2">{feature.title}</h3>
-                    <p className="text-ink-muted text-sm leading-relaxed">{feature.description}</p>
-                  </div>
-                </AnimateOnScroll>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Objection Handling */}
-        <section className="py-16 bg-paper">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="font-accent italic text-2xl md:text-3xl text-ink mb-4">
-                &ldquo;How can it be good at $9?&rdquo;
-              </h2>
-              <p className="text-lg text-ink-muted mb-6">
-                PRWeb charges $400 to cover sales teams and legacy infrastructure.
-                We use AI for first drafts and humans for the hard part — editing, feedback, quality control. Lower overhead, same result.
-              </p>
-              <div className="grid sm:grid-cols-3 gap-0 text-sm border border-rule rounded-md overflow-hidden">
-                <div className="bg-paper-light p-5 sm:border-r border-b sm:border-b-0 border-rule">
-                  <div className="font-semibold text-ink mb-1">AI handles</div>
-                  <div className="text-ink-muted">First draft, formatting, AP style</div>
-                </div>
-                <div className="bg-paper-light p-5 sm:border-r border-b sm:border-b-0 border-rule">
-                  <div className="font-semibold text-ink mb-1">Humans handle</div>
-                  <div className="text-ink-muted">Editing, tone, newsworthiness</div>
-                </div>
-                <div className="bg-paper-light p-5">
-                  <div className="font-semibold text-ink mb-1">You get</div>
-                  <div className="text-ink-muted">Professional output at startup prices</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <PressReleasePreview />
-
-        <section className="py-8 bg-paper border-y border-rule">
-          <div className="container mx-auto px-4">
-            <TrustBadges />
-          </div>
-        </section>
-
-        <PricingSection />
-
-        <section className="py-20 bg-paper">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="font-display text-3xl md:text-4xl text-ink mb-4">
-                Calculate Your Savings
-              </h2>
-              <p className="text-lg text-ink-muted max-w-2xl mx-auto">
-                See how much you could save by switching to PRBuild.
-              </p>
-            </div>
-            <SectionErrorBoundary sectionName="ROI Calculator">
-              <ROICalculator />
-            </SectionErrorBoundary>
-          </div>
-        </section>
-
-        <section className="py-20 bg-paper-light">
-          <div className="container mx-auto px-4">
-            <SectionErrorBoundary sectionName="Quiz Teaser">
-              <AnimateOnScroll>
-                <QuizTeaser />
-              </AnimateOnScroll>
-            </SectionErrorBoundary>
-          </div>
-        </section>
-
-        <section className="py-16 bg-paper-light">
-          <div className="container mx-auto px-4">
-            <h2 className="font-display text-3xl text-center mb-12 text-ink">
-              What Our Customers Say
+        {/* Testimonials */}
+        <section className="py-24 max-w-7xl mx-auto px-6 md:px-8" id="testimonials">
+          <div className="text-center mb-16">
+            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-on-surface">
+              Loved by founders who hate PR.
             </h2>
-            <SectionErrorBoundary sectionName="Testimonials">
-              <TestimonialsGrid />
-            </SectionErrorBoundary>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} className="bg-surface-container p-8 rounded-xl relative">
+                <span className="font-headline text-6xl text-primary-container/20 absolute top-4 left-4 leading-none" aria-hidden="true">
+                  &ldquo;
+                </span>
+                <p className="font-editorial text-on-surface leading-relaxed relative z-10 mb-8 italic">{t.quote}</p>
+                <div>
+                  <p className="font-headline font-bold text-sm text-on-surface">{t.name}</p>
+                  <p className="font-label text-xs text-on-surface-variant uppercase tracking-wider mt-1">{t.role}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
         {/* Final CTA — dark editorial */}
-        <section className="py-20 bg-ink text-paper-light">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="font-display text-3xl md:text-4xl mb-4">
-              Stop Writing Press Releases Nobody Reads
+        <section className="max-w-7xl mx-auto px-6 md:px-8 mb-24">
+          <div className="bg-on-surface text-surface rounded-3xl p-12 lg:p-24 text-center relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container/20 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/20 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
+            <h2 className="font-headline text-4xl lg:text-6xl font-extrabold tracking-tight mb-8 relative z-10">
+              Stop writing press releases <span className="text-primary-container italic">nobody</span> reads.
             </h2>
-            <p className="text-xl text-paper-light/70 mb-8 max-w-2xl mx-auto">
-              Your first release is free. No credit card. No catch.<br />
-              See real journalist feedback before you spend a dollar.
-            </p>
-            <Link href="/signup" data-cta="final-cta-signup">
-              <Button size="lg" className="bg-paper-light text-ink hover:bg-paper-dark text-lg px-8 rounded-sm">
-                Get Your Free Release
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <div className="flex justify-center relative z-10">
+              <Link
+                href="/start"
+                className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-12 py-5 rounded-full font-headline font-bold text-xl hover:scale-105 transition-all"
+                style={{ boxShadow: '0 20px 40px rgba(192, 59, 34, 0.4)' }}
+              >
+                Launch Your Story
+              </Link>
+            </div>
           </div>
         </section>
       </main>
 
-      {/* Footer — dark editorial */}
-      <footer className="py-12 bg-ink text-ink-muted">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-6 gap-8">
-            <div className="md:col-span-2">
-              <Link href="/" className="flex items-center space-x-2 mb-4">
-                <FileText className="h-5 w-5 text-paper-light" />
-                <span className="font-display text-xl text-paper-light">PRBuild</span>
-              </Link>
-              <p className="text-sm mb-4 text-paper-light/50">
-                AI-powered press releases with human quality control. Our journalist panel reviews every release.
-              </p>
-              <Link href="/referral" className="text-sm text-primary hover:text-primary-400">
-                Referral Program: Give $10, Get $10 →
-              </Link>
+      {/* Footer — tonal shift, no borders */}
+      <footer className="bg-surface-container-low">
+        <div className="flex flex-col md:flex-row justify-between items-center px-8 md:px-12 py-16 gap-8 max-w-7xl mx-auto">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+              <Rocket className="h-5 w-5 text-primary-container" />
+              <span className="font-headline text-xl font-bold text-on-surface">PRBuild</span>
             </div>
-
-            <div>
-              <h3 className="text-paper-light font-semibold mb-4 text-sm uppercase tracking-wider">Product</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="#features" className="hover:text-paper-light transition-colors">Features</Link></li>
-                <li><Link href="#pricing" className="hover:text-paper-light transition-colors">Pricing</Link></li>
-                <li><Link href="/showcase" className="hover:text-paper-light transition-colors">Showcase</Link></li>
-                <li><Link href="/compare" className="hover:text-paper-light transition-colors">Compare</Link></li>
-                <li><Link href="/signup" className="hover:text-paper-light transition-colors">Get Your Free Release</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-paper-light font-semibold mb-4 text-sm uppercase tracking-wider">Use Cases</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/for/startups" className="hover:text-paper-light transition-colors">For Startups</Link></li>
-                <li><Link href="/for/saas" className="hover:text-paper-light transition-colors">For SaaS</Link></li>
-                <li><Link href="/for/agencies" className="hover:text-paper-light transition-colors">For Agencies</Link></li>
-                <li><Link href="/for/ecommerce" className="hover:text-paper-light transition-colors">For E-commerce</Link></li>
-                <li><Link href="/for/healthcare" className="hover:text-paper-light transition-colors">For Healthcare</Link></li>
-                <li><Link href="/for/finance" className="hover:text-paper-light transition-colors">For Finance</Link></li>
-                <li><Link href="/for/legal" className="hover:text-paper-light transition-colors">For Law Firms</Link></li>
-                <li><Link href="/for/realestate" className="hover:text-paper-light transition-colors">For Real Estate</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-paper-light font-semibold mb-4 text-sm uppercase tracking-wider">Resources</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/resources/press-release-template" className="hover:text-paper-light transition-colors">Press Release Template</Link></li>
-                <li><Link href="/resources/how-to-write-press-release" className="hover:text-paper-light transition-colors">How to Write a PR</Link></li>
-                <li><Link href="/resources/press-release-examples" className="hover:text-paper-light transition-colors">Press Release Examples</Link></li>
-                <li><Link href="/resources/pr-distribution-checklist" className="hover:text-paper-light transition-colors">Distribution Checklist</Link></li>
-                <li><Link href="/resources/press-release-mistakes" className="hover:text-paper-light transition-colors">15 PR Mistakes to Avoid</Link></li>
-                <li><Link href="/faq" className="hover:text-paper-light transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-paper-light font-semibold mb-4 text-sm uppercase tracking-wider">Company</h3>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/about" className="hover:text-paper-light transition-colors">About</Link></li>
-                <li><Link href="/contact" className="hover:text-paper-light transition-colors">Contact</Link></li>
-                <li><Link href="/privacy" className="hover:text-paper-light transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="hover:text-paper-light transition-colors">Terms of Service</Link></li>
-                <li><Link href="/journalist/subscribe" className="hover:text-paper-light transition-colors">For Journalists</Link></li>
-              </ul>
-            </div>
+            <p className="font-label text-xs tracking-wide text-on-surface-variant max-w-xs uppercase">
+              &copy; {new Date().getFullYear()} PRBuild. All rights reserved.
+            </p>
           </div>
-
-          <div className="border-t border-paper-light/10 mt-8 pt-8 text-center text-sm text-paper-light/40">
-            <p>&copy; {new Date().getFullYear()} PRBuild. All rights reserved.</p>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12">
+            <Link href="/how-it-works" className="font-label text-sm tracking-wide uppercase text-on-surface-variant hover:text-primary-container transition-colors">
+              How It Works
+            </Link>
+            <Link href="/kit" className="font-label text-sm tracking-wide uppercase text-on-surface-variant hover:text-primary-container transition-colors">
+              Launch Kit
+            </Link>
+            <Link href="/docs" className="font-label text-sm tracking-wide uppercase text-on-surface-variant hover:text-primary-container transition-colors">
+              Docs
+            </Link>
+            <Link href="/contact" className="font-label text-sm tracking-wide uppercase text-on-surface-variant hover:text-primary-container transition-colors">
+              Contact
+            </Link>
           </div>
         </div>
       </footer>
-
-      <SectionErrorBoundary fallback={null}>
-        <ExitIntentPopup />
-      </SectionErrorBoundary>
-      <SectionErrorBoundary fallback={null}>
-        <StickyCTA />
-      </SectionErrorBoundary>
-      <SectionErrorBoundary fallback={null}>
-        <SocialProofTicker />
-      </SectionErrorBoundary>
     </div>
   );
 }
