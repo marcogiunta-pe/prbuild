@@ -772,7 +772,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               {release.ai_selected_headline || release.news_hook || 'Press Release'}
             </h1>
             <p className="text-gray-600">
-              {release.company_name} • {release.announcement_type.replace('_', ' ')}
+              {release.company_name} • {(release.announcement_type ?? '').replace('_', ' ')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -861,7 +861,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              {(release.ai_headline_options as string[]).map((headline: string, i: number) => (
+              {(Array.isArray(release.ai_headline_options) ? (release.ai_headline_options as string[]) : []).map((headline: string, i: number) => (
                 <button
                   key={i}
                   onClick={async () => {
@@ -1535,11 +1535,15 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               </div>
               <div>
                 <dt className="text-gray-500">Announcement Type</dt>
-                <dd className="font-medium capitalize">{release.announcement_type.replace('_', ' ')}</dd>
+                <dd className="font-medium capitalize">{(release.announcement_type ?? '').replace('_', ' ')}</dd>
               </div>
               <div>
                 <dt className="text-gray-500">Target Date</dt>
-                <dd className="font-medium">{format(new Date(release.release_date), 'PP')}</dd>
+                <dd className="font-medium">{(() => {
+                  if (!release.release_date) return '—';
+                  const d = new Date(release.release_date);
+                  return isNaN(d.getTime()) ? '—' : format(d, 'PP');
+                })()}</dd>
               </div>
               <div>
                 <dt className="text-gray-500">Plan</dt>

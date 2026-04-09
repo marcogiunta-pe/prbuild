@@ -454,7 +454,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {release.pitch_emails.map((pitch, index) => {
+                  {(Array.isArray(release.pitch_emails) ? release.pitch_emails : []).map((pitch, index) => {
                     const subjectKey = `subject-${index}`;
                     const bodyKey = `body-${index}`;
                     const mailtoHref = `mailto:?subject=${encodeURIComponent(pitch.subject)}&body=${encodeURIComponent(pitch.body)}`;

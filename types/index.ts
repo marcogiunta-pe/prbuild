@@ -241,7 +241,12 @@ export interface PanelFeedback {
  * The `compelling` field is often unpopulated, so we analyze the feedback text.
  */
 export function deriveNewsroomScore(feedback: PanelFeedback[]): { score: number; compellingCount: number; total: number } {
-  const total = feedback.length;
+  // Guard against malformed DB rows: null entries, non-arrays, or missing fields
+  // would otherwise throw in .every/.some/.forEach and crash the dashboard.
+  const safeFeedback = (Array.isArray(feedback) ? feedback : []).filter(
+    (fb): fb is PanelFeedback => fb != null && typeof fb === 'object'
+  );
+  const total = safeFeedback.length;
   if (total === 0) return { score: 0, compellingCount: 0, total: 0 };
 
   const negativeSignals = /\bnot compelling\b|\bwould not\b|\bwouldn't\b|\bfails\b|\bweak\b|\bmissing\b|\blacks\b|\bignore\b|\bskip\b|\bdelete\b|\btrash\b|\bnot newsworthy\b|\bnot run\b|\bpass on\b|\bwould pass\b|\bdo not publish\b/i;
@@ -250,12 +255,12 @@ export function deriveNewsroomScore(feedback: PanelFeedback[]): { score: number;
   // Detect if this is old data where the parser always set compelling=false
   // If ALL reviewers have compelling=false AND some have positive text signals,
   // fall back to text analysis for everyone
-  const allFalse = feedback.every(fb => fb.compelling === false);
-  const anyPositiveText = feedback.some(fb => positiveSignals.test(fb.feedback || ''));
+  const allFalse = safeFeedback.every(fb => fb.compelling === false);
+  const anyPositiveText = safeFeedback.some(fb => positiveSignals.test(fb.feedback || ''));
   const useTextAnalysis = allFalse && anyPositiveText;
 
   let compellingCount = 0;
-  for (const fb of feedback) {
+  for (const fb of safeFeedback) {
     if (!useTextAnalysis && typeof fb.compelling === 'boolean') {
       if (fb.compelling) compellingCount++;
       continue;

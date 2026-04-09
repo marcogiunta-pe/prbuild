@@ -140,7 +140,7 @@ export default async function MyReleasesPage() {
                         </div>
 
                         <p className="text-sm text-gray-600 mb-3">
-                          {release.company_name} • {release.announcement_type.replace('_', ' ')}
+                          {release.company_name} • {(release.announcement_type ?? '').replace('_', ' ')}
                         </p>
 
                         <div className="flex items-center gap-4 text-xs text-gray-500">

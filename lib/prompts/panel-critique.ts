@@ -314,6 +314,10 @@ export function parsePanelCritiqueResponse(response: string): ParsedPanelCritiqu
 
   const personaMatches = step1Text.match(/([A-Z][a-z]+\s[A-Z]\.)[^A-Z]*([\s\S]*?)(?=[A-Z][a-z]+\s[A-Z]\.|$)/g) || [];
 
+  if (personaMatches.length === 0) {
+    throw new Error('parsePanelCritiqueResponse: legacy fallback extracted zero personas. Raw response is malformed.');
+  }
+
   const individualFeedback = personaMatches.map(match => {
     const nameMatch = match.match(/^([A-Z][a-z]+\s[A-Z]\.)/);
     const name = nameMatch ? nameMatch[1] : 'Unknown';

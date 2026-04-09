@@ -200,6 +200,21 @@ ${draftContent}
     const panelAiResponse = panelCompletion.choices[0].message.content || '';
     const parsedPanel = parsePanelCritiqueResponse(panelAiResponse);
 
+    // Validate: parser must return a non-empty array, otherwise we'd persist a
+    // broken "panel_reviewed" state that re-shows the CTA and hides the score.
+    if (!Array.isArray(parsedPanel.individualFeedback) || parsedPanel.individualFeedback.length === 0) {
+      console.error('Panel parse failed: empty individualFeedback', { releaseRequestId, raw: panelAiResponse.slice(0, 500) });
+      await supabase
+        .from('release_requests')
+        .update({
+          admin_notes: 'Auto-panel parse failed: no individual feedback extracted. Draft was generated successfully.',
+          panel_critique_raw: { raw: panelAiResponse, parsed: parsedPanel },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', releaseRequestId);
+      return NextResponse.json({ error: 'Panel critique parse failed', stage: 'panel' }, { status: 500 });
+    }
+
     // Save panel critique
     const { error: panelUpdateError } = await supabase
       .from('release_requests')
