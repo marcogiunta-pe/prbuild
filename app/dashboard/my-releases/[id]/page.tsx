@@ -1439,10 +1439,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-headline text-on-surface">
                 <ArrowRight className="h-5 w-5 text-primary-container" />
-                Ready for Your Final Review
+                See the Final Product
               </CardTitle>
               <CardDescription className="font-editorial text-on-surface-variant">
-                You&apos;ve seen the draft and the journalist panel feedback. Continue to the final review page to approve or send revision notes.
+                You&apos;ve seen the draft and the journalist panel feedback. View the final formatted press release, then approve it or send revision notes.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1450,7 +1450,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                 onClick={() => router.push(`/dashboard/my-releases/${release.id}/preview`)}
                 className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
               >
-                Continue to Final Review
+                See Final Product
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
