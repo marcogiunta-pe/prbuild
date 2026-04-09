@@ -162,7 +162,10 @@ Return ONLY a JSON array — no markdown fences, no extra text. Each object must
 
     if (updateError) {
       console.error('Failed to save pitches:', updateError);
-      return NextResponse.json({ error: 'Failed to save pitch emails' }, { status: 500 });
+      return NextResponse.json({
+        error: `Failed to save pitch emails: ${updateError.message}${updateError.hint ? ` (${updateError.hint})` : ''}`,
+        code: updateError.code,
+      }, { status: 500 });
     }
 
     return NextResponse.json({
