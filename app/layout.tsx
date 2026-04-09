@@ -1,5 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from 'next';
+import { Plus_Jakarta_Sans, Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -7,6 +8,26 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { CTATracker } from '@/components/CTATracker';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import { OrganizationSchema, ProductSchema, WebsiteSchema } from '@/components/StructuredData';
+
+// Self-hosted, zero-CLS font loading per DESIGN.md
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-headline',
+  display: 'swap',
+});
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-editorial',
+  display: 'swap',
+});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-label',
+  display: 'swap',
+});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -106,11 +127,12 @@ export default function RootLayout({
   const gaScript = gaId ? `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId.replace(/'/g, "\\'")}');` : '';
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${jakarta.variable} ${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
+        {/* Legacy fonts (Instrument Serif / DM Sans / Cormorant) still loaded until older pages are migrated */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {gaId && (
           <>

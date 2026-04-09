@@ -15,9 +15,10 @@ const config: Config = {
         accent: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
         // New "High-End Editorial" tri-font system (DESIGN.md)
-        headline: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        editorial: ['"Inter"', 'system-ui', 'sans-serif'],
-        label: ['"Space Grotesk"', '"JetBrains Mono"', 'monospace'],
+        // Self-hosted via next/font; CSS vars set in app/layout.tsx
+        headline: ['var(--font-headline)', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        editorial: ['var(--font-editorial)', '"Inter"', 'system-ui', 'sans-serif'],
+        label: ['var(--font-label)', '"Space Grotesk"', '"JetBrains Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
