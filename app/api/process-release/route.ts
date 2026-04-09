@@ -182,6 +182,8 @@ ${draftContent}
         ],
         temperature: 0.8,
         max_tokens: 8000,
+        // Force valid JSON — parser expects {reviewers: [...], synthesis, contrarian}
+        response_format: { type: 'json_object' },
       });
     } catch (panelErr: any) {
       console.error('Panel critique failed:', panelErr);
