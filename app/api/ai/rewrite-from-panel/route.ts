@@ -101,14 +101,22 @@ export async function POST(request: NextRequest) {
 
     const rewrittenContent = completion.choices[0].message.content || '';
 
-    // Save rewrite as the refined content and mark rewrite as used
-    // Use admin client to bypass RLS for server-side updates
+    // Save rewrite as the refined content. Clear the stale panel review —
+    // the old score was computed against the pre-rewrite draft, so showing
+    // it on the rewritten draft is misleading. Clearing re-enables the
+    // "Request Journalist Review" CTA so the user can re-run the panel
+    // on the new draft and get a fresh score.
     const adminClient = createAdminClient();
     const { error: updateError } = await adminClient
       .from('release_requests')
       .update({
         admin_refined_content: rewrittenContent,
-        admin_notes: (release.admin_notes || '') + `\n[${new Date().toISOString()}] Rewrite based on panel feedback requested by ${profile?.role === 'admin' ? 'admin' : 'client'}.`,
+        panel_individual_feedback: null,
+        panel_synthesis: null,
+        panel_contrarian_recommendation: null,
+        panel_reviewed_at: null,
+        status: 'draft_generated',
+        admin_notes: (release.admin_notes || '') + `\n[${new Date().toISOString()}] Rewrite based on panel feedback requested by ${profile?.role === 'admin' ? 'admin' : 'client'}. Prior panel review cleared — re-run required.`,
         updated_at: new Date().toISOString(),
       })
       .eq('id', releaseRequestId);

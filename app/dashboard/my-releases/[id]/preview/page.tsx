@@ -17,7 +17,11 @@ import {
   CheckCircle,
   RefreshCw,
   Loader2,
+  AlertCircle,
+  ThumbsUp,
+  MessageSquare,
 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 import { ReleaseRequest, deriveNewsroomScore } from '@/types';
 import type { PanelFeedback } from '@/types';
 import { isSectionLabel, cleanContent, extractHeadlineFromContent, contentToHtml } from '@/lib/release-formatting';
@@ -85,6 +89,8 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const [copiedPitch, setCopiedPitch] = useState<string | null>(null);
   const [generatingAnnouncement, setGeneratingAnnouncement] = useState(false);
   const [copiedAnnouncement, setCopiedAnnouncement] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -142,6 +148,47 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
     await navigator.clipboard.writeText(text);
     setCopiedFormat(format);
     setTimeout(() => setCopiedFormat(null), 2000);
+  };
+
+  const canReview = release ? ['awaiting_client', 'panel_reviewed', 'sent_to_client', 'draft_generated'].includes(release.status) : false;
+
+  const handleApprove = async () => {
+    if (!release) return;
+    setSubmittingReview(true);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('release_requests')
+      .update({
+        status: 'client_approved',
+        final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
+        final_approved_at: new Date().toISOString(),
+      })
+      .eq('id', release.id);
+    if (!error) {
+      // Re-fetch so the page updates from "Your Review Needed" to "Approved"
+      const { data } = await supabase.from('release_requests').select('*').eq('id', release.id).single();
+      if (data) setRelease(data as ReleaseRequest);
+    }
+    setSubmittingReview(false);
+  };
+
+  const handleSubmitFeedback = async () => {
+    if (!feedback.trim() || !release) return;
+    setSubmittingReview(true);
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('release_requests')
+      .update({
+        client_feedback: feedback,
+        client_feedback_at: new Date().toISOString(),
+        status: 'client_feedback',
+      })
+      .eq('id', release.id);
+    if (!error) {
+      alert("Thank you for your feedback! We'll revise the draft and email you when it's ready.");
+      router.push(`/dashboard/my-releases/${release.id}`);
+    }
+    setSubmittingReview(false);
   };
 
   const handlePrint = () => window.print();
@@ -299,11 +346,37 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
         {/* Press release document */}
         <div className="print-content max-w-3xl mx-auto px-6 py-12">
-          {/* Approved badge */}
-          <div className="no-print flex items-center gap-2 mb-8">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium text-green-700">Approved &amp; Ready for Publication</span>
-          </div>
+          {/* Approval state indicator */}
+          {canReview ? (
+            <div className="no-print mb-10 bg-surface-container-low rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <AlertCircle className="h-5 w-5 text-primary-container" />
+                <h2 className="font-headline text-xl font-bold text-on-surface">Your Review Needed</h2>
+              </div>
+              <p className="font-editorial text-sm text-on-surface-variant mb-4">
+                Read through the press release below. If it&apos;s ready, approve it to send to our publication queue. Otherwise, send revision notes and we&apos;ll rewrite it.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleApprove}
+                  disabled={submittingReview}
+                  className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
+                >
+                  {submittingReview ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <ThumbsUp className="h-4 w-4 mr-2" />
+                  )}
+                  Approve Release
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="no-print flex items-center gap-2 mb-8">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <span className="text-sm font-medium text-green-700">Approved &amp; Ready for Publication</span>
+            </div>
+          )}
 
           {/* Header */}
           <div className="mb-10 pb-8 border-b border-rule">
@@ -348,6 +421,49 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           <div className="border-t border-rule pt-6 text-center">
             <p className="font-mono text-xs text-ink-muted">###</p>
           </div>
+
+          {/* Review + feedback form — only when canReview, at the bottom so reviewer reads first */}
+          {canReview && (
+            <div className="no-print mt-12 bg-surface-container-low rounded-xl p-6">
+              <h3 className="font-headline text-lg font-bold text-on-surface mb-2">Send revision notes instead</h3>
+              <p className="font-editorial text-sm text-on-surface-variant mb-4">
+                Spot something that needs changing? Tell us what to fix and we&apos;ll rewrite the draft.
+              </p>
+              <Textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="e.g., 'Change the headline to focus on the partnership angle' or 'The quote attribution should be CEO, not CTO'..."
+                rows={4}
+                className="mb-4 bg-surface-container-lowest"
+              />
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleApprove}
+                  disabled={submittingReview}
+                  className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
+                >
+                  {submittingReview ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <ThumbsUp className="h-4 w-4 mr-2" />
+                  )}
+                  Approve Release
+                </Button>
+                <Button
+                  onClick={handleSubmitFeedback}
+                  disabled={submittingReview || !feedback.trim()}
+                  variant="editorial-secondary"
+                >
+                  {submittingReview ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                  )}
+                  Send Feedback
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Newsroom Score */}
           {release.panel_individual_feedback && (release.panel_individual_feedback as any[]).length > 0 && (

@@ -1435,66 +1435,24 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
         {/* Client Review Section */}
         {canReview && (
-          <Card className="border-yellow-200 bg-yellow-50/50">
+          <Card className="bg-surface-container-low border-0">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-yellow-700">
-                <AlertCircle className="h-5 w-5" />
-                Your Review Needed
+              <CardTitle className="flex items-center gap-2 font-headline text-on-surface">
+                <ArrowRight className="h-5 w-5 text-primary-container" />
+                Ready for Your Final Review
               </CardTitle>
-              <CardDescription>
-                This is your chance to review the press release before it goes to publication. Take a moment to read through the draft and the journalist panel feedback above.
+              <CardDescription className="font-editorial text-on-surface-variant">
+                You&apos;ve seen the draft and the journalist panel feedback. Continue to the final review page to approve or send revision notes.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-surface-container-low p-4 rounded-md text-sm text-on-surface-variant space-y-2 font-editorial">
-                <p><strong className="text-ink">What to look for:</strong></p>
-                <ul className="list-disc ml-5 space-y-1">
-                  <li>Are all company names, dates, and facts accurate?</li>
-                  <li>Does the headline capture your announcement?</li>
-                  <li>Are the quotes attributed correctly?</li>
-                  <li>Is there anything missing that journalists should know?</li>
-                </ul>
-                <p className="pt-2"><strong className="text-ink">Your options:</strong> Approve to send it to our publication queue, or send feedback and we&apos;ll revise it. You can also edit the draft directly using the &quot;Edit Draft&quot; button above.</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-ink mb-2">
-                  Feedback or revision notes
-                </label>
-                <Textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="e.g., 'Change the headline to focus on the partnership angle' or 'The quote attribution should be CEO, not CTO'..."
-                  rows={4}
-                />
-              </div>
-              
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleApprove}
-                  disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {submitting ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <ThumbsUp className="h-4 w-4 mr-2" />
-                  )}
-                  Approve Release
-                </Button>
-                
-                <Button
-                  onClick={handleSubmitFeedback}
-                  disabled={submitting || !feedback.trim()}
-                  variant="outline"
-                >
-                  {submitting ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                  )}
-                  Send Feedback
-                </Button>
-              </div>
+            <CardContent>
+              <Button
+                onClick={() => router.push(`/dashboard/my-releases/${release.id}/preview`)}
+                className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
+              >
+                Continue to Final Review
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
             </CardContent>
           </Card>
         )}
