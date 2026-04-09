@@ -42,10 +42,10 @@ export function PricingSection() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="font-headline text-4xl md:text-5xl font-extrabold tracking-tight text-on-surface mb-4">
-            PRWeb: $400. Us: <span className="italic text-primary-container">$9</span>.
+            Select Your <span className="italic text-primary-container">Authority</span> Level
           </h2>
           <p className="font-editorial text-lg text-on-surface-variant mb-10">
-            Same result. 97% less money. Cancel anytime.
+            Same pickup rate as $400 wires. For the price of a coffee. Cancel anytime.
           </p>
 
           {/* Billing Toggle — pill shaped per DESIGN.md */}

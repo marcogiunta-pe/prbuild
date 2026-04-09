@@ -15,25 +15,25 @@ const WORKFLOW_STEPS = [
   {
     step: '01. STRATEGY',
     title: 'Narrative Extraction',
-    body: 'Our AI analyzes your announcement to find the hook that matters to humans, not algorithms.',
+    body: 'Our AI analyzes your product to find the hook that matters to humans.',
     Icon: BookOpen,
   },
   {
-    step: '02. REVIEW',
-    title: 'Journalist Panel',
-    body: '16 journalist personas score every draft before it leaves the building. No guesswork.',
+    step: '02. TARGETING',
+    title: 'AI Journalist Match',
+    body: 'Identify the 50 reporters most likely to cover your specific story today.',
     Icon: Brain,
   },
   {
-    step: '03. DELIVERY',
-    title: 'Newsroom-Ready Draft',
-    body: 'You approve the final version. We polish, format, and prep pitch emails ready to send.',
+    step: '03. EXECUTION',
+    title: 'Hyper-Pitching',
+    body: 'Personalized outreach sent at the optimal open-time for each recipient.',
     Icon: Send,
   },
   {
     step: '04. IMPACT',
-    title: 'Pickup Tracking',
-    body: 'Track opens, mentions, and real coverage with transparent attribution.',
+    title: 'Real-time Analytics',
+    body: 'Track every open, click, and mention with deep-link attribution.',
     Icon: BarChart3,
   },
 ];
@@ -134,24 +134,43 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="lg:col-span-5 relative">
-            {/* Tonal-layered floating card, no drop shadow */}
+            {/* Dashboard preview card with tonal layering, no drop shadow */}
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-tertiary/10 rounded-full blur-3xl pointer-events-none" aria-hidden="true" />
             <div
-              className="relative z-10 rounded-xl p-8 bg-surface-container-lowest"
+              className="relative z-10 rounded-xl p-4 bg-surface-container-lowest"
               style={{ boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' }}
             >
-              <p className="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-6">Live Panel Review</p>
-              <div className="space-y-3">
-                {['Compelling hook, strong lede', 'Numbers support the claim', 'Quote lands, cleanly attributed', '16 / 16 would run this'].map((line) => (
-                  <div key={line} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary-container mt-0.5 shrink-0" />
-                    <p className="font-editorial text-sm text-on-surface">{line}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(225, 191, 184, 0.15)' }}>
-                <p className="font-label text-xs uppercase tracking-widest text-on-surface-variant">Newsroom Score</p>
-                <p className="font-headline text-4xl font-extrabold text-primary-container mt-1">9.4 / 10</p>
+              {/* Mock dashboard surface */}
+              <div className="rounded-lg bg-on-surface text-surface p-6 font-label">
+                <div className="flex items-center gap-2 mb-4 opacity-60">
+                  <div className="w-2 h-2 rounded-full bg-surface/40" />
+                  <div className="w-2 h-2 rounded-full bg-surface/40" />
+                  <div className="w-2 h-2 rounded-full bg-surface/40" />
+                  <span className="text-[10px] uppercase tracking-widest ml-2">prbuild / panel</span>
+                </div>
+                <p className="text-[10px] uppercase tracking-widest opacity-50 mb-3">Newsroom Score</p>
+                <p className="font-headline text-5xl font-extrabold text-primary-container">9.4<span className="text-lg text-surface/50"> / 10</span></p>
+                <div className="mt-5 space-y-2">
+                  {[
+                    { label: 'Hook strength', pct: '94' },
+                    { label: 'Fact density', pct: '88' },
+                    { label: 'Quote attribution', pct: '100' },
+                  ].map((row) => (
+                    <div key={row.label}>
+                      <div className="flex justify-between text-[10px] uppercase tracking-wider opacity-70 mb-1">
+                        <span>{row.label}</span>
+                        <span>{row.pct}%</span>
+                      </div>
+                      <div className="h-1 rounded-full bg-surface/10 overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-primary to-primary-container" style={{ width: `${row.pct}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-5 pt-4 border-t border-surface/10 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary-container" />
+                  <span className="text-[10px] uppercase tracking-widest">16 / 16 would run this</span>
+                </div>
               </div>
             </div>
             <div className="absolute -bottom-6 -right-6 bg-tertiary-container text-on-tertiary px-4 py-3 rounded-xl font-label text-xs uppercase tracking-widest z-20">
@@ -160,18 +179,18 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Social Proof — tonal shift, no borders */}
+        {/* Social Proof — outlets we target, not false endorsements */}
         <section className="bg-surface-container-low py-14">
           <div className="max-w-7xl mx-auto px-6 md:px-8">
             <p className="font-label text-xs text-center uppercase tracking-[0.2em] text-on-surface-variant mb-8">
-              Trusted by founders shipping real news
+              Coverage we target for our clients
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-60">
-              <span className="font-headline text-2xl font-black italic tracking-tighter">Seedworks</span>
-              <span className="font-headline text-2xl font-extrabold uppercase tracking-widest">Relay</span>
-              <span className="font-headline text-2xl font-bold lowercase">halo</span>
-              <span className="font-headline text-2xl font-extrabold tracking-tight">Northwind</span>
-              <span className="font-headline text-2xl font-black uppercase tracking-tighter">Atlas</span>
+            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+              <span className="font-headline text-2xl font-black italic tracking-tighter">TechCrunch</span>
+              <span className="font-headline text-2xl font-extrabold uppercase tracking-widest">Forbes</span>
+              <span className="font-headline text-2xl font-bold lowercase">wired</span>
+              <span className="font-headline text-2xl font-extrabold tracking-tight">Bloomberg</span>
+              <span className="font-headline text-2xl font-black uppercase tracking-tighter">Verge</span>
             </div>
           </div>
         </section>
