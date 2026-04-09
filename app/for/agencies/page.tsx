@@ -159,15 +159,15 @@ export default function AgenciesPage() {
               declining quality under deadline pressure.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">$65K+/yr</div>
                 <div className="text-gray-600">Cost per junior PR writer</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">6+ weeks</div>
                 <div className="text-gray-600">To hire and train new staff</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">↓ Quality</div>
                 <div className="text-gray-600">When writers are stretched</div>
               </div>
@@ -204,7 +204,7 @@ export default function AgenciesPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {useCases.map((useCase) => (
-              <div key={useCase.title} className="bg-white p-8 rounded-xl border border-gray-200">
+              <div key={useCase.title} className="bg-surface-container-lowest p-8 rounded-xl">
                 <h3 className="font-semibold text-xl mb-3">{useCase.title}</h3>
                 <p className="text-gray-600 mb-4">{useCase.description}</p>
                 <div className="text-primary font-semibold">{useCase.metric}</div>
@@ -227,7 +227,7 @@ export default function AgenciesPage() {
             {pricingTiers.map((tier) => (
               <div 
                 key={tier.name} 
-                className={`p-8 rounded-2xl ${tier.popular ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-white border border-gray-200'}`}
+                className={`p-8 rounded-2xl ${tier.popular ? 'bg-gradient-to-r from-primary to-primary-container text-on-primary' : 'bg-surface-container-lowest'}`}
               >
                 {tier.popular && (
                   <div className="text-sm font-medium mb-4 bg-white/20 inline-block px-3 py-1 rounded-full">

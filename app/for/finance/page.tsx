@@ -134,15 +134,15 @@ export default function FinancePage() {
               legitimate player in a crowded market.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-emerald-600 mb-2">Trust</div>
                 <div className="text-gray-600">Media coverage builds credibility</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-emerald-600 mb-2">Investors</div>
                 <div className="text-gray-600">Coverage attracts funding interest</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-emerald-600 mb-2">Partners</div>
                 <div className="text-gray-600">Banks and enterprises notice PR</div>
               </div>
@@ -179,7 +179,7 @@ export default function FinancePage() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
             {examples.map((example, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200">
+              <div key={index} className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-sm text-emerald-600 font-medium mb-2">{example.type}</div>
                 <h3 className="font-semibold text-lg mb-3">{example.headline}</h3>
                 <div className="flex items-center gap-2 text-sm text-green-600">

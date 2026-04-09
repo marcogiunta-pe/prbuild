@@ -136,15 +136,15 @@ export default function NonprofitsPage() {
               Media coverage is the most credible form of awareness—and it's essentially free.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-rose-500 mb-2">Awareness</div>
                 <div className="text-gray-600">Reach people who've never heard of you</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-rose-500 mb-2">Credibility</div>
                 <div className="text-gray-600">Third-party validation builds trust</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-rose-500 mb-2">Donations</div>
                 <div className="text-gray-600">Coverage drives giving</div>
               </div>
@@ -181,7 +181,7 @@ export default function NonprofitsPage() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
             {examples.map((example, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200">
+              <div key={index} className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-sm text-rose-600 font-medium mb-2">{example.type}</div>
                 <h3 className="font-semibold text-lg mb-3">{example.headline}</h3>
                 <div className="flex items-center gap-2 text-sm text-green-600">
@@ -203,7 +203,7 @@ export default function NonprofitsPage() {
           <p className="text-xl text-gray-600 mb-8">
             Every dollar you save goes back to your mission.
           </p>
-          <div className="inline-flex items-center gap-8 bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+          <div className="inline-flex items-center gap-8 bg-surface-container-lowest rounded-2xl p-8">
             <div>
               <div className="text-sm text-gray-500">Starting at</div>
               <div className="text-4xl font-bold text-primary">$9<span className="text-lg text-gray-500">/mo</span></div>

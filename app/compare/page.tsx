@@ -74,7 +74,7 @@ export default function ComparePage() {
               <Link
                 key={card.slug}
                 href={`/compare/${card.slug}`}
-                className="group block bg-white border border-gray-200 rounded-2xl p-6 hover:border-primary hover:shadow-lg transition-all"
+                className="group block bg-surface-container-lowest rounded-2xl p-6 hover:bg-surface-container-low transition-all"
               >
                 <div className="text-sm text-gray-400 mb-2">PRBuild vs</div>
                 <div className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">

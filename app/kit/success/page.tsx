@@ -35,17 +35,17 @@ export default async function KitSuccessPage({
   if (!paid) {
     return (
       <div className="min-h-screen bg-paper font-body">
-        <header className="border-b border-rule bg-paper-light">
+        <header className="bg-surface-container-low">
           <div className="mx-auto max-w-5xl px-6 py-4 flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-primary" />
-              <span className="font-display text-xl text-ink">PRBuild</span>
+              <FileText className="h-5 w-5 text-primary-container" />
+              <span className="font-headline text-xl font-extrabold text-on-surface">PRBuild</span>
             </Link>
           </div>
         </header>
         <main className="mx-auto max-w-xl px-6 py-24 text-center">
           <AlertCircle className="h-12 w-12 text-ink-muted mx-auto mb-6" />
-          <h1 className="font-display text-3xl text-ink mb-4">
+          <h1 className="font-headline text-4xl font-extrabold tracking-tight text-on-surface mb-4">
             Payment not found.
           </h1>
           <p className="text-ink-muted leading-relaxed mb-8">
@@ -54,7 +54,7 @@ export default async function KitSuccessPage({
           </p>
           <Link
             href="/kit"
-            className="inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-base font-medium text-white transition-colors hover:bg-primary-700 min-h-[44px]"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-8 py-3 text-base font-headline font-bold text-on-primary transition-all hover:opacity-90 active:scale-95 min-h-[44px]"
           >
             Back to Launch PR Kit
           </Link>
@@ -77,7 +77,7 @@ export default async function KitSuccessPage({
 
       <main className="mx-auto max-w-xl px-6 py-24 text-center">
         <CheckCircle className="h-12 w-12 text-primary mx-auto mb-6" />
-        <h1 className="font-display text-3xl text-ink mb-4">
+        <h1 className="font-headline text-4xl font-extrabold tracking-tight text-on-surface mb-4">
           Payment confirmed.
         </h1>
         <p className="text-ink-muted leading-relaxed mb-8">
@@ -87,7 +87,7 @@ export default async function KitSuccessPage({
         </p>
         <Link
           href="/signup?from=kit"
-          className="inline-flex items-center gap-2 rounded-sm bg-primary px-8 py-3 text-base font-medium text-white transition-colors hover:bg-primary-700 min-h-[44px]"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container px-8 py-3 text-base font-headline font-bold text-on-primary transition-all hover:opacity-90 active:scale-95 min-h-[44px]"
         >
           Create Your Account
           <ArrowRight className="h-4 w-4" />

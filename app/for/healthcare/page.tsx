@@ -136,15 +136,15 @@ export default function HealthcarePage() {
               Overstated claims can trigger regulatory concerns. We get it right.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-cyan-600 mb-2">Accuracy</div>
                 <div className="text-gray-600">Medical terminology reviewed for correctness</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-cyan-600 mb-2">Compliance</div>
                 <div className="text-gray-600">Aware of FDA, HIPAA, and regulatory guidelines</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-cyan-600 mb-2">Targeting</div>
                 <div className="text-gray-600">Healthcare and biotech journalists on our list</div>
               </div>
@@ -181,7 +181,7 @@ export default function HealthcarePage() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
             {examples.map((example, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200">
+              <div key={index} className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-sm text-cyan-600 font-medium mb-2">{example.type}</div>
                 <h3 className="font-semibold text-lg mb-3">{example.headline}</h3>
                 <div className="flex items-center gap-2 text-sm text-green-600">

@@ -125,7 +125,7 @@ export default async function MyReleasesPage() {
 
             return (
               <Link key={release.id} href={`/dashboard/my-releases/${release.id}`}>
-                <Card className={`hover:shadow-md transition-shadow cursor-pointer ${needsAction ? 'ring-2 ring-yellow-400' : ''}`}>
+                <Card className={`bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer ${needsAction ? 'ring-2 ring-yellow-400' : ''}`}>
                   <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

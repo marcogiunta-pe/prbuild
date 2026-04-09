@@ -137,15 +137,15 @@ export default function SaaSPage() {
               builds credibility that compounds.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-green-500 mb-2">Credibility</div>
                 <div className="text-gray-600">"As seen in TechCrunch" in your pitch deck</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-green-500 mb-2">SEO</div>
                 <div className="text-gray-600">Backlinks from high-DA tech sites</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-green-500 mb-2">Leads</div>
                 <div className="text-gray-600">Inbound from people who read the article</div>
               </div>
@@ -182,7 +182,7 @@ export default function SaaSPage() {
           </h2>
           <div className="max-w-3xl mx-auto space-y-6">
             {examples.map((example, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200">
+              <div key={index} className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-sm text-primary font-medium mb-2">{example.type}</div>
                 <h3 className="font-semibold text-lg mb-3">{example.headline}</h3>
                 <div className="flex items-center gap-2 text-sm text-green-600">
@@ -204,7 +204,7 @@ export default function SaaSPage() {
           <p className="text-xl text-gray-600 mb-8">
             No enterprise contracts. No hidden fees. Cancel anytime.
           </p>
-          <div className="inline-flex items-center gap-8 bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
+          <div className="inline-flex items-center gap-8 bg-surface-container-lowest rounded-2xl p-8">
             <div>
               <div className="text-sm text-gray-500">Starting at</div>
               <div className="text-4xl font-bold text-primary">$9<span className="text-lg text-gray-500">/mo</span></div>

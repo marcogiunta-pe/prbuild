@@ -78,13 +78,13 @@ export function EmailCapture({
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
-          className="flex-1 px-4 py-2 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="flex-1 px-4 py-2 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 transition-colors font-editorial"
           disabled={status === 'loading' || status === 'success'}
         />
         <Button
           type="submit"
           disabled={status === 'loading' || status === 'success'}
-          className="bg-primary hover:bg-primary-700 rounded-sm"
+          className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
         >
           {status === 'loading' && <Loader2 className="w-4 h-4 animate-spin" />}
           {status === 'success' && <Check className="w-4 h-4" />}
@@ -97,8 +97,8 @@ export function EmailCapture({
 
   if (variant === 'card') {
     return (
-      <div className={`bg-paper-dark border border-rule rounded-md p-8 ${className}`}>
-        <h3 className="text-xl font-display mb-2">{title}</h3>
+      <div className={`bg-surface-container rounded-xl p-8 ${className}`}>
+        <h3 className="font-headline text-xl font-bold mb-2 text-on-surface">{title}</h3>
         <p className="text-ink-muted mb-6">{description}</p>
 
         {status === 'success' ? (
@@ -116,7 +116,7 @@ export function EmailCapture({
                 if (status === 'error') setStatus('idle');
               }}
               placeholder="you@company.com"
-              className="w-full px-4 py-3 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="w-full px-4 py-3 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 transition-colors font-editorial"
               disabled={status === 'loading'}
             />
             {status === 'error' && (
@@ -147,7 +147,7 @@ export function EmailCapture({
   // Default variant
   return (
     <div className={className}>
-      <h3 className="text-2xl font-display mb-2">{title}</h3>
+      <h3 className="font-headline text-2xl font-bold mb-2 text-on-surface">{title}</h3>
       <p className="text-ink-muted mb-6">{description}</p>
 
       {status === 'success' ? (
@@ -165,13 +165,13 @@ export function EmailCapture({
               if (status === 'error') setStatus('idle');
             }}
             placeholder="you@company.com"
-            className="flex-1 px-4 py-3 rounded-sm border border-rule focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 transition-colors font-editorial"
             disabled={status === 'loading'}
           />
           <Button
             type="submit"
             size="lg"
-            className="bg-primary hover:bg-primary-700 rounded-sm"
+            className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
             disabled={status === 'loading'}
           >
             {status === 'loading' ? (

@@ -162,15 +162,15 @@ export default function StartupsPage() {
               "We are excited to announce..."
             </p>
             <div className="grid md:grid-cols-3 gap-6 text-left">
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">$5,000+/mo</div>
                 <div className="text-gray-600">Average PR agency retainer</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">$400+</div>
                 <div className="text-gray-600">PRWeb per release</div>
               </div>
-              <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="bg-surface-container-lowest p-6 rounded-xl">
                 <div className="text-2xl font-bold text-red-500 mb-2">97%</div>
                 <div className="text-gray-600">Press releases get ignored</div>
               </div>
@@ -210,7 +210,7 @@ export default function StartupsPage() {
           </p>
           <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {useCases.map((useCase) => (
-              <div key={useCase.title} className="bg-white p-6 rounded-xl border border-gray-200">
+              <div key={useCase.title} className="bg-surface-container-lowest p-6 rounded-xl">
                 <h3 className="font-semibold text-lg mb-2">{useCase.title}</h3>
                 <p className="text-gray-600 text-sm">{useCase.description}</p>
               </div>
@@ -253,7 +253,7 @@ export default function StartupsPage() {
           <p className="text-xl text-gray-600 mb-8">
             Plans that grow with you. Cancel anytime.
           </p>
-          <div className="inline-flex items-center gap-8 bg-white rounded-2xl p-8 shadow-sm">
+          <div className="inline-flex items-center gap-8 bg-surface-container-lowest rounded-2xl p-8">
             <div>
               <div className="text-sm text-gray-500">Starting at</div>
               <div className="text-4xl font-bold text-primary">$9<span className="text-lg text-gray-500">/mo</span></div>
