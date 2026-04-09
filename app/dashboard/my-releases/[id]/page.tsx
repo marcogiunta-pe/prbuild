@@ -338,7 +338,7 @@ function PanelReviewAnimation({ reviewers, progress, comments }: {
               )}
             </div>
             {i < progress && (
-              <span className="font-mono text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-sm flex-shrink-0">
+              <span className="font-mono text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full flex-shrink-0">
                 DONE
               </span>
             )}
@@ -823,14 +823,14 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
         {/* Process Request button — shown when status is submitted (pipeline didn't run) */}
         {release.status === 'submitted' && !processing && (
-          <div className="mt-4 p-5 bg-paper-light border border-rule rounded-md flex items-center justify-between">
+          <div className="mt-4 p-5 bg-surface-container-lowest rounded-xl flex items-center justify-between">
             <div>
               <p className="font-semibold text-ink">Ready to process your request?</p>
               <p className="text-sm text-ink-muted">We'll write your press release and have our journalist panel review it.</p>
             </div>
             <Button
               onClick={handleProcessRequest}
-              className="bg-primary hover:bg-primary-700 rounded-sm"
+              className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
             >
               <Sparkles className="h-4 w-4 mr-2" />
               Process Your Request
@@ -872,10 +872,10 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                       .eq('id', release.id);
                     await loadRelease();
                   }}
-                  className="w-full text-left p-4 rounded-md border border-rule bg-paper-light hover:border-primary hover:bg-primary/5 transition-colors"
+                  className="w-full text-left p-4 rounded-md bg-surface-container-lowest hover:bg-primary/5 transition-colors"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="font-mono text-xs text-ink-muted bg-paper-dark px-2 py-1 rounded-sm flex-shrink-0">
+                    <span className="font-label text-xs uppercase tracking-wider text-on-surface-variant bg-surface-container px-2 py-1 rounded-full flex-shrink-0">
                       {i + 1}
                     </span>
                     <span className="font-display text-lg text-ink">{headline}</span>
@@ -909,7 +909,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   <select
                     value={draftVersion}
                     onChange={(e) => setDraftVersion(e.target.value as 'latest' | 'rewritten' | 'original')}
-                    className="font-mono text-sm border border-rule bg-paper rounded-sm px-2 py-1 text-ink focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="font-label text-sm bg-surface-container-low rounded-md px-3 py-2 text-on-surface focus:outline-none focus:ring-2 focus:ring-tertiary/50 focus:bg-surface-container-lowest transition-colors"
                   >
                     <option value="latest">Latest Version</option>
                     <option value="rewritten">Rewritten Draft</option>
@@ -1074,7 +1074,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               {!requestingPanel ? (
                 <Button
                   onClick={handleRequestPanelReview}
-                  className="bg-primary hover:bg-primary-700 rounded-sm"
+                  className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
                 >
                   <Users className="h-4 w-4 mr-2" />
                   Request Journalist Review
@@ -1095,7 +1095,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
           <div className="flex items-center gap-3">
             <Button
               onClick={handleRequestPanelReview}
-              className="bg-secondary hover:bg-secondary/90 rounded-sm"
+              className="bg-surface-container-highest text-on-surface hover:bg-surface-container-high rounded-md font-headline"
             >
               <Users className="h-4 w-4 mr-2" />
               Request New Review
@@ -1167,7 +1167,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                   {/* Key Themes */}
                   {release.panel_synthesis && (
-                    <div className="p-4 bg-paper border border-rule rounded-md">
+                    <div className="p-4 bg-surface-container-low rounded-md">
                       <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
                         <Sparkles className="h-4 w-4 text-secondary" />
                         Top Fixes
@@ -1183,7 +1183,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                   {/* Suggestions */}
                   {suggestions.length > 0 && (
-                    <div className="p-4 bg-paper border border-rule rounded-md">
+                    <div className="p-4 bg-surface-container-low rounded-md">
                       <h4 className="font-semibold text-ink flex items-center gap-2 mb-2 text-sm">
                         <Lightbulb className="h-4 w-4 text-secondary" />
                         Additional Fixes
@@ -1202,7 +1202,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                   {/* Toggle Detail View */}
                   <button
                     onClick={() => setShowPanelDetail(!showPanelDetail)}
-                    className="w-full flex items-center justify-between p-3 border border-rule rounded-md hover:bg-paper transition-colors text-sm"
+                    className="w-full flex items-center justify-between p-3 bg-surface-container-low rounded-md hover:bg-surface-container transition-colors text-sm"
                   >
                     <span className="font-semibold text-ink flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-primary" />
@@ -1230,7 +1230,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                 <div className="text-sm font-semibold text-ink">{fb.persona || `Reviewer ${i + 1}`}</div>
                                 <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-ink-muted">{fb.role || 'Journalist'}</div>
                               </div>
-                              <span className={`font-mono text-[11px] font-semibold px-3 py-1 rounded-sm ${fb.compelling ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
+                              <span className={`font-label text-[11px] font-semibold px-3 py-1 rounded-full tracking-wider uppercase ${fb.compelling ? 'bg-green-50 text-green-700' : 'bg-orange-50 text-orange-700'}`}>
                                 {fb.compelling ? 'PASS' : 'REVISE'}
                               </span>
                             </div>
@@ -1250,7 +1250,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
                               {/* Suggested Fix */}
                               {(fb as any).suggestion && (
-                                <div className="mt-2 p-3 bg-primary/5 border border-primary/20 rounded-sm">
+                                <div className="mt-2 p-4 bg-primary/5 rounded-md">
                                   <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-primary mb-1">Suggested Fix</div>
                                   <p className="text-sm text-ink leading-relaxed">{(fb as any).suggestion}</p>
                                 </div>
@@ -1262,7 +1262,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                   <div className="flex items-center gap-2">
                                     <button
                                       onClick={() => setReviewerVotes(prev => ({ ...prev, [i]: prev[i] === 'agree' ? undefined as any : 'agree' }))}
-                                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border transition-colors ${
+                                      className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider rounded-full transition-colors ${
                                         vote === 'agree'
                                           ? 'bg-green-50 border-green-300 text-green-700'
                                           : 'border-rule text-ink-muted hover:text-ink hover:bg-paper-light'
@@ -1273,7 +1273,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                     </button>
                                     <button
                                       onClick={() => setReviewerVotes(prev => ({ ...prev, [i]: prev[i] === 'disagree' ? undefined as any : 'disagree' }))}
-                                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border transition-colors ${
+                                      className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider rounded-full transition-colors ${
                                         vote === 'disagree'
                                           ? 'bg-orange-50 border-orange-300 text-orange-700'
                                           : 'border-rule text-ink-muted hover:text-ink hover:bg-paper-light'
@@ -1284,7 +1284,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                     </button>
                                     <button
                                       onClick={() => setShowReplyFor(showReplyFor === i ? null : i)}
-                                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-sm border border-rule text-ink-muted hover:text-ink hover:bg-paper-light transition-colors"
+                                      className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider rounded-full bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
                                     >
                                       <MessageSquare className="h-3 w-3" />
                                       Reply
@@ -1293,7 +1293,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                     {/* Apply button — shown when agreed or has a suggestion */}
                                     {vote === 'agree' && suggestion && (
                                       appliedSuggestion === i ? (
-                                        <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-sm ml-auto">
+                                        <span className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-green-700 bg-green-50 rounded-full ml-auto">
                                           <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
                                         </span>
                                       ) : (
@@ -1301,7 +1301,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                           size="sm"
                                           onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
                                           disabled={applyingSuggestion !== null}
-                                          className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3 ml-auto"
+                                          className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline text-xs h-7 px-3 ml-auto"
                                         >
                                           {applyingSuggestion === i ? (
                                             <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying...</>
@@ -1325,7 +1325,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                       />
                                       {suggestion && (
                                         appliedSuggestion === i ? (
-                                          <span className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-sm">
+                                          <span className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-green-700 bg-green-50 rounded-full">
                                             <CheckCircle className="h-3 w-3" /> Applied — review the updated draft above
                                           </span>
                                         ) : (
@@ -1333,7 +1333,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                             size="sm"
                                             onClick={() => handleApplySuggestion(suggestion, fb.persona, i)}
                                             disabled={applyingSuggestion !== null}
-                                            className="bg-primary hover:bg-primary-700 rounded-sm text-xs h-7 px-3"
+                                            className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline text-xs h-7 px-3"
                                           >
                                             {applyingSuggestion === i ? (
                                               <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Applying with your context...</>
@@ -1377,7 +1377,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                         <div>
                           <Button
                             onClick={handleRequestRewrite}
-                            className="bg-primary hover:bg-primary-700 rounded-sm"
+                            className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
                           >
                             <RefreshCw className="h-4 w-4 mr-2" />
                             Rewrite Based on Panel Feedback
@@ -1387,7 +1387,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                           </p>
                         </div>
                       ) : (
-                        <div className="space-y-3 p-4 bg-paper border border-rule rounded-md">
+                        <div className="space-y-3 p-4 bg-surface-container-low rounded-md">
                           <div className="flex items-center gap-3">
                             <Loader2 className="h-5 w-5 animate-spin text-primary" />
                             <span className="font-semibold text-ink">Rewriting your press release...</span>
@@ -1411,7 +1411,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                                 ) : i === rewriteProgress ? (
                                   <Loader2 className="h-4 w-4 animate-spin flex-shrink-0" />
                                 ) : (
-                                  <div className="w-4 h-4 rounded-full border border-rule flex-shrink-0" />
+                                  <div className="w-4 h-4 rounded-full bg-surface-container flex-shrink-0" />
                                 )}
                                 {step}
                               </div>
@@ -1446,7 +1446,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="bg-paper p-4 rounded-md border border-rule text-sm text-ink-muted space-y-2">
+              <div className="bg-surface-container-low p-4 rounded-md text-sm text-on-surface-variant space-y-2 font-editorial">
                 <p><strong className="text-ink">What to look for:</strong></p>
                 <ul className="list-disc ml-5 space-y-1">
                   <li>Are all company names, dates, and facts accurate?</li>

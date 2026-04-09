@@ -259,21 +259,21 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => copyAs('text')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-paper-light/70 hover:text-paper-light rounded-full bg-paper-light/5 hover:bg-paper-light/15 transition-colors"
               >
                 {copiedFormat === 'text' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
                 {copiedFormat === 'text' ? 'Copied' : 'Plain Text'}
               </button>
               <button
                 onClick={() => copyAs('markdown')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-paper-light/70 hover:text-paper-light rounded-full bg-paper-light/5 hover:bg-paper-light/15 transition-colors"
               >
                 {copiedFormat === 'markdown' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <FileText className="h-3.5 w-3.5" />}
                 {copiedFormat === 'markdown' ? 'Copied' : 'Markdown'}
               </button>
               <button
                 onClick={() => copyAs('html')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-paper-light/70 hover:text-paper-light rounded-full bg-paper-light/5 hover:bg-paper-light/15 transition-colors"
               >
                 {copiedFormat === 'html' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Code className="h-3.5 w-3.5" />}
                 {copiedFormat === 'html' ? 'Copied' : 'HTML'}
@@ -281,14 +281,14 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               <div className="w-px h-5 bg-paper-light/20 mx-1" />
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-paper-light/70 hover:text-paper-light rounded-full bg-paper-light/5 hover:bg-paper-light/15 transition-colors"
               >
                 <Printer className="h-3.5 w-3.5" />
                 Print
               </button>
               <button
                 onClick={handleEmail}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-paper-light/70 hover:text-paper-light border border-paper-light/20 rounded-sm hover:bg-paper-light/10 transition-colors"
+                className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-paper-light/70 hover:text-paper-light rounded-full bg-paper-light/5 hover:bg-paper-light/15 transition-colors"
               >
                 <Mail className="h-3.5 w-3.5" />
                 Email
@@ -351,7 +351,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
           {/* Newsroom Score */}
           {release.panel_individual_feedback && (release.panel_individual_feedback as any[]).length > 0 && (
-            <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+            <div className="no-print mt-12 rounded-xl overflow-hidden bg-surface-container-low">
               <div className="p-6 border-b border-rule bg-paper-light">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -396,7 +396,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           )}
 
           {/* Journalist Pitch Emails */}
-          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+          <div className="no-print mt-12 rounded-xl overflow-hidden bg-surface-container-low">
             <div className="p-6 border-b border-rule bg-paper-light">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -412,7 +412,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   <button
                     onClick={handleGeneratePitches}
                     disabled={generatingPitches}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ink-muted hover:text-ink border border-rule rounded-sm hover:bg-paper transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-on-surface-variant hover:text-on-surface rounded-full bg-surface-container hover:bg-surface-container-high transition-colors disabled:opacity-50"
                   >
                     {generatingPitches ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -440,7 +440,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   <Button
                     onClick={handleGeneratePitches}
                     disabled={generatingPitches}
-                    className="bg-primary hover:bg-primary-700 rounded-sm"
+                    className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
                   >
                     {generatingPitches ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
@@ -459,14 +459,14 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                     const bodyKey = `body-${index}`;
                     const mailtoHref = `mailto:?subject=${encodeURIComponent(pitch.subject)}&body=${encodeURIComponent(pitch.body)}`;
                     return (
-                      <div key={index} className="border border-rule rounded-sm bg-paper">
+                      <div key={index} className="rounded-xl bg-surface-container-lowest">
                         <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
                           <div>
                             <span className="font-display text-sm text-ink font-semibold">{pitch.reporterName}</span>
                             <span className="text-ink-muted text-sm"> &mdash; </span>
                             <span className="text-sm text-ink-muted">{pitch.outlet}</span>
                           </div>
-                          <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                          <span className="font-label text-[10px] tracking-[0.12em] uppercase text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
                             {pitch.beat}
                           </span>
                         </div>
@@ -512,7 +512,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                           <div className="pt-2 border-t border-rule">
                             <a
                               href={mailtoHref}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-primary-container hover:text-primary rounded-full bg-primary/5 hover:bg-primary/10 transition-colors"
                             >
                               <Send className="h-3 w-3" />
                               Send via Email
@@ -528,7 +528,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           </div>
 
           {/* Client / Stakeholder Announcement Email + LinkedIn Post */}
-          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+          <div className="no-print mt-12 rounded-xl overflow-hidden bg-surface-container-low">
             <div className="p-6 border-b border-rule bg-paper-light">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -544,7 +544,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   <button
                     onClick={handleGenerateAnnouncement}
                     disabled={generatingAnnouncement}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-ink-muted hover:text-ink border border-rule rounded-sm hover:bg-paper transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-on-surface-variant hover:text-on-surface rounded-full bg-surface-container hover:bg-surface-container-high transition-colors disabled:opacity-50"
                   >
                     {generatingAnnouncement ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -571,7 +571,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   <Button
                     onClick={handleGenerateAnnouncement}
                     disabled={generatingAnnouncement}
-                    className="bg-primary hover:bg-primary-700 rounded-sm"
+                    className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline"
                   >
                     {generatingAnnouncement ? (
                       <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Generating...</>
@@ -584,14 +584,14 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                 <div className="space-y-4">
                   {/* Client / Stakeholder Email */}
                   {release.announcement_content.clientEmail && (
-                    <div className="border border-rule rounded-sm bg-paper">
+                    <div className="rounded-xl bg-surface-container-lowest">
                       <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
                         <div>
                           <span className="font-display text-sm text-ink font-semibold">Stakeholder Announcement Email</span>
                           <span className="text-ink-muted text-sm"> &mdash; </span>
                           <span className="text-sm text-ink-muted">Clients, partners &amp; investors</span>
                         </div>
-                        <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                        <span className="font-label text-[10px] tracking-[0.12em] uppercase text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
                           email
                         </span>
                       </div>
@@ -631,7 +631,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                         <div className="pt-2 border-t border-rule">
                           <a
                             href={`mailto:?subject=${encodeURIComponent(release.announcement_content.clientEmail.subject)}&body=${encodeURIComponent(release.announcement_content.clientEmail.body)}`}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-primary-container hover:text-primary rounded-full bg-primary/5 hover:bg-primary/10 transition-colors"
                           >
                             <Mail className="h-3 w-3" />
                             Send via Email
@@ -643,14 +643,14 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
                   {/* LinkedIn Post */}
                   {release.announcement_content.linkedInPost && (
-                    <div className="border border-rule rounded-sm bg-paper">
+                    <div className="rounded-xl bg-surface-container-lowest">
                       <div className="px-4 py-3 border-b border-rule flex items-center justify-between">
                         <div>
                           <span className="font-display text-sm text-ink font-semibold">LinkedIn Post</span>
                           <span className="text-ink-muted text-sm"> &mdash; </span>
                           <span className="text-sm text-ink-muted">Share with your followers</span>
                         </div>
-                        <span className="font-mono text-[10px] tracking-[0.08em] uppercase text-ink-muted bg-paper-light border border-rule px-2 py-0.5 rounded-sm">
+                        <span className="font-label text-[10px] tracking-[0.12em] uppercase text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
                           linkedin
                         </span>
                       </div>
@@ -676,7 +676,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                             href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(release.company_website || '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-700 border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-label uppercase tracking-wider text-primary-container hover:text-primary rounded-full bg-primary/5 hover:bg-primary/10 transition-colors"
                           >
                             <Send className="h-3 w-3" />
                             Open LinkedIn
@@ -691,7 +691,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
           </div>
 
           {/* Publish CTA */}
-          <div className="no-print mt-12 border border-rule rounded-md overflow-hidden">
+          <div className="no-print mt-12 rounded-xl overflow-hidden bg-surface-container-low">
             <div className="bg-ink p-8 text-center">
               <h3 className="font-display text-3xl text-paper-light mb-3">Publish to the Media</h3>
               <p className="text-paper-light/70 mb-0 max-w-xl mx-auto">
@@ -733,7 +733,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                     <Button
                       onClick={() => setShowDisclaimer(true)}
                       variant="outline"
-                      className="border-rule text-ink-muted hover:text-ink rounded-sm"
+                      className="bg-surface-container-highest text-on-surface hover:bg-surface-container-high rounded-md font-headline"
                     >
                       <FileText className="h-4 w-4 mr-2" /> View Publication Authorization
                     </Button>
@@ -742,7 +742,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   <div>
                     <Button
                       onClick={() => setShowDisclaimer(true)}
-                      className="bg-primary hover:bg-primary-700 rounded-sm text-lg px-10 py-3"
+                      className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline font-bold text-lg px-10 py-3"
                       size="lg"
                     >
                       <Send className="h-5 w-5 mr-2" /> Publish to Media
@@ -761,7 +761,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
       {/* Publication Authorization Modal */}
       {showDisclaimer && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/60 backdrop-blur-sm no-print">
-          <div className="bg-paper-light border border-rule rounded-md max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-surface-container-lowest rounded-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto" style={{ boxShadow: '0 20px 40px rgba(26, 28, 25, 0.06)' }}>
             <div className="p-6 border-b border-rule">
               <h3 className="font-display text-xl text-ink">Publication Authorization</h3>
               <p className="text-sm text-ink-muted mt-1">Please review and sign before distribution.</p>
@@ -769,7 +769,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
 
             <div className="p-6 space-y-4">
               {/* Disclaimer text */}
-              <div className="bg-paper border border-rule rounded-md p-4 text-xs text-ink-muted leading-relaxed max-h-48 overflow-y-auto">
+              <div className="bg-surface-container-low rounded-md p-4 text-xs text-on-surface-variant leading-relaxed max-h-48 overflow-y-auto font-editorial">
                 <p className="font-semibold text-ink mb-2">Publication Agreement &amp; Indemnification</p>
                 <p className="mb-2">By authorizing this press release for publication, I represent and warrant that:</p>
                 <ol className="list-decimal ml-4 space-y-1">
@@ -790,7 +790,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   value={sigName}
                   onChange={(e) => setSigName(e.target.value)}
                   placeholder="Your full legal name (serves as digital signature)"
-                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                  className="w-full px-4 py-3 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 text-on-surface text-sm font-editorial transition-colors"
                 />
               </div>
               <div>
@@ -800,7 +800,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   value={sigEmail}
                   onChange={(e) => setSigEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                  className="w-full px-4 py-3 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 text-on-surface text-sm font-editorial transition-colors"
                 />
               </div>
               <div>
@@ -810,12 +810,12 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
                   value={sigPhone}
                   onChange={(e) => setSigPhone(e.target.value)}
                   placeholder="(555) 123-4567"
-                  className="w-full px-3 py-2 border border-rule rounded-sm bg-paper text-ink text-sm"
+                  className="w-full px-4 py-3 rounded-md bg-surface-container-low focus:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-tertiary/50 text-on-surface text-sm font-editorial transition-colors"
                 />
               </div>
 
               {/* Agreement checkbox */}
-              <label className="flex items-start gap-3 p-3 border border-rule rounded-sm bg-paper cursor-pointer">
+              <label className="flex items-start gap-3 p-3 rounded-md bg-surface-container-low cursor-pointer">
                 <input
                   type="checkbox"
                   checked={sigAgreed}
@@ -832,7 +832,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               <Button
                 onClick={handlePublishToMedia}
                 disabled={publishing || !sigAgreed || !sigName || !sigEmail || !sigPhone}
-                className="bg-primary hover:bg-primary-700 rounded-sm flex-1"
+                className="bg-gradient-to-r from-primary to-primary-container text-on-primary hover:opacity-90 rounded-full font-headline flex-1"
               >
                 {publishing ? (
                   <><div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" /> Submitting...</>
@@ -843,7 +843,7 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               <Button
                 variant="outline"
                 onClick={() => setShowDisclaimer(false)}
-                className="rounded-sm"
+                className="rounded-md"
               >
                 Cancel
               </Button>
