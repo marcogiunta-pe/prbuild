@@ -93,18 +93,32 @@ export default function LandingPage() {
               </a>
             ))}
             <Link
+              href="/login"
+              className="font-label text-sm tracking-wide uppercase text-on-surface-variant hover:text-primary-container transition-colors duration-300"
+            >
+              Log In
+            </Link>
+            <Link
               href="/start"
               className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-6 py-2 rounded-full font-headline font-bold text-sm hover:opacity-90 transition-all active:scale-95"
             >
               Get Started
             </Link>
           </div>
-          <Link
-            href="/start"
-            className="md:hidden bg-gradient-to-r from-primary to-primary-container text-on-primary px-4 py-2 rounded-full font-headline font-bold text-xs"
-          >
-            Start
-          </Link>
+          <div className="md:hidden flex items-center gap-3">
+            <Link
+              href="/login"
+              className="font-label text-xs tracking-wide uppercase text-on-surface-variant hover:text-primary-container"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/start"
+              className="bg-gradient-to-r from-primary to-primary-container text-on-primary px-4 py-2 rounded-full font-headline font-bold text-xs"
+            >
+              Start
+            </Link>
+          </div>
         </div>
       </nav>
 
