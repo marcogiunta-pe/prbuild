@@ -9,10 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
+        // Legacy (kept for existing pages until migrated)
         display: ['"Instrument Serif"', 'Georgia', 'serif'],
-        body: ['"DM Sans"', 'system-ui', 'sans-serif'],
+        body: ['"Inter"', '"DM Sans"', 'system-ui', 'sans-serif'],
         accent: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
+        // New "High-End Editorial" tri-font system (DESIGN.md)
+        headline: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        editorial: ['"Inter"', 'system-ui', 'sans-serif'],
+        label: ['"Space Grotesk"', '"JetBrains Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -20,8 +25,30 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // --- High-End Editorial tokens (DESIGN.md) ---
+        surface: {
+          DEFAULT: "#fafaf5",
+          bright: "#fafaf5",
+          dim: "#dadad5",
+        },
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#f4f4ef",
+        "surface-container": "#eeeee9",
+        "surface-container-high": "#e3e3de",
+        "surface-container-highest": "#e3e3de",
+        "on-surface": "#1a1c19",
+        "on-surface-variant": "#59413c",
+        "primary-container": "#c23b22",
+        "on-primary": "#ffffff",
+        tertiary: {
+          DEFAULT: "#5c20df",
+          container: "#7544f8",
+        },
+        "on-tertiary": "#ffffff",
+        "outline-variant": "#e1bfb8",
+        // --- Existing primary scale (updated: DEFAULT now #a0220b per DESIGN.md) ---
         primary: {
-          DEFAULT: "#C23B22",
+          DEFAULT: "#a0220b",
           foreground: "#FFFFFF",
           50: "#FEF2F0",
           100: "#FDE0DB",
