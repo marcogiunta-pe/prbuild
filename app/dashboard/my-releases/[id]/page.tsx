@@ -1121,6 +1121,13 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
             const percentage = Math.round((compellingCount / totalCount) * 100);
             const score = numScore.toFixed(1);
 
+            // Stale score detection: the draft has been edited after the panel reviewed it.
+            // Uses updated_at vs panel_reviewed_at with a 5-second buffer to ignore the
+            // same-transaction write that marked the panel review complete.
+            const panelTs = release.panel_reviewed_at ? new Date(release.panel_reviewed_at).getTime() : 0;
+            const updatedTs = release.updated_at ? new Date(release.updated_at).getTime() : 0;
+            const scoreOutdated = panelTs > 0 && updatedTs > panelTs + 5000;
+
             const suggestions = panelFeedback
               .filter(f => f.missing && f.missing.trim())
               .map(f => f.missing)
@@ -1128,6 +1135,17 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
 
             return (
               <Card className="border-rule bg-paper-light">
+                {scoreOutdated && (
+                  <div className="mx-6 mt-6 flex items-start gap-3 p-4 rounded-md bg-yellow-50 text-yellow-900">
+                    <AlertCircle className="h-5 w-5 shrink-0 mt-0.5 text-yellow-700" />
+                    <div className="flex-1">
+                      <p className="font-headline text-sm font-bold">Score may be outdated</p>
+                      <p className="font-editorial text-sm text-yellow-900/80 mt-1">
+                        The draft has been edited since this review ran. Click <span className="font-semibold">Request New Review</span> above to get a fresh score on the updated draft.
+                      </p>
+                    </div>
+                  </div>
+                )}
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
