@@ -74,6 +74,7 @@ export default function AccountPage() {
   const [formData, setFormData] = useState<ProfileData>(INITIAL_DATA);
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
   const [autoFilling, setAutoFilling] = useState(false);
+  const [autoFillDiff, setAutoFillDiff] = useState<Array<{ key: string; label: string; current: string; proposed: string; apply: boolean }> | null>(null);
 
   useEffect(() => {
     loadProfile();
@@ -150,14 +151,6 @@ export default function AccountPage() {
   const handleAutoFill = async () => {
     if (!formData.companyWebsite) return;
 
-    // Warn user that existing data will be overwritten
-    const hasData = formData.companyName || formData.companyAddress || formData.companyCity ||
-      formData.companyPhone || formData.companyBoilerplate || formData.companyVoiceStyle || formData.industry;
-
-    if (hasData && !confirm('This will replace all company information with data from the website. You can edit any field after. Continue?')) {
-      return;
-    }
-
     setAutoFilling(true);
     setError(null);
 
@@ -179,41 +172,73 @@ export default function AccountPage() {
 
       const data = await res.json();
 
-      setFormData(prev => {
-        const next = { ...prev };
-
-        // Override all fields with data from the website
-        if (data.companyName) next.companyName = data.companyName;
-        if (data.phone) next.companyPhone = data.phone;
-        if (data.address) next.companyAddress = data.address;
-        if (data.city) next.companyCity = data.city;
-        if (data.state) next.companyState = data.state;
-        if (data.zip) next.companyZip = data.zip;
-        if (data.country) next.companyCountry = data.country;
-        if (data.logoUrl) next.companyLogoUrl = data.logoUrl;
-        if (data.boilerplate) next.companyBoilerplate = data.boilerplate;
-        if (data.voiceStyle) next.companyVoiceStyle = data.voiceStyle;
-
-        // Handle industry mapping
-        if (data.industry) {
-          const isStandard = INDUSTRIES.some(i => i.value === data.industry?.toLowerCase());
-          if (isStandard) {
-            next.industry = data.industry.toLowerCase();
-            next.customIndustry = '';
-          } else {
-            next.industry = 'other';
-            next.customIndustry = data.industry;
-          }
+      // Build a field-by-field diff instead of overwriting everything. Only
+      // fields the website actually returned AND that differ from the current
+      // value show up, each individually applyable.
+      const fieldMap: Array<{ dataKey: string; formKey: string; label: string }> = [
+        { dataKey: 'companyName', formKey: 'companyName', label: 'Company name' },
+        { dataKey: 'phone', formKey: 'companyPhone', label: 'Company phone' },
+        { dataKey: 'address', formKey: 'companyAddress', label: 'Address' },
+        { dataKey: 'city', formKey: 'companyCity', label: 'City' },
+        { dataKey: 'state', formKey: 'companyState', label: 'State' },
+        { dataKey: 'zip', formKey: 'companyZip', label: 'ZIP' },
+        { dataKey: 'country', formKey: 'companyCountry', label: 'Country' },
+        { dataKey: 'logoUrl', formKey: 'companyLogoUrl', label: 'Logo URL' },
+        { dataKey: 'boilerplate', formKey: 'companyBoilerplate', label: 'Boilerplate' },
+        { dataKey: 'voiceStyle', formKey: 'companyVoiceStyle', label: 'Voice style' },
+      ];
+      const fd = formData as unknown as Record<string, unknown>;
+      const diff: Array<{ key: string; label: string; current: string; proposed: string; apply: boolean }> = [];
+      for (const f of fieldMap) {
+        const proposed = (data[f.dataKey] ?? '').toString().trim();
+        if (!proposed) continue;
+        const current = (fd[f.formKey] ?? '').toString();
+        if (proposed === current) continue;
+        diff.push({ key: f.formKey, label: f.label, current, proposed, apply: true });
+      }
+      if (data.industry) {
+        const proposed = data.industry.toString().trim();
+        const currentDisplay = formData.industry === 'other' ? formData.customIndustry : formData.industry;
+        if (proposed && proposed.toLowerCase() !== (currentDisplay || '').toLowerCase()) {
+          diff.push({ key: '__industry', label: 'Industry', current: currentDisplay || '', proposed, apply: true });
         }
+      }
 
-        return next;
-      });
+      setAutoFillDiff(diff);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to analyze website';
       setError(message);
     } finally {
       setAutoFilling(false);
     }
+  };
+
+  const toggleDiffField = (key: string) => {
+    setAutoFillDiff(prev => (prev ? prev.map(d => (d.key === key ? { ...d, apply: !d.apply } : d)) : prev));
+  };
+
+  const applyAutoFillDiff = () => {
+    if (!autoFillDiff) return;
+    setFormData(prev => {
+      const next = { ...prev } as unknown as Record<string, unknown>;
+      for (const d of autoFillDiff) {
+        if (!d.apply) continue;
+        if (d.key === '__industry') {
+          const isStandard = INDUSTRIES.some(i => i.value === d.proposed.toLowerCase());
+          if (isStandard) {
+            next.industry = d.proposed.toLowerCase();
+            next.customIndustry = '';
+          } else {
+            next.industry = 'other';
+            next.customIndustry = d.proposed;
+          }
+        } else {
+          next[d.key] = d.proposed;
+        }
+      }
+      return next as unknown as typeof prev;
+    });
+    setAutoFillDiff(null);
   };
 
   const handleSave = async () => {
@@ -540,6 +565,45 @@ export default function AccountPage() {
                   </>
                 )}
               </Button>
+
+              {autoFillDiff && (
+                <div className="mt-3 rounded-md border border-rule bg-paper-dark/20 p-4 space-y-3">
+                  {autoFillDiff.length === 0 ? (
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-ink-muted">No new information found on the website.</p>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => setAutoFillDiff(null)}>Dismiss</Button>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm font-medium text-ink">Review changes from the website — uncheck anything you want to keep.</p>
+                      <div className="space-y-2">
+                        {autoFillDiff.map(d => (
+                          <label key={d.key} className="flex items-start gap-3 text-sm cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={d.apply}
+                              onChange={() => toggleDiffField(d.key)}
+                              className="mt-1 flex-shrink-0"
+                            />
+                            <span className="flex-1 min-w-0">
+                              <span className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">{d.label}</span>
+                              <span className="block break-words">
+                                <span className="text-ink-muted line-through">{d.current || '(empty)'}</span>
+                                <span className="text-ink-muted"> → </span>
+                                <span className="text-ink">{d.proposed}</span>
+                              </span>
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button type="button" size="sm" onClick={applyAutoFillDiff} className="rounded-sm">Apply selected</Button>
+                        <Button type="button" variant="outline" size="sm" onClick={() => setAutoFillDiff(null)} className="rounded-sm">Cancel</Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Company Name */}
