@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
-import { rateLimit, getRateLimitKey } from '@/lib/rate-limit';
+import { rateLimitDurable, getRateLimitKey } from '@/lib/rate-limit';
 
 /** Public: submit a request for free access. Creates a pending invite; admin must approve before they can set password. */
 export async function POST(request: NextRequest) {
   try {
     const ip = getRateLimitKey(request);
-    const { success, retryAfter } = rateLimit(`invite-request:${ip}`, { maxRequests: 3, windowMs: 60 * 60 * 1000 });
+    const { success, retryAfter } = await rateLimitDurable(`invite-request:${ip}`, { maxRequests: 3, windowMs: 60 * 60 * 1000 });
     if (!success) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },

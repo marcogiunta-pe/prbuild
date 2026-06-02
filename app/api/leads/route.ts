@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { sendLeadWelcomeEmail } from '@/lib/email';
-import { rateLimit, getRateLimitKey } from '@/lib/rate-limit';
+import { rateLimitDurable, getRateLimitKey } from '@/lib/rate-limit';
 import { requireAdmin } from '@/lib/auth';
 
 const VALID_SOURCES = ['quiz', 'checklist', 'teardown_signup'];
@@ -36,7 +36,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const ip = getRateLimitKey(request);
-    const { success, retryAfter } = rateLimit(`leads:${ip}`, { maxRequests: 5, windowMs: 60 * 60 * 1000 });
+    const { success, retryAfter } = await rateLimitDurable(`leads:${ip}`, { maxRequests: 5, windowMs: 60 * 60 * 1000 });
     if (!success) {
       return NextResponse.json(
         { error: 'Too many requests. Please try again later.' },

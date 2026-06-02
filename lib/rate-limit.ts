@@ -1,4 +1,5 @@
 // lib/rate-limit.ts
+import { createAdminClient } from '@/lib/supabase/server';
 
 interface RateLimitEntry {
   count: number;
@@ -53,6 +54,38 @@ export function rateLimit(
     success: false,
     retryAfter: Math.ceil((entry.resetAt - now) / 1000),
   };
+}
+
+/**
+ * Durable, cross-instance rate limiter backed by the Postgres check_rate_limit
+ * RPC. Use this on serverless — unlike the in-memory rateLimit() above, the
+ * count is shared across all instances and survives cold starts.
+ *
+ * Fail-safe: if the DB call errors (RPC missing, network blip), fall back to
+ * the in-memory limiter so a backend hiccup degrades protection rather than
+ * either locking everyone out or removing the limit entirely.
+ */
+export async function rateLimitDurable(
+  key: string,
+  { maxRequests, windowMs }: { maxRequests: number; windowMs: number }
+): Promise<{ success: boolean; retryAfter?: number }> {
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin.rpc('check_rate_limit', {
+      p_key: key,
+      p_max: maxRequests,
+      p_window_seconds: Math.max(1, Math.ceil(windowMs / 1000)),
+    });
+    if (error) throw error;
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) throw new Error('check_rate_limit returned no row');
+    return row.allowed
+      ? { success: true }
+      : { success: false, retryAfter: row.retry_after ?? Math.ceil(windowMs / 1000) };
+  } catch {
+    // Degrade to per-instance in-memory limiting rather than fail open.
+    return rateLimit(key, { maxRequests, windowMs });
+  }
 }
 
 /** Extract a client identifier from the request for rate limiting. */
