@@ -1,5 +1,6 @@
 // app/api/releases/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 
 // GET - Get a single release
@@ -77,14 +78,18 @@ export async function PATCH(
 
     const body = await request.json();
     
-    // Whitelist allowed fields to prevent mass assignment
+    // Whitelist allowed fields to prevent mass assignment. The client may only
+    // edit its own non-privileged fields here. Status transitions and content
+    // promotion go through the guarded subroutes (feedback / approve /
+    // rewrite-decision / select-headline). Leaving status, admin_refined_content,
+    // or pending_rewrite_content in the client list would let an owner bypass
+    // those guards entirely now that the write uses the service-role client.
     const clientAllowedFields = [
       'client_feedback', 'client_feedback_at', 'client_edited_content',
-      'status', // only for client_feedback, client_approved
-      'admin_refined_content', 'pending_rewrite_content', // when accepting/rejecting rewrite
     ] as const;
     const adminAllowedFields = [
       ...clientAllowedFields,
+      'status', 'admin_refined_content', 'pending_rewrite_content',
       'admin_notes', 'admin_reviewed_by', 'admin_reviewed_at',
       'ai_selected_headline', 'category', 'tags', 'industry',
       'quality_score', 'quality_notes', 'quality_reviewed_by', 'quality_reviewed_at',
@@ -101,7 +106,11 @@ export async function PATCH(
       }
     }
 
-    const { data: updated, error } = await supabase
+    // Ownership/role and field whitelist are already enforced above; use the
+    // service-role client so the write succeeds after the client RLS policies
+    // are dropped.
+    const admin = createAdminClient();
+    const { data: updated, error } = await admin
       .from('release_requests')
       .update({
         ...updates,

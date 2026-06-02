@@ -180,17 +180,27 @@ export default function AdminRequestDetailPage({ params }: { params: { id: strin
   const handleUpdateStatus = async (newStatus: ReleaseStatus) => {
     if (!release) return;
     setActionLoading(newStatus);
-    
-    const supabase = createClient();
-    const updates: any = { status: newStatus };
-    
+
+    // Publishing must go through the canonical publish route so the showcase
+    // entry, activity log, and status change happen together. Writing
+    // status='published' directly would create a "published" row with no
+    // public showcase page.
     if (newStatus === 'published') {
-      updates.published_at = new Date().toISOString();
+      const res = await fetch(`/api/releases/${release.id}/publish`, { method: 'POST' });
+      if (res.ok) {
+        await loadRelease();
+      } else {
+        const { error } = await res.json().catch(() => ({ error: 'Failed to publish' }));
+        alert(error || 'Failed to publish release');
+      }
+      setActionLoading(null);
+      return;
     }
-    
+
+    const supabase = createClient();
     const { error } = await supabase
       .from('release_requests')
-      .update(updates)
+      .update({ status: newStatus })
       .eq('id', release.id);
 
     if (!error) {

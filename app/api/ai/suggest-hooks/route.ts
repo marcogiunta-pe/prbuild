@@ -2,6 +2,8 @@ import 'openai/shims/web';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -15,6 +17,21 @@ const RequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { success, retryAfter } = rateLimit(`ai-suggest-hooks:${auth.user.id}`, {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const parsed = RequestSchema.safeParse(body);
     if (!parsed.success) {

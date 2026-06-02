@@ -7,6 +7,7 @@ import { PanelFeedback } from '@/types';
 import { getRewritePrompts } from '@/lib/prompts';
 import { requireAuth } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/server';
+import { EDITABLE_STATES } from '@/lib/release-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -59,6 +60,15 @@ export async function POST(request: NextRequest) {
       
     if (profile?.role !== 'admin' && release.client_id !== user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Block rewriting an already-approved/published/finalized release —
+    // otherwise an owner could reopen and clobber a later-stage row.
+    if (!EDITABLE_STATES.includes(release.status)) {
+      return NextResponse.json(
+        { error: `Cannot rewrite a release in status "${release.status}"` },
+        { status: 409 }
+      );
     }
 
     // Need draft and panel feedback

@@ -156,19 +156,19 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const handleApprove = async () => {
     if (!release) return;
     setSubmittingReview(true);
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        status: 'client_approved',
-        final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
-        final_approved_at: new Date().toISOString(),
-      })
-      .eq('id', release.id);
-    if (!error) {
+    const res = await fetch(`/api/releases/${release.id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    if (res.ok) {
       // Re-fetch so the page updates from "Your Review Needed" to "Approved"
+      const supabase = createClient();
       const { data } = await supabase.from('release_requests').select('*').eq('id', release.id).single();
       if (data) setRelease(data as ReleaseRequest);
+    } else {
+      const { error } = await res.json().catch(() => ({ error: 'Failed to approve' }));
+      alert(error || 'Failed to approve');
     }
     setSubmittingReview(false);
   };
@@ -176,18 +176,17 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const handleSubmitFeedback = async () => {
     if (!feedback.trim() || !release) return;
     setSubmittingReview(true);
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        client_feedback: feedback,
-        client_feedback_at: new Date().toISOString(),
-        status: 'client_feedback',
-      })
-      .eq('id', release.id);
-    if (!error) {
+    const res = await fetch(`/api/releases/${release.id}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedback }),
+    });
+    if (res.ok) {
       alert("Thank you for your feedback! We'll revise the draft and email you when it's ready.");
       router.push(`/dashboard/my-releases/${release.id}`);
+    } else {
+      const { error } = await res.json().catch(() => ({ error: 'Failed to submit feedback' }));
+      alert(error || 'Failed to submit feedback');
     }
     setSubmittingReview(false);
   };
@@ -204,16 +203,11 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const handlePublishToMedia = async () => {
     if (!sigAgreed || !sigName || !sigEmail || !sigPhone) return;
     setPublishing(true);
-    const supabase = createClient();
-    await supabase
-      .from('release_requests')
-      .update({
-        status: 'client_approved',
-        final_content: cleaned,
-        final_approved_at: new Date().toISOString(),
-        admin_notes: `[${new Date().toISOString()}] Publication authorized by: ${sigName} (${sigEmail}, ${sigPhone}). Digital signature on file.`,
-      })
-      .eq('id', release.id);
+    await fetch(`/api/releases/${release.id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ signature: { name: sigName, email: sigEmail, phone: sigPhone } }),
+    });
     setPublishing(false);
     setShowDisclaimer(false);
     router.push(`/dashboard/my-releases/${release.id}`);

@@ -2,6 +2,9 @@ import 'openai/shims/web';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
+import { requireAuth } from '@/lib/auth';
+import { rateLimit } from '@/lib/rate-limit';
+import { assertPublicHttpUrl } from '@/lib/safe-fetch';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -13,6 +16,21 @@ const RequestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireAuth();
+    if (!auth) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { success, retryAfter } = rateLimit(`ai-boilerplate:${auth.user.id}`, {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
+
     const body = await request.json().catch(() => ({}));
     const parsed = RequestSchema.safeParse(body);
     if (!parsed.success) {
@@ -20,10 +38,18 @@ export async function POST(request: NextRequest) {
     }
     const { companyName, companyWebsite } = parsed.data;
 
+    // SSRF guard: reject internal/private targets before any server-side fetch.
+    let safeUrl: URL;
+    try {
+      safeUrl = await assertPublicHttpUrl(companyWebsite);
+    } catch (e: any) {
+      return NextResponse.json({ error: e?.message || 'Invalid website URL' }, { status: 400 });
+    }
+
     // Fetch the company website to get content
     let siteContent = '';
     try {
-      const res = await globalThis.fetch(companyWebsite, {
+      const res = await globalThis.fetch(safeUrl.toString(), {
         signal: AbortSignal.timeout(8000),
         headers: { 'User-Agent': 'PRBuild/1.0 (boilerplate generator)' },
       });

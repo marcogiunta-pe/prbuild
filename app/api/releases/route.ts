@@ -1,6 +1,6 @@
 // app/api/releases/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { requireAuth } from '@/lib/auth';
 
 // GET - List releases for current user
@@ -49,11 +49,28 @@ export async function POST(request: NextRequest) {
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { user, supabase } = auth;
+    const { user } = auth;
+    const admin = createAdminClient();
 
     const body = await request.json();
 
-    const { data: release, error } = await supabase
+    // Authoritative entitlement check. The client cannot supply amount_paid,
+    // stripe_payment_id, status, or client_id — all are set server-side.
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('role, subscription_status, free_releases_remaining')
+      .eq('id', user.id)
+      .single();
+
+    if (!profile) {
+      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+    }
+
+    const isAdmin = profile.role === 'admin';
+    const hasActiveSubscription = profile.subscription_status === 'active';
+    const mustSpendCredit = !isAdmin && !hasActiveSubscription;
+
+    const { data: release, error } = await admin
       .from('release_requests')
       .insert({
         client_id: user.id,
@@ -74,9 +91,12 @@ export async function POST(request: NextRequest) {
         visuals_description: body.visualsDescription,
         desired_cta: body.desiredCta,
         industry: body.industry,
+        supporting_context: body.supportingContext,
         plan: body.plan,
-        amount_paid: body.amountPaid,
-        stripe_payment_id: body.stripePaymentId,
+        // Billing is enforced server-side. During beta all releases are free;
+        // never trust a client-supplied amount or Stripe id.
+        amount_paid: 0,
+        stripe_payment_id: null,
         status: 'submitted',
       })
       .select()
@@ -87,8 +107,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create release' }, { status: 500 });
     }
 
+    // Atomically spend one free credit. Roll back the insert if none remain so
+    // an out-of-credit user can never leave a row behind.
+    if (mustSpendCredit) {
+      const { data: remaining, error: spendErr } = await admin.rpc('spend_free_release', {
+        p_user: user.id,
+      });
+      if (spendErr || remaining === -2) {
+        await admin.from('release_requests').delete().eq('id', release.id);
+        return NextResponse.json(
+          { error: 'No releases remaining. Please upgrade your plan.' },
+          { status: 402 }
+        );
+      }
+    }
+
     // Log activity
-    await supabase.from('activity_log').insert({
+    await admin.from('activity_log').insert({
       release_request_id: release.id,
       user_id: user.id,
       action: 'release_submitted',

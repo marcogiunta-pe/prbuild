@@ -10,7 +10,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const PROFILE_COLUMNS = 'company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role, media_contact_name, media_contact_title, media_contact_email, media_contact_phone, company_boilerplate, industry';
+  const PROFILE_COLUMNS = 'company_name, company_website, full_name, email, is_free_user, free_releases_remaining, role, media_contact_name, media_contact_title, media_contact_email, media_contact_phone, company_boilerplate, industry, subscription_status, current_plan, billing_interval';
 
   let profile: Record<string, unknown> | null = null;
 

@@ -399,13 +399,13 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     if (!confirm('Are you sure you want to delete this release? This cannot be undone.')) return;
 
     setDeleting(true);
-    const supabase = createClient();
-    const { error } = await supabase
-      .from('release_requests')
-      .delete()
-      .eq('id', release.id);
+    const res = await fetch('/api/releases/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ releaseId: release.id }),
+    });
 
-    if (!error) {
+    if (res.ok) {
       router.push('/dashboard/my-releases');
     } else {
       alert('Failed to delete release.');
@@ -431,21 +431,20 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     if (!feedback.trim() || !release) return;
     
     setSubmitting(true);
-    const supabase = createClient();
-    
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        client_feedback: feedback,
-        client_feedback_at: new Date().toISOString(),
-        status: 'client_feedback',
-      })
-      .eq('id', release.id);
 
-    if (!error) {
+    const res = await fetch(`/api/releases/${release.id}/feedback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ feedback }),
+    });
+
+    if (res.ok) {
       alert("Thank you for your feedback! We'll revise the draft and email you when it's ready.");
       await loadRelease();
       setFeedback('');
+    } else {
+      const { error } = await res.json().catch(() => ({ error: 'Failed to submit feedback' }));
+      alert(error || 'Failed to submit feedback');
     }
     setSubmitting(false);
   };
@@ -454,22 +453,21 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     if (!release) return;
 
     setSubmitting(true);
-    const supabase = createClient();
 
-    // Client approves — goes to client_approved (admin must publish)
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        status: 'client_approved',
-        final_content: release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '',
-        final_approved_at: new Date().toISOString(),
-      })
-      .eq('id', release.id);
+    // Client approves — goes to client_approved (admin must publish).
+    // final_content is computed server-side from stored content.
+    const res = await fetch(`/api/releases/${release.id}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
 
-    if (!error) {
+    if (res.ok) {
       router.push(`/dashboard/my-releases/${release.id}/preview`);
       return;
     }
+    const { error } = await res.json().catch(() => ({ error: 'Failed to approve' }));
+    alert(error || 'Failed to approve');
     setSubmitting(false);
   };
 
@@ -523,17 +521,14 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     if (!release) return;
     
     setSubmitting(true);
-    const supabase = createClient();
-    
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        admin_refined_content: release.pending_rewrite_content,
-        pending_rewrite_content: null,
-      })
-      .eq('id', release.id);
 
-    if (!error) {
+    const res = await fetch(`/api/releases/${release.id}/rewrite-decision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision: 'accept' }),
+    });
+
+    if (res.ok) {
       await loadRelease();
     }
     setSubmitting(false);
@@ -543,16 +538,14 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     if (!release) return;
     
     setSubmitting(true);
-    const supabase = createClient();
-    
-    const { error } = await supabase
-      .from('release_requests')
-      .update({
-        pending_rewrite_content: null,
-      })
-      .eq('id', release.id);
 
-    if (!error) {
+    const res = await fetch(`/api/releases/${release.id}/rewrite-decision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ decision: 'reject' }),
+    });
+
+    if (res.ok) {
       await loadRelease();
     }
     setSubmitting(false);
@@ -645,10 +638,7 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     try {
       const response = await fetch('/api/process-release', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ releaseRequestId: release.id }),
       });
       clearInterval(interval);
@@ -709,12 +699,11 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
     }, 3500);
 
     try {
-      const response = await fetch('/api/process-release', {
+      // Panel re-score only — re-critiques the existing draft without
+      // regenerating it (process-release would clobber accepted edits).
+      const response = await fetch('/api/ai/panel-critique', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ releaseRequestId: release.id }),
       });
       clearInterval(interval);
@@ -877,11 +866,11 @@ export default function ReleaseDetailPage({ params }: { params: { id: string } }
                 <button
                   key={i}
                   onClick={async () => {
-                    const supabase = createClient();
-                    await supabase
-                      .from('release_requests')
-                      .update({ ai_selected_headline: headline })
-                      .eq('id', release.id);
+                    await fetch(`/api/releases/${release.id}/select-headline`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ headline }),
+                    });
                     await loadRelease();
                   }}
                   className="w-full text-left p-4 rounded-md bg-surface-container-lowest hover:bg-primary/5 transition-colors"
