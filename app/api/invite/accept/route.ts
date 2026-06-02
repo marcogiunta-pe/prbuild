@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
         .select('id, email, free_releases_remaining')
         .eq('token', token)
         .is('used_at', null)
+        .not('approved_at', 'is', null)
         .single();
       if (!error && data) {
         const inviteEmail = (data.email as string).trim().toLowerCase();
@@ -37,6 +38,7 @@ export async function POST(request: NextRequest) {
         .select('id, email, free_releases_remaining')
         .eq('email', userEmail)
         .is('used_at', null)
+        .not('approved_at', 'is', null)
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -47,7 +49,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    const { error: updateProfileError } = await supabase
+    const { error: updateProfileError } = await admin
       .from('profiles')
       .update({
         is_free_user: true,
