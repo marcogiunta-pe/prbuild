@@ -8,7 +8,7 @@ import {
   parsePanelCritiqueResponse,
 } from '@/lib/prompts/panel-critique';
 import { getPanelCritiquePrompts } from '@/lib/prompts';
-import { requireAdmin } from '@/lib/auth';
+import { guardRelease, EDITABLE_STATES } from '@/lib/release-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -28,12 +28,6 @@ function getOpenAIClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const auth = await requireAdmin();
-    if (!auth) {
-      return NextResponse.json({ error: 'Admin only' }, { status: 403 });
-    }
-    const { user, supabase } = auth;
-
     const body = await request.json().catch(() => ({}));
     const parsed_body = RequestSchema.safeParse(body);
     if (!parsed_body.success) {
@@ -41,15 +35,22 @@ export async function POST(request: NextRequest) {
     }
     const { releaseRequestId } = parsed_body.data;
 
-    // Fetch the release request
-    const { data: release, error } = await supabase
-      .from('release_requests')
-      .select('*')
-      .eq('id', releaseRequestId)
-      .single();
+    // Owner or admin. Panel re-critique only re-scores the existing draft — it
+    // never regenerates content — so it is safe to expose to the release owner.
+    const guard = await guardRelease(releaseRequestId);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
+    }
+    const { admin: supabase, user, release } = guard;
 
-    if (error || !release) {
-      return NextResponse.json({ error: 'Release not found' }, { status: 404 });
+    // Block re-scoring a release that is already approved/published/finalized —
+    // an owner could otherwise roll it backward to 'panel_reviewed' and re-run
+    // the (paid) critique repeatedly.
+    if (!EDITABLE_STATES.includes(release.status)) {
+      return NextResponse.json(
+        { error: `Cannot re-score a release in status "${release.status}"` },
+        { status: 409 }
+      );
     }
 
     // Need to have a draft first

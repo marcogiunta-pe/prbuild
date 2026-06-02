@@ -11,7 +11,7 @@ import {
   buildIndustryPanelPrompt,
   parsePanelCritiqueResponse,
 } from '@/lib/prompts/panel-critique';
-import { createAdminClient } from '@/lib/supabase/server';
+import { guardRelease } from '@/lib/release-auth';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -31,12 +31,6 @@ function getOpenAIClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    // API key check
-    const apiKey = request.headers.get('x-api-key');
-    if (!apiKey || apiKey !== process.env.PROCESS_API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const body = await request.json().catch(() => ({}));
     const parsed_body = RequestSchema.safeParse(body);
     if (!parsed_body.success) {
@@ -44,18 +38,41 @@ export async function POST(request: NextRequest) {
     }
     const { releaseRequestId } = parsed_body.data;
 
-    // Use admin client (service role) to bypass RLS
-    const supabase = createAdminClient();
+    // Authenticated owner (or admin) only. Replaces the former public
+    // NEXT_PUBLIC_PROCESS_API_KEY header, which let anyone run the OpenAI
+    // pipeline on any release id (cost-bomb + draft clobber).
+    const guard = await guardRelease(releaseRequestId);
+    if (!guard.ok) {
+      return NextResponse.json({ error: guard.error }, { status: guard.status });
+    }
+    const { admin: supabase, release } = guard;
 
-    // Fetch the release request
-    const { data: release, error } = await supabase
+    // Idempotency: only the initial run is allowed. Re-running on an
+    // already-drafted release regenerates the draft from intake and clobbers
+    // accepted edits, so block anything past 'submitted'. Panel re-scoring on an
+    // existing draft goes through /api/ai/panel-critique instead.
+    if (release.status !== 'submitted') {
+      return NextResponse.json(
+        { error: `Release already processed (status: ${release.status})` },
+        { status: 409 }
+      );
+    }
+
+    // Atomic claim: flip submitted -> draft_generated only while still
+    // 'submitted'. Two concurrent runs both pass the in-memory check above;
+    // this conditional update lets exactly one win and prevents double-spending
+    // the OpenAI pipeline. A 0-row result means another run already claimed it.
+    // (On draft failure the catch below resets status to 'submitted', so a
+    // genuinely failed run stays retryable.)
+    const { data: claimed } = await supabase
       .from('release_requests')
-      .select('*')
+      .update({ status: 'draft_generated', updated_at: new Date().toISOString() })
       .eq('id', releaseRequestId)
-      .single();
-
-    if (error || !release) {
-      return NextResponse.json({ error: 'Release not found' }, { status: 404 });
+      .eq('status', 'submitted')
+      .select('id')
+      .maybeSingle();
+    if (!claimed) {
+      return NextResponse.json({ error: 'Release is already being processed' }, { status: 409 });
     }
 
     // -------------------------------------------------------

@@ -181,54 +181,42 @@ export default function NewRequestPage() {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const amountPaid = 0; // All releases are free during beta
-      const stripePaymentId = isFreeRelease ? null : undefined;
-
-      const { data, error: insertError } = await supabase
-        .from('release_requests')
-        .insert({
-          client_id: userId,
-          company_name: formData.companyName,
-          company_website: formData.companyWebsite,
-          announcement_type: formData.announcementType,
-          news_hook: formData.newsHook,
-          dateline_city: formData.datelineCity,
-          release_date: formData.releaseDate,
-          core_facts: formData.coreFacts.filter(f => f.trim()),
-          quote_sources: formData.quoteSources.filter(q => q.name.trim()),
+      // Create the release through the server route. The route enforces
+      // entitlement, spends a free credit atomically, and ignores any
+      // client-supplied payment fields — none of that is trusted from here.
+      const res = await fetch('/api/releases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          companyName: formData.companyName,
+          companyWebsite: formData.companyWebsite,
+          announcementType: formData.announcementType,
+          newsHook: formData.newsHook,
+          datelineCity: formData.datelineCity,
+          releaseDate: formData.releaseDate,
+          coreFacts: formData.coreFacts.filter(f => f.trim()),
+          quoteSources: formData.quoteSources.filter(q => q.name.trim()),
           boilerplate: formData.boilerplate || null,
-          company_facts: formData.companyFacts || null,
-          media_contact_name: formData.mediaContactName,
-          media_contact_title: formData.mediaContactTitle || null,
-          media_contact_email: formData.mediaContactEmail,
-          media_contact_phone: formData.mediaContactPhone || null,
-          visuals_description: formData.visualsDescription || null,
-          desired_cta: formData.desiredCta,
+          companyFacts: formData.companyFacts || null,
+          mediaContactName: formData.mediaContactName,
+          mediaContactTitle: formData.mediaContactTitle || null,
+          mediaContactEmail: formData.mediaContactEmail,
+          mediaContactPhone: formData.mediaContactPhone || null,
+          visualsDescription: formData.visualsDescription || null,
+          desiredCta: formData.desiredCta,
           industry: formData.industry || null,
-          supporting_context: formData.supportingContext || null,
+          supportingContext: formData.supportingContext || null,
           plan: formData.plan,
-          amount_paid: amountPaid,
-          stripe_payment_id: stripePaymentId,
-          status: 'submitted',
-        })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
-
-      // Decrement credits (skip for unlimited = -1, skip for admins)
-      if (freeReleasesRemaining > 0 && userRole !== 'admin') {
-        await fetch('/api/releases/decrement-credits', { method: 'POST' });
-      }
+        }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.error || 'Failed to submit request');
+      const data = result.release;
 
       // Fire-and-forget: kick off automated draft + panel review pipeline
       fetch('/api/process-release', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_PROCESS_API_KEY || '',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ releaseRequestId: data.id }),
       }).catch((err) => {
         console.error('Failed to trigger process-release pipeline:', err);
