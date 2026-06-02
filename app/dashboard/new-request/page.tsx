@@ -39,6 +39,7 @@ export default function NewRequestPage() {
   const [isFreeRelease, setIsFreeRelease] = useState(false);
   const [noCredits, setNoCredits] = useState(false);
   const [userRole, setUserRole] = useState<string>('client');
+  const [subscriptionActive, setSubscriptionActive] = useState(false);
   const [releasesUsed, setReleasesUsed] = useState(0);
   const [generatingBoilerplate, setGeneratingBoilerplate] = useState(false);
   const [showCustomIndustry, setShowCustomIndustry] = useState(false);
@@ -106,6 +107,7 @@ export default function NewRequestPage() {
         setUserRole(profile.role || 'client');
         setIsFreeUser(isFree);
         setFreeReleasesRemaining(remaining);
+        setSubscriptionActive(hasActiveSubscription);
 
         // Determine if user has credits
         const hasCredits = isAdmin || hasActiveSubscription || (isFree && (remaining > 0 || remaining === -1));
@@ -319,6 +321,20 @@ export default function NewRequestPage() {
           <HelpTip text="Fill out each section and we'll write your release. Average time: 5 minutes." />
         </div>
         <p className="text-gray-600 mt-1">Tell us about your announcement and we'll create a professional press release.</p>
+      </div>
+
+      {/* Entitlement banner — show exactly what the user is allowed before they fill the form */}
+      <div className="mb-6 p-3 rounded-lg border border-secondary/20 bg-secondary/5 flex items-center gap-2 text-sm text-gray-700">
+        <Check className="h-4 w-4 text-secondary flex-shrink-0" />
+        <span>
+          {userRole === 'admin'
+            ? 'Admin account — unlimited releases.'
+            : subscriptionActive
+              ? 'Subscription active — this release is included in your plan.'
+              : freeReleasesRemaining === -1
+                ? 'Unlimited free releases on your account.'
+                : `${freeReleasesRemaining} free release${freeReleasesRemaining === 1 ? '' : 's'} remaining${freeReleasesRemaining > 0 ? ' — this one is on us.' : '.'}`}
+        </span>
       </div>
 
       {/* Progress Steps */}
