@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
-import { rateLimit } from '@/lib/rate-limit';
+import { rateLimitDurable } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const { success, retryAfter } = rateLimit(`ai-suggest-hooks:${auth.user.id}`, {
+    const { success, retryAfter } = await rateLimitDurable(`ai-suggest-hooks:${auth.user.id}`, {
       maxRequests: 15,
       windowMs: 60 * 1000,
     });
