@@ -34,7 +34,7 @@ export function OnboardingChecklist({
   const prevCompletedCount = useRef<number | null>(null);
 
   const items: ChecklistItem[] = [
-    { label: 'Complete your profile', href: '/dashboard/account', complete: hasCompanyName },
+    { label: 'Add your company name', href: '/dashboard/account', complete: hasCompanyName },
     { label: 'Submit your first release', href: '/dashboard/new-request', complete: releaseCount > 0 },
     { label: 'Review your draft', href: '/dashboard/my-releases', complete: hasReviewedRelease },
   ];

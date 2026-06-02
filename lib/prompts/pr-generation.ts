@@ -8,7 +8,7 @@ Required output format and content (produce all items listed):
 3) Dateline: CITY, STATE/COUNTRY — Month Day, Year.
 4) Lead paragraph (1 concise paragraph answering who, what, where, when, why, how).
 5) Body (2–3 short paragraphs) expanding the "what" and "why," including one or two key statistics or details from the provided facts. Keep sentences short and every sentence meaningful.
-6) Quotes: include 1–2 attributed quotes (name — title). Use provided quotes verbatim if given; otherwise create realistic, relevant quotes and mark them as "Suggested quote" if asked to review later.
+6) Quotes: include 1–2 attributed quotes (name — title). Use provided quotes verbatim if given. If NO quote source is provided, do NOT invent a real-sounding name or job title — attribute the quote to bracketed placeholders exactly like "[Spokesperson Name], [Title]" and prefix it with "Suggested quote — replace before publishing:". A generic invented title (e.g. "Sales Manager") that reads as real is not acceptable.
 7) Boilerplate: one paragraph (50–75 words) about the company.
 8) Media contact block: name, title, phone, email, website.
 9) Call to Action (1 clear, specific next step and link or contact).
@@ -78,7 +78,7 @@ export function buildPRGenerationUserPrompt(data: PRGenerationInput): string {
             `- ${q.name}, ${q.title}${q.quote ? `: "${q.quote}"` : ' (please create suggested quote)'}`
         )
         .join('\n')
-    : 'No quotes provided - please create 1-2 suggested quotes and label them as such.';
+    : 'No quote sources provided. Create 1-2 suggested quotes. Attribute each to bracketed placeholders exactly like "[Spokesperson Name], [Title]" — do NOT invent a real-sounding name or job title — and prefix each with "Suggested quote — replace before publishing:".';
 
   return `Please produce a press release based on the following announcement details:
 

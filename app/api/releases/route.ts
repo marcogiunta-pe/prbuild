@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
     // stripe_payment_id, status, or client_id — all are set server-side.
     const { data: profile } = await admin
       .from('profiles')
-      .select('role, subscription_status, free_releases_remaining')
+      .select('role, subscription_status, free_releases_remaining, company_name')
       .eq('id', user.id)
       .single();
 
@@ -120,6 +120,16 @@ export async function POST(request: NextRequest) {
           { status: 402 }
         );
       }
+    }
+
+    // Backfill the profile company name from this release if the profile has
+    // none yet, so the onboarding "Add your company name" step reflects reality
+    // instead of staying unchecked after the user typed it on the release form.
+    if (!profile.company_name && body.companyName) {
+      await admin
+        .from('profiles')
+        .update({ company_name: body.companyName })
+        .eq('id', user.id);
     }
 
     // Log activity
