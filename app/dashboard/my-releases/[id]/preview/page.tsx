@@ -127,6 +127,17 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
   const rawContent = release.client_edited_content || release.admin_refined_content || release.ai_draft_content || '';
   const cleaned = cleanContent(rawContent);
 
+  // Version context for the approval box — make it obvious WHICH draft is being approved.
+  const contentSource = release.client_edited_content
+    ? 'your edited version'
+    : release.admin_refined_content
+      ? 'our refined draft'
+      : 'the original AI draft';
+  const generatedAt = release.ai_generated_at
+    ? new Date(release.ai_generated_at).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+    : null;
+  const hasPendingRewrite = !!release.pending_rewrite_content;
+
   // Extract headline: prefer ai_selected_headline, then try to extract from content, then fall back to news_hook
   const headline = release.ai_selected_headline
     || extractHeadlineFromContent(rawContent)
@@ -349,6 +360,15 @@ export default function ReleasePreviewPage({ params }: { params: { id: string } 
               <p className="font-editorial text-sm text-on-surface-variant mb-4">
                 Read through the press release below. If it&apos;s ready, approve it to send to our publication queue. Otherwise, send revision notes and we&apos;ll rewrite it.
               </p>
+              <p className="font-editorial text-xs text-on-surface-variant mb-4">
+                You are approving <strong>{contentSource}</strong>{generatedAt ? <> (draft generated {generatedAt})</> : null}.
+              </p>
+              {hasPendingRewrite && (
+                <div className="mb-4 p-3 rounded-lg border border-amber-300 bg-amber-50 flex items-start gap-2 text-sm text-amber-900">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                  <span>A rewrite is still pending review. Approving now publishes the draft shown above — not the pending rewrite. Go back and accept or reject the rewrite first if you want it included.</span>
+                </div>
+              )}
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={handleApprove}
