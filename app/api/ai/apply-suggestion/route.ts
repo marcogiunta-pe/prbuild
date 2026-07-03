@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
+import { rateLimitDurable } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -11,7 +12,7 @@ export const maxDuration = 60;
 
 const RequestSchema = z.object({
   releaseRequestId: z.string().uuid(),
-  suggestion: z.string().min(1, 'Suggestion is required'),
+  suggestion: z.string().min(1, 'Suggestion is required').max(5000, 'Suggestion is too long'),
   persona: z.string().optional(),
 });
 
@@ -31,6 +32,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const { user, supabase } = auth;
+    const { success, retryAfter } = await rateLimitDurable(`ai-apply-suggestion:${user.id}`, {
+      maxRequests: 15,
+      windowMs: 60 * 1000,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
 
     const body = await request.json().catch(() => ({}));
     const parsed = RequestSchema.safeParse(body);

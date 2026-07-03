@@ -9,6 +9,7 @@ import {
 } from '@/lib/prompts/panel-critique';
 import { getPanelCritiquePrompts } from '@/lib/prompts';
 import { guardRelease, EDITABLE_STATES } from '@/lib/release-auth';
+import { rateLimitDurable } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -42,6 +43,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: guard.error }, { status: guard.status });
     }
     const { admin: supabase, user, release } = guard;
+
+    const { success, retryAfter } = await rateLimitDurable(`ai-panel-critique:${user.id}`, {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
+    }
 
     // Block re-scoring a release that is already approved/published/finalized —
     // an owner could otherwise roll it backward to 'panel_reviewed' and re-run

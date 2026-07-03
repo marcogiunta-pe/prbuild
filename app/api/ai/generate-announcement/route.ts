@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { requireAuth } from '@/lib/auth';
+import { rateLimitDurable } from '@/lib/rate-limit';
 import { createAdminClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
@@ -27,6 +28,16 @@ export async function POST(request: NextRequest) {
     const auth = await requireAuth();
     if (!auth) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { success, retryAfter } = await rateLimitDurable(`ai-announcement:${auth.user.id}`, {
+      maxRequests: 10,
+      windowMs: 60 * 1000,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      );
     }
 
     const body = await request.json().catch(() => ({}));
@@ -78,6 +89,7 @@ Generate the client announcement email and LinkedIn post.`,
       ],
       temperature: 0.7,
       max_tokens: 2000,
+      response_format: { type: 'json_object' },
     });
 
     const aiResponse = completion.choices[0].message.content || '{}';
@@ -96,13 +108,18 @@ Generate the client announcement email and LinkedIn post.`,
 
     // Save to the release record
     const adminSupabase = createAdminClient();
-    await adminSupabase
+    const { error: saveError } = await adminSupabase
       .from('release_requests')
       .update({
         announcement_content: result,
         updated_at: new Date().toISOString(),
       })
       .eq('id', releaseRequestId);
+
+    if (saveError) {
+      console.error('Failed to save announcement:', saveError);
+      return NextResponse.json({ error: 'Failed to save announcement' }, { status: 500 });
+    }
 
     return NextResponse.json({ success: true, ...result });
   } catch (error) {

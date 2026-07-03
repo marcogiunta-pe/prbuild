@@ -105,12 +105,27 @@ Do NOT include any text before or after the JSON.`,
       ],
       temperature: 0.3,
       max_tokens: 500,
+      response_format: { type: 'json_object' },
     });
 
     const response = completion.choices[0].message.content || '{}';
-    // Parse JSON — handle potential markdown code block wrapping
+    // Parse JSON — handle potential markdown code block wrapping. A parse
+    // failure is the model's fault, not the caller's: return a clean 422, not a
+    // 500, so the client can retry the auto-fill.
     const jsonStr = response.replace(/^```json?\s*/i, '').replace(/\s*```$/i, '').trim();
-    const data = JSON.parse(jsonStr);
+    let data: Record<string, any>;
+    try {
+      data = JSON.parse(jsonStr);
+    } catch {
+      console.error('Failed to parse company-info response:', response);
+      return NextResponse.json({ error: 'Could not read company info. Please try again.' }, { status: 422 });
+    }
+
+    // The model controls every field. Drop a logoUrl that isn't a plain http(s)
+    // URL so a `javascript:`/`data:` value can't reach the browser form.
+    if (typeof data.logoUrl === 'string' && !/^https?:\/\//i.test(data.logoUrl)) {
+      data.logoUrl = null;
+    }
 
     return NextResponse.json(data);
   } catch (error: any) {
