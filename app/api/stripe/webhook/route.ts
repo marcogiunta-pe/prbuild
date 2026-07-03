@@ -43,13 +43,33 @@ export async function POST(request: NextRequest) {
           .upsert({
             stripe_session_id: session.id,
             customer_email: customerEmail,
-            amount_cents: session.amount_total ?? 4900,
+            // Record the amount actually collected. Never fabricate a price:
+            // a 100%-off promo or currency edge case can legitimately yield null.
+            amount_cents: session.amount_total ?? 0,
             status: 'paid',
           }, { onConflict: 'stripe_session_id' });
 
         if (kitError) {
           console.error('Failed to persist kit purchase:', kitError);
           return NextResponse.json({ error: 'DB write failed' }, { status: 500 });
+        }
+
+        // Link to an existing account immediately (case-insensitive). The
+        // profiles AFTER-INSERT trigger only covers buyers who sign up *after*
+        // purchasing; existing users (and the signup/webhook race) need this.
+        if (customerEmail) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .ilike('email', customerEmail)
+            .maybeSingle();
+          if (profile) {
+            await supabase
+              .from('kit_purchases')
+              .update({ user_id: profile.id, updated_at: new Date().toISOString() })
+              .eq('stripe_session_id', session.id)
+              .is('user_id', null);
+          }
         }
 
         console.log(`Kit purchase recorded: ${session.id}`);
@@ -78,10 +98,17 @@ export async function POST(request: NextRequest) {
         }
         updateData.subscription_status = 'active';
 
-        await supabase
+        const { error: subError } = await supabase
           .from('profiles')
           .update(updateData)
           .eq('id', userId);
+
+        // Surface the failure to Stripe (500) so it retries. Swallowing it
+        // leaves a paying customer with no active subscription and no retry.
+        if (subError) {
+          console.error(`Failed to activate subscription for user ${userId}:`, subError);
+          return NextResponse.json({ error: 'DB write failed' }, { status: 500 });
+        }
 
         console.log(`Subscription started for user ${userId}, plan: ${plan}, interval: ${interval}`);
       }

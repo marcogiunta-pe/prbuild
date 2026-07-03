@@ -25,6 +25,16 @@ export async function POST(
       return NextResponse.json({ error: 'Release not found' }, { status: 404 });
     }
 
+    // Only publish content the client actually approved. Publishing from any
+    // earlier state would push an unreviewed/unapproved draft to the public
+    // showcase.
+    if (release.status !== 'client_approved' && release.status !== 'published') {
+      return NextResponse.json(
+        { error: `Cannot publish from status "${release.status}" — client approval required` },
+        { status: 409 }
+      );
+    }
+
     // Check if already published
     const { data: existingShowcase } = await supabase
       .from('showcase_releases')
@@ -36,8 +46,14 @@ export async function POST(
       return NextResponse.json({ error: 'Release already published' }, { status: 409 });
     }
 
-    // Create summary from content (first 200 chars)
-    const content = release.admin_refined_content || release.ai_draft_content || '';
+    // Publish the approved snapshot. `final_content` is what approve() stored
+    // as the authoritative, client-signed-off text; fall back only if absent.
+    const content =
+      release.final_content ||
+      release.client_edited_content ||
+      release.admin_refined_content ||
+      release.ai_draft_content ||
+      '';
     const summary = content.substring(0, 200).trim() + (content.length > 200 ? '...' : '');
 
     // Create showcase entry

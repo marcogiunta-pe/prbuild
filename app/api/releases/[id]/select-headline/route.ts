@@ -4,7 +4,7 @@
 // write arbitrary text into ai_selected_headline.
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { guardRelease } from '@/lib/release-auth';
+import { guardRelease, EDITABLE_STATES } from '@/lib/release-auth';
 
 const Schema = z.object({ headline: z.string().trim().min(1) });
 
@@ -23,6 +23,13 @@ export async function POST(
     return NextResponse.json({ error: guard.error }, { status: guard.status });
   }
   const { admin, release } = guard;
+
+  if (!EDITABLE_STATES.includes(release.status)) {
+    return NextResponse.json(
+      { error: `Cannot change headline in status "${release.status}"` },
+      { status: 409 }
+    );
+  }
 
   const options = Array.isArray(release.ai_headline_options)
     ? (release.ai_headline_options as string[])

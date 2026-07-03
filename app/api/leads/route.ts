@@ -56,24 +56,40 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    const unsubscribeToken = crypto.randomUUID();
-
-    const { error } = await supabase
+    // Don't blow away an existing lead's unsubscribe_token (that would break
+    // links already emailed to them) or overwrite stored name/company with null
+    // when this resubmit omits them. Update in place; only insert mints a token.
+    const { data: existing } = await supabase
       .from('email_leads')
-      .upsert(
-        {
-          email: body.email,
-          name: body.name || null,
-          company_name: body.companyName || null,
-          lead_source: body.leadSource,
-          quiz_score: body.quizScore ?? null,
-          quiz_answers: body.quizAnswers ?? null,
-          subscribed_teardown: true,
-          unsubscribe_token: unsubscribeToken,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'email' }
-      );
+      .select('id')
+      .eq('email', body.email)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      const updates: Record<string, any> = {
+        lead_source: body.leadSource,
+        subscribed_teardown: true,
+        updated_at: new Date().toISOString(),
+      };
+      if (body.name) updates.name = body.name;
+      if (body.companyName) updates.company_name = body.companyName;
+      if (body.quizScore != null) updates.quiz_score = body.quizScore;
+      if (body.quizAnswers != null) updates.quiz_answers = body.quizAnswers;
+      ({ error } = await supabase.from('email_leads').update(updates).eq('id', existing.id));
+    } else {
+      ({ error } = await supabase.from('email_leads').insert({
+        email: body.email,
+        name: body.name || null,
+        company_name: body.companyName || null,
+        lead_source: body.leadSource,
+        quiz_score: body.quizScore ?? null,
+        quiz_answers: body.quizAnswers ?? null,
+        subscribed_teardown: true,
+        unsubscribe_token: crypto.randomUUID(),
+        updated_at: new Date().toISOString(),
+      }));
+    }
 
     if (error) {
       console.error('Error saving email lead:', error);

@@ -19,6 +19,12 @@ export async function requireAuth(): Promise<AuthResult | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
+  // Middleware forces browser navigation to /change-password but returns early
+  // for /api/*, so enforce the reset here too — a temp-password user must not
+  // be able to drive API routes before setting a real password.
+  if ((user.user_metadata as Record<string, unknown> | undefined)?.force_password_reset === true) {
+    return null;
+  }
   return { user, supabase };
 }
 
@@ -32,6 +38,9 @@ export async function requireAdmin(): Promise<AdminAuthResult | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
+  if ((user.user_metadata as Record<string, unknown> | undefined)?.force_password_reset === true) {
+    return null;
+  }
 
   // Try regular client first
   const { data: profile } = await supabase

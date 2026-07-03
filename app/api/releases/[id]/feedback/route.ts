@@ -30,17 +30,24 @@ export async function POST(
     );
   }
 
-  const { error } = await admin
+  // Guard the UPDATE with the same status predicate to avoid clobbering a row
+  // a concurrent approve already advanced (read-then-write race).
+  const { data: updated, error } = await admin
     .from('release_requests')
     .update({
       client_feedback: parsed.data.feedback,
       client_feedback_at: new Date().toISOString(),
       status: 'client_feedback',
     })
-    .eq('id', params.id);
+    .eq('id', params.id)
+    .in('status', CLIENT_REVIEW_STATES)
+    .select('id');
 
   if (error) {
     return NextResponse.json({ error: `Failed to save feedback: ${error.message}` }, { status: 500 });
+  }
+  if (!updated || updated.length === 0) {
+    return NextResponse.json({ error: 'Release status changed — please reload' }, { status: 409 });
   }
 
   return NextResponse.json({ success: true });

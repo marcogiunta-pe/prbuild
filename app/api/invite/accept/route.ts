@@ -49,11 +49,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
+    // Add the invite's grant to the current balance rather than overwriting it.
+    // Overwriting let a user with multiple approved invites (or one who had
+    // already spent their credits) reset the counter back to the invite value
+    // by re-accepting. -1 means unlimited — leave it untouched.
+    const { data: current } = await admin
+      .from('profiles')
+      .select('free_releases_remaining')
+      .eq('id', user.id)
+      .single();
+
+    const existing = current?.free_releases_remaining ?? 0;
+    const newRemaining =
+      existing === -1 ? -1 : existing + invite.free_releases_remaining;
+
     const { error: updateProfileError } = await admin
       .from('profiles')
       .update({
         is_free_user: true,
-        free_releases_remaining: invite.free_releases_remaining,
+        free_releases_remaining: newRemaining,
       })
       .eq('id', user.id);
 

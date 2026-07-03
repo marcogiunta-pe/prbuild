@@ -156,12 +156,16 @@ export function parsePRDraftResponse(response: string): ParsedPRDraft {
   const subheadMatch = response.match(/Subhead[:\s]*([^\n]+)/i);
   const subhead = subheadMatch ? subheadMatch[1].trim() : '';
 
-  // Extract main content (everything between subhead and visuals/checklist)
-  const contentStart = response.indexOf('Dateline') !== -1 
-    ? response.indexOf('Dateline') 
+  // Extract main content (everything between subhead and visuals/checklist).
+  // If neither the "Dateline" marker nor a dateline-shaped match is found,
+  // indexOf/search return -1 — fall back to the whole response instead of
+  // slicing from -1 (which would yield just the final character).
+  const rawStart = response.indexOf('Dateline') !== -1
+    ? response.indexOf('Dateline')
     : response.search(/[A-Z]{2,}[,\s]+[A-Z]/);
+  const contentStart = rawStart === -1 ? 0 : rawStart;
   const contentEnd = response.search(/Visuals?\s*suggestions?/i);
-  const fullContent = contentEnd > contentStart 
+  const fullContent = contentEnd > contentStart
     ? response.slice(contentStart, contentEnd).trim()
     : response.slice(contentStart).trim();
 

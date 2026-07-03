@@ -42,9 +42,11 @@ export default async function AdminLayout({
     profile = data;
   }
 
-  // Only redirect when we have positive confirmation they're NOT admin.
-  // If profile is null (fetch failed), don't redirect - middleware already verified admin access.
-  if (profile && profile.role !== 'admin') {
+  // Fail closed: this layout is the authoritative admin gate (getUser() is
+  // verified and the profile is read via the service-role client, which
+  // reliably resolves the user's own row). Redirect unless admin is confirmed —
+  // a null/failed profile read must not grant access.
+  if (profile?.role !== 'admin') {
     redirect('/dashboard/my-releases');
   }
 

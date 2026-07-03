@@ -12,7 +12,11 @@
 -- auth.role() = 'service_role' and is allowed through unchanged.
 
 CREATE OR REPLACE FUNCTION public.protect_privileged_profile_columns()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   -- Server-side writes (service role) are trusted: webhooks, invite/accept,
   -- decrement-credits, admin grants all go through createAdminClient.
@@ -32,7 +36,7 @@ BEGIN
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 DROP TRIGGER IF EXISTS protect_privileged_profile_columns ON public.profiles;
 CREATE TRIGGER protect_privileged_profile_columns
