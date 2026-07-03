@@ -19,7 +19,11 @@
 --   returns -1 when the user has unlimited credits (nothing spent)
 --   returns -2 when there is no credit to spend
 CREATE OR REPLACE FUNCTION public.spend_free_release(p_user uuid)
-RETURNS integer AS $$
+RETURNS integer
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
   remaining integer;
   current_remaining integer;
@@ -42,7 +46,7 @@ BEGIN
 
   RETURN remaining;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Phase 2: drop the over-broad client write policies. Server routes use the
 -- service-role client, which bypasses RLS, so legit flows keep working.

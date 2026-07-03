@@ -24,7 +24,11 @@ CREATE OR REPLACE FUNCTION public.check_rate_limit(
   p_max INTEGER,
   p_window_seconds INTEGER
 )
-RETURNS TABLE(allowed BOOLEAN, retry_after INTEGER) AS $$
+RETURNS TABLE(allowed BOOLEAN, retry_after INTEGER)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 DECLARE
   now_ts    TIMESTAMPTZ := now();
   new_reset TIMESTAMPTZ := now() + make_interval(secs => p_window_seconds);
@@ -46,4 +50,4 @@ BEGIN
     RETURN QUERY SELECT true, 0;
   END IF;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
