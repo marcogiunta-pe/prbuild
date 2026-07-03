@@ -58,13 +58,20 @@ export async function POST(
     updates.admin_notes = release.admin_notes ? `${release.admin_notes}\n${stamp}` : stamp;
   }
 
-  const { error } = await admin
+  // Re-assert the status in the UPDATE itself so a concurrent approve/feedback
+  // that already moved the row can't be clobbered (read-then-write race).
+  const { data: updated, error } = await admin
     .from('release_requests')
     .update(updates)
-    .eq('id', params.id);
+    .eq('id', params.id)
+    .in('status', CLIENT_REVIEW_STATES)
+    .select('id');
 
   if (error) {
     return NextResponse.json({ error: `Failed to approve: ${error.message}` }, { status: 500 });
+  }
+  if (!updated || updated.length === 0) {
+    return NextResponse.json({ error: 'Release status changed — please reload' }, { status: 409 });
   }
 
   return NextResponse.json({ success: true });

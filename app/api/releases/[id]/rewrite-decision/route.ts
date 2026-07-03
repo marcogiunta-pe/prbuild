@@ -4,7 +4,7 @@
 // buffer. Replaces the former browser writes (handleAcceptRewrite / Reject).
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { guardRelease } from '@/lib/release-auth';
+import { guardRelease, EDITABLE_STATES } from '@/lib/release-auth';
 
 const Schema = z.object({ decision: z.enum(['accept', 'reject']) });
 
@@ -23,6 +23,13 @@ export async function POST(
     return NextResponse.json({ error: guard.error }, { status: guard.status });
   }
   const { admin, release } = guard;
+
+  if (!EDITABLE_STATES.includes(release.status)) {
+    return NextResponse.json(
+      { error: `Cannot change content in status "${release.status}"` },
+      { status: 409 }
+    );
+  }
 
   if (!release.pending_rewrite_content) {
     return NextResponse.json({ error: 'No pending rewrite to act on' }, { status: 409 });
